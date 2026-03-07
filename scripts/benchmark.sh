@@ -291,8 +291,8 @@ for profile in "${profiles_to_run[@]}"; do
 
     # Extract metrics
     if [ "$USE_H2LOAD" = "true" ]; then
-        # h2load: "time for request:" section, line after header: min max mean sd +/-sd
-        avg_lat=$(echo "$best_output" | awk '/time for request:/{getline; getline; print $3}')
+        # h2load: "time for request:  min  max  mean  sd  +/-sd" all on one line
+        avg_lat=$(echo "$best_output" | awk '/time for request:/{print $6}')
         p99_lat="$avg_lat"  # h2load doesn't report p99; use mean as placeholder
         reconnects="0"
     else
