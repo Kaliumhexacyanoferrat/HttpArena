@@ -28,4 +28,34 @@
   "pipeline": 1,
   "reconnects": 12207
 }
+,
+{
+  "framework": "quarkus-jvm",
+  "language": "Java",
+  "rps": 191709,
+  "avg_latency": "58.97ms",
+  "p99_latency": "110.00ms",
+  "cpu": "2017.1%",
+  "memory": "8.1GiB",
+  "connections": 32768,
+  "threads": 12,
+  "duration": "5s",
+  "pipeline": 1,
+  "reconnects": 9380
+}
+,
+{
+  "framework": "spring-jvm",
+  "language": "Java",
+  "rps": 164802,
+  "avg_latency": "69.50ms",
+  "p99_latency": "110.00ms",
+  "cpu": "2020.9%",
+  "memory": "4.0GiB",
+  "connections": 32768,
+  "threads": 12,
+  "duration": "5s",
+  "pipeline": 1,
+  "reconnects": 23028
+}
 ]

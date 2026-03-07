@@ -1,0 +1,10 @@
+{
+  "display_name": "quarkus-jvm",
+  "language": "Java",
+  "type": "realistic",
+  "engine": "Netty",
+  "description": "Quarkus with RESTEasy Reactive on Vert.x/Netty, JDK 21.",
+  "repo": "https://github.com/quarkusio/quarkus",
+  "enabled": true,
+  "tests": ["baseline", "pipelined", "limited-conn", "json", "baseline-h2"]
+}

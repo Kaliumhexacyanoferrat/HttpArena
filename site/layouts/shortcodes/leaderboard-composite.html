@@ -41,10 +41,11 @@ html.dark .composite-disclaimer { color: #fff !important; background: rgba(234,1
   </div>
 
   <div id="composite-table" class="lb" style="margin-top:1rem;">
-    <div class="lb-row lb-header" style="grid-template-columns: 2.5rem 10rem 4rem 4rem 3.5rem 1fr repeat({{ len $profiles }}, 7.5rem);">
+    <div class="lb-row lb-header" style="grid-template-columns: 2.5rem 10rem 4rem 4.5rem 4rem 3.5rem 1fr repeat({{ len $profiles }}, 7.5rem);">
       <div title="Rank by composite score">#</div>
       <div>Framework</div>
       <div>Lang</div>
+      <div title="HTTP server engine">Engine</div>
       <div>Type</div>
       <div style="font-weight:700; padding-left:0.5rem;" title="Composite score: geometric mean of normalized profile scores">Score</div>
       <div></div>
@@ -144,7 +145,7 @@ results.forEach(function(r, idx) {
   row.dataset.name = r.framework;
   row.dataset.lang = r.language;
   row.dataset.type = ftype;
-  row.style.gridTemplateColumns = '2.5rem 10rem 4rem 4rem 3.5rem 1fr repeat(' + profileCount + ', 7.5rem)';
+  row.style.gridTemplateColumns = '2.5rem 10rem 4rem 4.5rem 4rem 3.5rem 1fr repeat(' + profileCount + ', 7.5rem)';
   row.style.cursor = 'pointer';
 
   var rank = idx < 3 ? medals[idx] : String(idx + 1);
@@ -170,6 +171,7 @@ results.forEach(function(r, idx) {
     '<div class="lb-rank">' + rank + '</div>' +
     '<div class="lb-name">' + r.framework + '</div>' +
     '<div class="lb-lang">' + r.language + '</div>' +
+    '<div class="lb-lang">' + (fmeta.engine || '—') + '</div>' +
     '<div><span class="lb-pill lb-pill-' + ftype + '">' + ftype + '</span></div>' +
     '<div class="lb-rps" style="font-weight:700; text-align:left; padding-left:0.5rem;">' + r.composite.toFixed(1) + '</div>' +
     '<div class="lb-bar-cell"><div class="lb-bar ' + barClass + '" style="width:' + pct.toFixed(1) + '%;"></div></div>' +

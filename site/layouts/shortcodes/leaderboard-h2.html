@@ -69,6 +69,7 @@
         <div title="Rank by requests per second">#</div>
         <div title="HTTP server framework name">Framework</div>
         <div title="Programming language">Lang</div>
+        <div title="HTTP server engine">Engine</div>
         <div title="realistic = production-ready framework, stripped = custom bare-metal implementation">Type</div>
         <div title="Number of concurrent connections" style="text-align:right">Conn</div>
         <div class="lb-sortable" data-sort="rps" title="Requests per second — higher is better" style="text-align:right">Req/s</div>
@@ -91,6 +92,7 @@
       <div title="Rank by requests per second">#</div>
       <div title="HTTP server framework name">Framework</div>
       <div title="Programming language">Lang</div>
+      <div title="HTTP server engine">Engine</div>
       <div title="realistic = production-ready framework, stripped = custom bare-metal implementation">Type</div>
       <div title="Number of concurrent connections" style="text-align:right">Conn</div>
       <div class="lb-sortable" data-sort="rps" title="Requests per second — higher is better" style="text-align:right">Req/s</div>
@@ -111,6 +113,7 @@
       <div class="lb-rank">{{ if eq $j 0 }}🥇{{ else if eq $j 1 }}🥈{{ else if eq $j 2 }}🥉{{ else }}{{ add $j 1 }}{{ end }}</div>
       <div class="lb-name">{{ $r.framework }}</div>
       <div class="lb-lang">{{ $r.language | default "—" }}</div>
+      <div class="lb-lang">{{ with $meta }}{{ .engine | default "—" }}{{ else }}—{{ end }}</div>
       <div><span class="lb-pill lb-pill-{{ $ftype }}">{{ $ftype }}</span></div>
       <div class="lb-conns">{{ lang.FormatNumber 0 $r.connections }}</div>
       <div class="lb-rps">{{ lang.FormatNumber 0 $r.rps }}</div>

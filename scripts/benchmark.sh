@@ -36,6 +36,28 @@ PROFILE_FILTER="${2:-}"
 rebuild_site_data() {
     local site_data="$ROOT_DIR/site/data"
     mkdir -p "$site_data"
+
+    # Rebuild frameworks.json from individual meta.json files
+    local fw_json="$site_data/frameworks.json"
+    echo '{' > "$fw_json"
+    local fw_first=true
+    for fw_dir in "$ROOT_DIR"/frameworks/*/; do
+        [ -d "$fw_dir" ] || continue
+        local fw=$(basename "$fw_dir")
+        local meta="$fw_dir/meta.json"
+        [ -f "$meta" ] || continue
+        $fw_first || echo ',' >> "$fw_json"
+        local desc=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('description',''))" "$meta")
+        local repo=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('repo',''))" "$meta")
+        local ftype=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('type','realistic'))" "$meta")
+        local engine=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('engine',''))" "$meta")
+        printf '  "%s": {"description": "%s", "repo": "%s", "type": "%s", "engine": "%s"}' "$fw" "$desc" "$repo" "$ftype" "$engine" >> "$fw_json"
+        fw_first=false
+    done
+    echo '' >> "$fw_json"
+    echo '}' >> "$fw_json"
+    echo "[updated] site/data/frameworks.json"
+
     for profile_dir in "$RESULTS_DIR"/*/; do
         [ -d "$profile_dir" ] || continue
         local profile=$(basename "$profile_dir")
@@ -103,12 +125,20 @@ if [ -f "$META_FILE" ]; then
 fi
 
 cleanup() {
+    docker stop -t 5 "$CONTAINER_NAME" 2>/dev/null || true
     docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
 }
 trap cleanup EXIT
 
-# Stop any httparena containers
+# Clean slate: stop containers, restart Docker, drop caches
+docker ps -q --filter "name=httparena-" | xargs -r docker stop -t 5 2>/dev/null || true
 docker ps -aq --filter "name=httparena-" | xargs -r docker rm -f 2>/dev/null || true
+echo "[clean] Restarting Docker daemon..."
+sudo systemctl restart docker
+sleep 3
+echo "[clean] Dropping kernel caches..."
+sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' 2>/dev/null || true
+sync
 
 # Build once
 echo "=== Building: $FRAMEWORK ==="
@@ -147,22 +177,17 @@ for profile in "${profiles_to_run[@]}"; do
     echo "=============================================="
 
     # (Re)start container with profile-specific flags
+    docker stop -t 5 "$CONTAINER_NAME" 2>/dev/null || true
     docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
 
     docker_args=(-d --name "$CONTAINER_NAME" --network host
         --security-opt seccomp=unconfined
         --ulimit memlock=-1:-1
-        --ulimit nofile="$HARD_NOFILE:$HARD_NOFILE")
+        --ulimit nofile="$HARD_NOFILE:$HARD_NOFILE"
+        -v "$ROOT_DIR/data/dataset.json:/data/dataset.json:ro"
+        -v "$CERTS_DIR:/certs:ro")
     if [ -n "$cpu_limit" ]; then
         docker_args+=(--cpus="$cpu_limit")
-    fi
-    # Mount dataset for json profile
-    if [ "$endpoint" = "json" ]; then
-        docker_args+=(-v "$ROOT_DIR/data/dataset.json:/data/dataset.json:ro")
-    fi
-    # Mount TLS certs for h2 profile
-    if [ "$endpoint" = "h2" ]; then
-        docker_args+=(-v "$CERTS_DIR:/certs:ro")
     fi
     docker run "${docker_args[@]}" "$IMAGE_NAME"
 
@@ -303,6 +328,7 @@ EOF
     echo "[saved] site/static/logs/$profile/${CONNS}/${FRAMEWORK}.log"
 
     # Stop container before next connection count
+    docker stop -t 5 "$CONTAINER_NAME" 2>/dev/null || true
     docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
 
     done # CONNS loop

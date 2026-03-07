@@ -2,6 +2,7 @@
   "display_name": "ringzero",
   "language": "C",
   "type": "stripped",
+  "engine": "io_uring",
   "description": "Custom C HTTP server built on io_uring with a multi-reactor architecture. No epoll, no thread-per-connection.",
   "repo": "https://github.com/MDA2AV/ringzero",
   "enabled": true,

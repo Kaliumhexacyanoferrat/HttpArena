@@ -30,6 +30,21 @@
 }
 ,
 {
+  "framework": "quarkus-jvm",
+  "language": "Java",
+  "rps": 665614,
+  "avg_latency": "6.04ms",
+  "p99_latency": "31.80ms",
+  "cpu": "1981.4%",
+  "memory": "1.6GiB",
+  "connections": 4096,
+  "threads": 12,
+  "duration": "5s",
+  "pipeline": 1,
+  "reconnects": 331672
+}
+,
+{
   "framework": "ringzero",
   "language": "C",
   "rps": 1728959,
@@ -42,5 +57,20 @@
   "duration": "5s",
   "pipeline": 1,
   "reconnects": 864132
+}
+,
+{
+  "framework": "spring-jvm",
+  "language": "Java",
+  "rps": 447902,
+  "avg_latency": "7.86ms",
+  "p99_latency": "14.40ms",
+  "cpu": "1537.8%",
+  "memory": "1.9GiB",
+  "connections": 4096,
+  "threads": 12,
+  "duration": "5s",
+  "pipeline": 1,
+  "reconnects": 222563
 }
 ]

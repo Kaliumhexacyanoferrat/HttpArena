@@ -11,7 +11,7 @@ public class ServerHeaderFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        ((HttpServletResponse) response).setHeader("Server", "spring");
+        ((HttpServletResponse) response).setHeader("Server", "spring-jvm");
         chain.doFilter(request, response);
     }
 }
