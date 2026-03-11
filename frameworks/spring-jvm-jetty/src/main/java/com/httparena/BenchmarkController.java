@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,6 +22,8 @@ public class BenchmarkController {
     private final ObjectMapper mapper = new ObjectMapper();
     private List<Map<String, Object>> dataset;
     private byte[] largeJsonResponse;
+    private Connection dbConn;
+    private PreparedStatement dbStmt;
     private final Map<String, byte[]> staticFiles = new ConcurrentHashMap<>();
     private static final Map<String, String> MIME_TYPES = Map.of(
         ".css", "text/css", ".js", "application/javascript", ".html", "text/html",
@@ -44,6 +50,16 @@ public class BenchmarkController {
                 largeItems.add(processed);
             }
             largeJsonResponse = mapper.writeValueAsBytes(Map.of("items", largeItems, "count", largeItems.size()));
+        }
+        // Open SQLite database
+        File dbFile = new File("/data/benchmark.db");
+        if (dbFile.exists()) {
+            try {
+                dbConn = DriverManager.getConnection("jdbc:sqlite:file:/data/benchmark.db?mode=ro&immutable=1");
+                dbConn.createStatement().execute("PRAGMA mmap_size=268435456");
+                dbStmt = dbConn.prepareStatement(
+                    "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ? AND ? LIMIT 50");
+            } catch (Exception ignored) {}
         }
         File staticDir = new File("/data/static");
         if (staticDir.isDirectory()) {
@@ -89,6 +105,43 @@ public class BenchmarkController {
     @GetMapping(value = "/baseline2", produces = MediaType.TEXT_PLAIN_VALUE)
     public String baseline2(@RequestParam Map<String, String> params) {
         return String.valueOf(sumParams(params));
+    }
+
+    @GetMapping(value = "/db", produces = MediaType.APPLICATION_JSON_VALUE)
+    public org.springframework.http.ResponseEntity<byte[]> db(
+            @RequestParam(value = "min", defaultValue = "10") double minPrice,
+            @RequestParam(value = "max", defaultValue = "50") double maxPrice) {
+        if (dbStmt == null)
+            return org.springframework.http.ResponseEntity.status(500).build();
+        try {
+            List<Map<String, Object>> items;
+            synchronized (dbStmt) {
+                dbStmt.setDouble(1, minPrice);
+                dbStmt.setDouble(2, maxPrice);
+                ResultSet rs = dbStmt.executeQuery();
+                com.fasterxml.jackson.core.type.TypeReference<List<String>> listType = new com.fasterxml.jackson.core.type.TypeReference<>() {};
+                items = new ArrayList<>();
+                while (rs.next()) {
+                    List<String> tags = mapper.readValue(rs.getString(7), listType);
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    row.put("id", rs.getInt(1));
+                    row.put("name", rs.getString(2));
+                    row.put("category", rs.getString(3));
+                    row.put("price", rs.getDouble(4));
+                    row.put("quantity", rs.getInt(5));
+                    row.put("active", rs.getInt(6) == 1);
+                    row.put("tags", tags);
+                    row.put("rating", Map.of("score", rs.getDouble(8), "count", rs.getInt(9)));
+                    items.add(row);
+                }
+                rs.close();
+            }
+            return org.springframework.http.ResponseEntity.ok()
+                .header("Content-Type", "application/json")
+                .body(mapper.writeValueAsBytes(Map.of("items", items, "count", items.size())));
+        } catch (Exception e) {
+            return org.springframework.http.ResponseEntity.status(500).build();
+        }
     }
 
     @GetMapping(value = "/json", produces = MediaType.APPLICATION_JSON_VALUE)

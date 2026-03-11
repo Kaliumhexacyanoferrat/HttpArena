@@ -31,7 +31,7 @@ declare -A PROFILES=(
     [upload]="1|0||64,256,512|upload"
     [compression]="1|0||4096,16384|compression"
     [noisy]="1|0||512,4096,16384|noisy"
-    [mixed]="1|100||512,4096|mixed"
+    [mixed]="1|100||512,1024|mixed"
     [baseline-h2]="1|0||256,1024|h2"
     [static-h2]="1|0||256,1024|static-h2"
     [baseline-h3]="32|0||256,512|h3"
@@ -318,6 +318,7 @@ for profile in "${profiles_to_run[@]}"; do
         --ulimit nofile="$HARD_NOFILE:$HARD_NOFILE"
         -v "$ROOT_DIR/data/dataset.json:/data/dataset.json:ro"
         -v "$ROOT_DIR/data/dataset-large.json:/data/dataset-large.json:ro"
+        -v "$ROOT_DIR/data/benchmark.db:/data/benchmark.db:ro"
         -v "$ROOT_DIR/data/static:/data/static:ro"
         -v "$CERTS_DIR:/certs:ro")
     if [ -n "$cpu_limit" ]; then
@@ -398,7 +399,7 @@ for profile in "${profiles_to_run[@]}"; do
             -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline")
     elif [ "$endpoint" = "mixed" ]; then
         gc_args=("http://localhost:$PORT"
-            --raw "$REQUESTS_DIR/get.raw,$REQUESTS_DIR/get.raw,$REQUESTS_DIR/get.raw,$REQUESTS_DIR/post_cl.raw,$REQUESTS_DIR/post_cl.raw,$REQUESTS_DIR/json-get.raw,$REQUESTS_DIR/upload-small.raw,$REQUESTS_DIR/json-gzip.raw,$REQUESTS_DIR/json-gzip.raw"
+            --raw "$REQUESTS_DIR/get.raw,$REQUESTS_DIR/get.raw,$REQUESTS_DIR/get.raw,$REQUESTS_DIR/post_cl.raw,$REQUESTS_DIR/post_cl.raw,$REQUESTS_DIR/json-get.raw,$REQUESTS_DIR/db-get.raw,$REQUESTS_DIR/upload-small.raw,$REQUESTS_DIR/json-gzip.raw,$REQUESTS_DIR/json-gzip.raw"
             -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline")
     elif [ "$endpoint" = "noisy" ]; then
         gc_args=("http://localhost:$PORT"
@@ -522,6 +523,27 @@ for profile in "${profiles_to_run[@]}"; do
         status_5xx=$(echo "$best_output" | grep -oP '5xx=\K\d+' || echo "0")
     fi
 
+    # Parse per-template response counts (gcannon mixed/multi-template output)
+    tpl_json=""
+    if [ "$USE_H2LOAD" = "false" ] && [ "$USE_OHA" = "false" ]; then
+        tpl_line=$(echo "$best_output" | grep -oP 'Per-template: \K.*' || echo "")
+        if [ -n "$tpl_line" ] && [ "$endpoint" = "mixed" ]; then
+            # Mixed templates: get×3, post_cl×2, json-get×1, db-get×1, upload-small×1, json-gzip×2
+            IFS=',' read -ra tpl_counts <<< "$tpl_line"
+            t_baseline=$(( ${tpl_counts[0]:-0} + ${tpl_counts[1]:-0} + ${tpl_counts[2]:-0} + ${tpl_counts[3]:-0} + ${tpl_counts[4]:-0} ))
+            t_json=${tpl_counts[5]:-0}
+            t_db=${tpl_counts[6]:-0}
+            t_upload=${tpl_counts[7]:-0}
+            t_compression=$(( ${tpl_counts[8]:-0} + ${tpl_counts[9]:-0} ))
+            tpl_json=",
+  \"tpl_baseline\": $t_baseline,
+  \"tpl_json\": $t_json,
+  \"tpl_db\": $t_db,
+  \"tpl_upload\": $t_upload,
+  \"tpl_compression\": $t_compression"
+        fi
+    fi
+
     # Save results only with --save flag
     if [ "$SAVE_RESULTS" = "true" ]; then
         mkdir -p "$RESULTS_DIR/$profile/$CONNS"
@@ -543,7 +565,7 @@ for profile in "${profiles_to_run[@]}"; do
   "status_2xx": ${status_2xx:-0},
   "status_3xx": ${status_3xx:-0},
   "status_4xx": ${status_4xx:-0},
-  "status_5xx": ${status_5xx:-0}
+  "status_5xx": ${status_5xx:-0}${tpl_json}
 }
 EOF
         echo "[saved] results/$profile/${CONNS}/${FRAMEWORK}.json"

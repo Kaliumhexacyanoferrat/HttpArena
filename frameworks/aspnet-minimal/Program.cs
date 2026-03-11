@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Data.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
@@ -112,6 +113,50 @@ if (Directory.Exists(staticDir))
         staticFileMap[name] = (File.ReadAllBytes(file), ct);
     }
 }
+
+// Open SQLite database
+SqliteConnection? dbConn = null;
+var dbPath = "/data/benchmark.db";
+if (File.Exists(dbPath))
+{
+    dbConn = new SqliteConnection($"Data Source={dbPath};Mode=ReadOnly");
+    dbConn.Open();
+    using var pragma = dbConn.CreateCommand();
+    pragma.CommandText = "PRAGMA mmap_size=268435456";
+    pragma.ExecuteNonQuery();
+}
+
+app.MapGet("/db", (HttpRequest req) =>
+{
+    if (dbConn == null)
+        return Results.Problem("DB not available");
+    double min = 10, max = 50;
+    if (req.Query.ContainsKey("min") && double.TryParse(req.Query["min"], out double pmin))
+        min = pmin;
+    if (req.Query.ContainsKey("max") && double.TryParse(req.Query["max"], out double pmax))
+        max = pmax;
+    using var cmd = dbConn.CreateCommand();
+    cmd.CommandText = "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN @min AND @max LIMIT 50";
+    cmd.Parameters.AddWithValue("@min", min);
+    cmd.Parameters.AddWithValue("@max", max);
+    using var reader = cmd.ExecuteReader();
+    var items = new List<object>();
+    while (reader.Read())
+    {
+        items.Add(new
+        {
+            id = reader.GetInt32(0),
+            name = reader.GetString(1),
+            category = reader.GetString(2),
+            price = reader.GetDouble(3),
+            quantity = reader.GetInt32(4),
+            active = reader.GetInt32(5) == 1,
+            tags = JsonSerializer.Deserialize<List<string>>(reader.GetString(6)),
+            rating = new { score = reader.GetDouble(7), count = reader.GetInt32(8) },
+        });
+    }
+    return Results.Json(new { items, count = items.Count });
+});
 
 app.MapGet("/static/{filename}", (string filename) =>
 {

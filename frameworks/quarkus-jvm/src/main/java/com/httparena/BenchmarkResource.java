@@ -12,6 +12,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,6 +27,8 @@ public class BenchmarkResource {
     private final ObjectMapper mapper = new ObjectMapper();
     private List<Map<String, Object>> dataset;
     private byte[] largeJsonResponse;
+    private Connection dbConn;
+    private PreparedStatement dbStmt;
     private final Map<String, byte[]> staticFiles = new ConcurrentHashMap<>();
     private static final Map<String, String> MIME_TYPES = Map.ofEntries(
         Map.entry(".css", "text/css"),
@@ -54,6 +60,16 @@ public class BenchmarkResource {
                 largeItems.add(processed);
             }
             largeJsonResponse = mapper.writeValueAsBytes(Map.of("items", largeItems, "count", largeItems.size()));
+        }
+        // Open SQLite database
+        File dbFile = new File("/data/benchmark.db");
+        if (dbFile.exists()) {
+            try {
+                dbConn = DriverManager.getConnection("jdbc:sqlite:file:/data/benchmark.db?mode=ro&immutable=1");
+                dbConn.createStatement().execute("PRAGMA mmap_size=268435456");
+                dbStmt = dbConn.prepareStatement(
+                    "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ? AND ? LIMIT 50");
+            } catch (Exception ignored) {}
         }
         // Pre-load static files
         File staticDir = new File("/data/static");
@@ -119,6 +135,44 @@ public class BenchmarkResource {
     }
 
     @GET
+    @Path("/db")
+    @Produces(MediaType.APPLICATION_JSON)
+    public jakarta.ws.rs.core.Response db(@QueryParam("min") String minParam, @QueryParam("max") String maxParam) {
+        if (dbStmt == null)
+            return jakarta.ws.rs.core.Response.status(500).entity("DB not available").build();
+        double minPrice = 10.0, maxPrice = 50.0;
+        if (minParam != null) try { minPrice = Double.parseDouble(minParam); } catch (NumberFormatException ignored) {}
+        if (maxParam != null) try { maxPrice = Double.parseDouble(maxParam); } catch (NumberFormatException ignored) {}
+        try {
+            List<Map<String, Object>> items;
+            synchronized (dbStmt) {
+                dbStmt.setDouble(1, minPrice);
+                dbStmt.setDouble(2, maxPrice);
+                ResultSet rs = dbStmt.executeQuery();
+                items = new ArrayList<>();
+                while (rs.next()) {
+                    List<String> tags = mapper.readValue(rs.getString(7), new TypeReference<>() {});
+                    Map<String, Object> row = new LinkedHashMap<>();
+                    row.put("id", rs.getInt(1));
+                    row.put("name", rs.getString(2));
+                    row.put("category", rs.getString(3));
+                    row.put("price", rs.getDouble(4));
+                    row.put("quantity", rs.getInt(5));
+                    row.put("active", rs.getInt(6) == 1);
+                    row.put("tags", tags);
+                    row.put("rating", Map.of("score", rs.getDouble(8), "count", rs.getInt(9)));
+                    items.add(row);
+                }
+                rs.close();
+            }
+            return jakarta.ws.rs.core.Response.ok(mapper.writeValueAsBytes(Map.of("items", items, "count", items.size())))
+                .header("Content-Type", "application/json").build();
+        } catch (Exception e) {
+            return jakarta.ws.rs.core.Response.status(500).entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
     @Path("/json")
     @Produces(MediaType.APPLICATION_JSON)
     @NonBlocking
@@ -137,7 +191,6 @@ public class BenchmarkResource {
     @GET
     @Path("/compression")
     @Produces(MediaType.APPLICATION_JSON)
-    @NonBlocking
     public byte[] compression() {
         return largeJsonResponse;
     }

@@ -14,6 +14,7 @@
     "upload",
     "compression",
     "noisy",
+    "mixed",
     "baseline-h2",
     "static-h2"
   ]

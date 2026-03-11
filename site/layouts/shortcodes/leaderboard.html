@@ -342,6 +342,11 @@ html.dark .lb-status-tip { background: #1e293b; border-color: #334155; color: #c
 html.dark .lb-status-ok { color: #4ade80; }
 html.dark .lb-status-err { color: #f87171; }
 html.dark .lb-status-na { color: #64748b; }
+/* Mixed request-mix bar */
+.lb-mix-wrap { display:flex; height:100%; width:100%; border-radius:0; overflow:hidden; }
+.lb-mix-seg { height:100%; }
+.lb-mix-cell { position:relative; height:1.1rem; border-radius:0; overflow:hidden; }
+.lb-mix-header { min-width:5rem; }
 .lb-bar-1 { background: linear-gradient(90deg, #2563eb, #3b82f6); }
 .lb-bar-2 { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
 .lb-bar-3 { background: linear-gradient(90deg, #60a5fa, #93c5fd); }
@@ -418,6 +423,7 @@ html.dark .lb-filters-toggle:hover .lb-toggle-icon { color: #60a5fa; }
   (dict "id" "upload"       "label" "Upload (20 MB)"        "conns" (slice 64 256 512)     "desc" "Each request sends a 20 MB binary payload via <code>POST /upload</code>. The server reads the entire body and returns its CRC32 checksum. Measures request body ingestion throughput — how efficiently a framework handles large uploads, including buffering, memory management, and I/O handling under sustained load.")
   (dict "id" "compression" "label" "Compression"           "conns" (slice 4096 16384) "desc" "Requests <code>GET /compression</code> with <code>Accept-Encoding: gzip</code>. The server loads a 6000-item dataset (~1 MB JSON) at startup and serves it gzip-compressed on the fly. Measures the throughput cost of real-time compression — only frameworks with built-in gzip support are eligible.")
   (dict "id" "noisy"       "label" "Noisy"                 "conns" (slice 512 4096 16384) "desc" "Valid baseline requests interleaved with malformed noise — nonexistent paths, bad content-length, and raw binary. Only 2xx responses count. Measures resilience: how well a framework maintains throughput while rejecting garbage traffic.")
+  (dict "id" "mixed"        "label" "Mixed Workload"        "conns" (slice 512 1024) "desc" "A realistic mix of request types: 3 baseline GETs, 2 baseline POSTs, 1 JSON processing, 1 SQLite DB lookup, 1 file upload (1 MB), and 2 compression requests. Connections limited to 100 requests each. Measures overall framework performance under a diverse, real-world-like workload that exercises multiple code paths simultaneously.")
   (dict "id" "pipelined"    "label" "Pipelined (16)"        "conns" (slice 512 4096 16384) "desc" "16 HTTP requests are sent back-to-back on each connection before waiting for responses. Uses a lightweight <code>GET /pipeline</code> endpoint that returns a fixed response, isolating raw I/O and pipeline handling from application logic. Frameworks that batch pipelined requests from the read buffer gain a significant advantage.")
 }}
 
@@ -497,9 +503,9 @@ var lbProfiles = {{ $profiles | jsonify | safeJS }};
   <div class="lb-filters" style="margin:0 0 0 0;">
     <span class="lb-filters-label">Conn</span>
     <div class="lb-conn-tabs" data-for="{{ $p.id }}">
-      <div class="lb-conn-tab active" data-conns="best">Best</div>
+      {{ if not (or (eq $p.id "mixed") (eq $p.id "compression")) }}<div class="lb-conn-tab active" data-conns="best">Best</div>{{ end }}
     {{ range $ci, $c := $p.conns }}
-      <div class="lb-conn-tab" data-conns="{{ $c }}">{{ $c }}</div>
+      <div class="lb-conn-tab{{ if or (eq $p.id "mixed") (eq $p.id "compression") }}{{ if eq $ci 0 }} active{{ end }}{{ end }}" data-conns="{{ $c }}">{{ $c }}</div>
     {{ end }}
     </div>
   </div>
@@ -507,7 +513,7 @@ var lbProfiles = {{ $profiles | jsonify | safeJS }};
 
   {{ $isReconn := or (eq $p.id "limited-conn") (eq $p.id "noisy") }}
   {{ $isNoisy := eq $p.id "noisy" }}
-  <div class="lb-conn-panel active" data-profile="{{ $p.id }}" data-conns="best">
+  <div class="lb-conn-panel{{ if not (or (eq $p.id "mixed") (eq $p.id "compression")) }} active{{ end }}" data-profile="{{ $p.id }}" data-conns="best">
     <div class="lb">
       <div class="lb-row lb-header{{ if $isReconn }} lb-row-reconn{{ end }}{{ if $isNoisy }} lb-row-noisy{{ end }}">
         <div title="Rank by requests per second">#</div>
@@ -532,7 +538,7 @@ var lbProfiles = {{ $profiles | jsonify | safeJS }};
   {{ range $ci, $c := $p.conns }}
   {{ $key := printf "%s-%d" $p.id $c }}
   {{ $data := index site.Data $key }}
-  <div class="lb-conn-panel" data-profile="{{ $p.id }}" data-conns="{{ $c }}">
+  <div class="lb-conn-panel{{ if and (or (eq $p.id "mixed") (eq $p.id "compression")) (eq $ci 0) }} active{{ end }}" data-profile="{{ $p.id }}" data-conns="{{ $c }}">
   <div class="lb">
     <div class="lb-row lb-header{{ if $isReconn }} lb-row-reconn{{ end }}{{ if $isNoisy }} lb-row-noisy{{ end }}">
       <div title="Rank by requests per second">#</div>
@@ -559,7 +565,7 @@ var lbProfiles = {{ $profiles | jsonify | safeJS }};
     {{ $pct := mul (div (float $r.rps) (float $maxRps)) 100.0 }}
     {{ $meta := index site.Data.frameworks $r.framework }}
     {{ $s2xx := int ($r.status_2xx | default 0) }}{{ $s3xx := int ($r.status_3xx | default 0) }}{{ $s4xx := int ($r.status_4xx | default 0) }}{{ $s5xx := int ($r.status_5xx | default 0) }}{{ $errs := add $s4xx $s5xx }}
-    <div class="lb-row{{ if $isReconn }} lb-row-reconn{{ end }}{{ if $isNoisy }} lb-row-noisy{{ end }}" data-lang="{{ $r.language | default "" }}" data-name="{{ $r.framework }}" data-rps="{{ printf "%.0f" $r.rps }}" data-bandwidth="{{ $r.bandwidth | default "" }}" data-type="{{ with $meta }}{{ .type | default "realistic" }}{{ end }}" data-desc="{{ with $meta }}{{ .description }}{{ end }}" data-repo="{{ with $meta }}{{ .repo }}{{ end }}" data-s2xx="{{ $s2xx }}" data-s3xx="{{ $s3xx }}" data-s4xx="{{ $s4xx }}" data-s5xx="{{ $s5xx }}">
+    <div class="lb-row{{ if $isReconn }} lb-row-reconn{{ end }}{{ if $isNoisy }} lb-row-noisy{{ end }}" data-lang="{{ $r.language | default "" }}" data-name="{{ $r.framework }}" data-rps="{{ printf "%.0f" $r.rps }}" data-bandwidth="{{ $r.bandwidth | default "" }}" data-type="{{ with $meta }}{{ .type | default "realistic" }}{{ end }}" data-desc="{{ with $meta }}{{ .description }}{{ end }}" data-repo="{{ with $meta }}{{ .repo }}{{ end }}" data-s2xx="{{ $s2xx }}" data-s3xx="{{ $s3xx }}" data-s4xx="{{ $s4xx }}" data-s5xx="{{ $s5xx }}" {{ if $r.tpl_baseline }}data-tpl-baseline="{{ $r.tpl_baseline }}" data-tpl-json="{{ $r.tpl_json }}" data-tpl-db="{{ $r.tpl_db }}" data-tpl-upload="{{ $r.tpl_upload }}" data-tpl-compression="{{ $r.tpl_compression }}"{{ end }}>
       {{ $ftype := "realistic" }}{{ with $meta }}{{ $ftype = .type | default "realistic" }}{{ end }}
       <div class="lb-rank">{{ if eq $j 0 }}🥇{{ else if eq $j 1 }}🥈{{ else if eq $j 2 }}🥉{{ else }}{{ add $j 1 }}{{ end }}</div>
       <div class="lb-name">{{ $r.framework }}</div>
@@ -596,8 +602,9 @@ var barClasses = ['lb-bar-1', 'lb-bar-2', 'lb-bar-3', 'lb-bar-4', 'lb-bar-5'];
 /* Build "Best" panels — pick best RPS per framework across all conn counts */
 function buildBestPanels() {
   document.querySelectorAll('.lb-conn-panel[data-conns="best"]').forEach(function(bestPanel) {
-    /* Skip compression — handled by applyCompressionScores() */
+    /* Skip compression and mixed — handled by their own score functions */
     if (bestPanel.dataset.profile === 'compression') return;
+    if (bestPanel.dataset.profile === 'mixed') return;
 
     var parentPanel = bestPanel.closest('.lb-panel');
     var connPanels = parentPanel.querySelectorAll('.lb-conn-panel:not([data-conns="best"])');
@@ -620,13 +627,16 @@ function buildBestPanels() {
     entries.forEach(function(entry, idx) {
       var clone = entry.row.cloneNode(true);
       clone.dataset.rps = entry.rps;
+      clone.dataset.mixedDone = '';  /* allow applyMixedPanels to re-process clones */
       var rankEl = clone.querySelector('.lb-rank');
       rankEl.textContent = idx < 3 ? medals[idx] : String(idx + 1);
       var bar = clone.querySelector('.lb-bar');
-      barClasses.forEach(function(c) { bar.classList.remove(c); });
-      bar.classList.add(barClasses[Math.min(idx, barClasses.length - 1)]);
-      var pct = entries[0].rps > 0 ? (entry.rps / entries[0].rps * 100) : 0;
-      bar.style.width = pct.toFixed(1) + '%';
+      if (bar) {
+        barClasses.forEach(function(c) { bar.classList.remove(c); });
+        bar.classList.add(barClasses[Math.min(idx, barClasses.length - 1)]);
+        var pct = entries[0].rps > 0 ? (entry.rps / entries[0].rps * 100) : 0;
+        bar.style.width = pct.toFixed(1) + '%';
+      }
       lb.appendChild(clone);
     });
   });
@@ -983,6 +993,13 @@ window.addEventListener('roundChanged', function(ev) {
       row.dataset.s4xx = String(rs4);
       row.dataset.s5xx = String(rs5);
       row.dataset.bandwidth = r.bandwidth || '';
+      if (r.tpl_baseline) {
+        row.dataset.tplBaseline = String(r.tpl_baseline);
+        row.dataset.tplJson = String(r.tpl_json || 0);
+        row.dataset.tplDb = String(r.tpl_db || 0);
+        row.dataset.tplUpload = String(r.tpl_upload || 0);
+        row.dataset.tplCompression = String(r.tpl_compression || 0);
+      }
       row.innerHTML =
         '<div class="lb-rank">' + rank + '</div>' +
         '<div class="lb-name">' + r.framework + '</div>' +
@@ -1006,6 +1023,8 @@ window.addEventListener('roundChanged', function(ev) {
   // Rebuild best panels and re-apply filters
   buildBestPanels();
   applyFilters();
+  if (typeof applyCompressionScores === 'function') applyCompressionScores();
+  if (typeof applyMixedScores === 'function') applyMixedScores();
 });
 
 /* Compression score: replace bar with bandwidth-adjusted score */
@@ -1174,4 +1193,197 @@ function applyCompressionScores() {
   });
 }
 applyCompressionScores();
+
+/* Mixed workload: weighted scoring + stacked mix bar */
+function fmtK(n) {
+  n = parseInt(n) || 0;
+  if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+  if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+  return String(n);
+}
+
+var mixedColors = {baseline:'#3b82f6', json:'#8b5cf6', db:'#f59e0b', upload:'#10b981', compression:'#ef4444'};
+var mixedLabels = {baseline:'Baseline', json:'JSON', db:'DB', upload:'Upload', compression:'Gzip'};
+var mixedKeys = ['baseline','json','db','upload','compression'];
+var mixedWeights = {baseline:0.1, json:1, db:15, upload:15, compression:8};
+
+var mixedGrid = '2.5rem 10rem 5.5rem 4.5rem 4.5rem 3.5rem 6rem 5rem 3.5rem 5rem 4.5rem 5.5rem 5rem 5rem 4rem';
+
+function buildMixBar(d) {
+  var total = d.baseline + d.json + d.db + d.upload + d.compression;
+  if (total === 0) return '';
+  var tipLines = mixedKeys.map(function(k) {
+    return mixedLabels[k] + ': ' + fmtK(d[k]) + ' (' + (d[k]/total*100).toFixed(1) + '%) [w=' + mixedWeights[k] + ']';
+  }).join('&#10;');
+  var html = '<div class="lb-mix-wrap" title="' + tipLines + '">';
+  mixedKeys.forEach(function(k) {
+    var pct = d[k] / total * 100;
+    if (pct > 0.5) {
+      html += '<div class="lb-mix-seg" style="width:' + pct.toFixed(1) + '%;background:' + mixedColors[k] + ' !important;"></div>';
+    }
+  });
+  html += '</div>';
+  return html;
+}
+
+function applyMixedPanel(panel) {
+  var rows = Array.from(panel.querySelectorAll('.lb-row:not(.lb-header)'));
+  if (rows.length === 0) return;
+  var hasData = rows.some(function(r) { return r.dataset.tplBaseline; });
+  if (!hasData) return;
+
+  /* Compute weighted score for each row: sum(count * weight), then normalize top = 100 */
+  var rowData = [];
+  var maxWeighted = 0;
+  rows.forEach(function(row) {
+    if (row.classList.contains('lb-hidden')) return;
+    var d = {
+      baseline: parseInt(row.dataset.tplBaseline) || 0,
+      json: parseInt(row.dataset.tplJson) || 0,
+      db: parseInt(row.dataset.tplDb) || 0,
+      upload: parseInt(row.dataset.tplUpload) || 0,
+      compression: parseInt(row.dataset.tplCompression) || 0
+    };
+    var weighted = 0;
+    mixedKeys.forEach(function(k) { weighted += d[k] * mixedWeights[k]; });
+    if (weighted > maxWeighted) maxWeighted = weighted;
+    rowData.push({row: row, d: d, weighted: weighted});
+  });
+
+  /* Normalize so top = 100 */
+  rowData.forEach(function(rd) {
+    rd.score = maxWeighted > 0 ? (rd.weighted / maxWeighted) * 100 : 0;
+  });
+
+  /* Sort by score descending */
+  rowData.sort(function(a, b) { return b.score - a.score; });
+
+  /* Update header */
+  var header = panel.querySelector('.lb-row.lb-header');
+  if (header && !header.dataset.mixedDone) {
+    header.style.gridTemplateColumns = mixedGrid;
+    /* Replace bar-cell with Score + Mix headers */
+    var barHeader = header.querySelector('.lb-bar-cell');
+    if (barHeader) {
+      barHeader.className = 'lb-mix-header';
+      barHeader.style.textAlign = 'right';
+      barHeader.style.fontWeight = '600';
+      barHeader.title = 'Weighted score: baseline\u00d70.1 + json\u00d71 + db\u00d715 + upload\u00d715 + gzip\u00d78, normalized to 100';
+      barHeader.textContent = 'Score';
+      /* Insert mix legend header after Score */
+      var mixHeader = document.createElement('div');
+      mixHeader.innerHTML = '<div style="font-size:0.65rem;font-weight:600;margin-bottom:1px;">Request Mix</div>' +
+        '<div style="display:flex;gap:0.3rem;flex-wrap:wrap;">' +
+        mixedKeys.map(function(k) {
+          return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:0.55rem;color:#94a3b8;line-height:1;">' +
+            '<span style="width:6px;height:6px;border-radius:1px;background:' + mixedColors[k] + ';flex-shrink:0;"></span>' +
+            mixedLabels[k] + '</span>';
+        }).join('') + '</div>';
+      barHeader.parentNode.insertBefore(mixHeader, barHeader.nextSibling);
+    }
+    header.dataset.mixedDone = '1';
+  }
+
+  /* Update rows: re-rank, add score cell, add mix bar */
+  var lb = panel.querySelector('.lb');
+  rowData.forEach(function(rd, idx) {
+    var row = rd.row;
+    row.style.gridTemplateColumns = mixedGrid;
+
+    /* Update rank */
+    var rankEl = row.querySelector('.lb-rank');
+    if (rankEl) rankEl.textContent = idx < 3 ? medals[idx] : String(idx + 1);
+
+    /* Replace bar cell with score */
+    var barCell = row.querySelector('.lb-bar-cell');
+    if (barCell) {
+      var color = rd.score >= 80 ? '#16a34a' : rd.score >= 50 ? '#ca8a04' : '#dc2626';
+      barCell.outerHTML = '<div class="lb-stat lb-mix-score" style="text-align:right;font-weight:700;color:' + color + ';">' + rd.score.toFixed(1) + '</div>';
+    } else if (!row.dataset.mixedDone) {
+      /* Already processed — update existing score cell */
+      var scoreCell = row.querySelector('.lb-mix-score');
+      if (scoreCell) {
+        var color = rd.score >= 80 ? '#16a34a' : rd.score >= 50 ? '#ca8a04' : '#dc2626';
+        scoreCell.textContent = rd.score.toFixed(1);
+        scoreCell.style.color = color;
+      }
+    }
+
+    /* Insert mix bar cell after score (only once) */
+    if (!row.dataset.mixedDone) {
+      var mixCell = document.createElement('div');
+      mixCell.className = 'lb-mix-cell';
+      var total = rd.d.baseline + rd.d.json + rd.d.db + rd.d.upload + rd.d.compression;
+      if (total > 0) {
+        mixCell.innerHTML = buildMixBar(rd.d);
+      }
+      var scoreCell = row.querySelector('.lb-mix-score');
+      if (scoreCell) scoreCell.parentNode.insertBefore(mixCell, scoreCell.nextSibling);
+    }
+
+    row.dataset.mixedDone = '1';
+    row.dataset.mixedScore = rd.score.toFixed(1);
+    lb.appendChild(row);
+  });
+}
+
+function applyMixedScores() {
+  /* Process connection panels */
+  document.querySelectorAll('.lb-conn-panel[data-profile="mixed"]:not([data-conns="best"])').forEach(applyMixedPanel);
+
+  /* Build best panel using mixed scores */
+  document.querySelectorAll('.lb-conn-panel[data-profile="mixed"][data-conns="best"]').forEach(function(bestPanel) {
+    var parentPanel = bestPanel.closest('.lb-panel');
+    var connPanels = parentPanel.querySelectorAll('.lb-conn-panel[data-profile="mixed"]:not([data-conns="best"])');
+    var best = {};
+
+    connPanels.forEach(function(cp) {
+      cp.querySelectorAll('.lb-row:not(.lb-header)').forEach(function(row) {
+        var name = row.dataset.name;
+        var score = parseFloat(row.dataset.mixedScore || '0');
+        if (!best[name] || score > best[name].score) {
+          best[name] = { score: score, row: row };
+        }
+      });
+    });
+
+    var lb = bestPanel.querySelector('.lb');
+    lb.querySelectorAll('.lb-row:not(.lb-header)').forEach(function(r) { r.remove(); });
+
+    /* Update best header */
+    var header = bestPanel.querySelector('.lb-row.lb-header');
+    if (header && !header.dataset.mixedDone) {
+      header.style.gridTemplateColumns = mixedGrid;
+      var barHeader = header.querySelector('.lb-bar-cell');
+      if (barHeader) {
+        barHeader.className = 'lb-mix-header';
+        barHeader.style.textAlign = 'right';
+        barHeader.style.fontWeight = '600';
+        barHeader.title = 'Weighted score: baseline\u00d70.1 + json\u00d71 + db\u00d715 + upload\u00d715 + gzip\u00d78, normalized to 100';
+        barHeader.textContent = 'Score';
+        var mixHeader = document.createElement('div');
+        mixHeader.innerHTML = '<div style="font-size:0.65rem;font-weight:600;margin-bottom:1px;">Request Mix</div>' +
+          '<div style="display:flex;gap:0.3rem;flex-wrap:wrap;">' +
+          mixedKeys.map(function(k) {
+            return '<span style="display:inline-flex;align-items:center;gap:2px;font-size:0.55rem;color:#94a3b8;line-height:1;">' +
+              '<span style="width:6px;height:6px;border-radius:1px;background:' + mixedColors[k] + ';flex-shrink:0;"></span>' +
+              mixedLabels[k] + '</span>';
+          }).join('') + '</div>';
+        barHeader.parentNode.insertBefore(mixHeader, barHeader.nextSibling);
+      }
+      header.dataset.mixedDone = '1';
+    }
+
+    var entries = Object.values(best).sort(function(a, b) { return b.score - a.score; });
+    entries.forEach(function(entry, idx) {
+      var clone = entry.row.cloneNode(true);
+      clone.dataset.mixedScore = entry.score;
+      clone.style.gridTemplateColumns = mixedGrid;
+      var rankEl = clone.querySelector('.lb-rank');
+      rankEl.textContent = idx < 3 ? medals[idx] : String(idx + 1);
+      lb.appendChild(clone);
+    });
+  });
+}
+applyMixedScores();
 </script>

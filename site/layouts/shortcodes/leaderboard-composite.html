@@ -6,6 +6,7 @@
   (dict "id" "upload" "label" "Upload" "sublabel" "HTTP/1.1" "proto" "h1" "conns" (slice 64 256 512) "scored" true)
   (dict "id" "compression" "label" "Compression" "sublabel" "HTTP/1.1" "proto" "h1" "conns" (slice 4096 16384) "scored" true)
   (dict "id" "noisy" "label" "Noisy" "sublabel" "HTTP/1.1" "proto" "h1" "conns" (slice 512 4096 16384) "scored" false)
+  (dict "id" "mixed" "label" "Mixed" "sublabel" "HTTP/1.1" "proto" "h1" "conns" (slice 512 1024) "scored" true)
   (dict "id" "baseline-h2" "label" "Baseline" "sublabel" "HTTP/2" "proto" "h2" "conns" (slice 256 1024) "scored" true)
   (dict "id" "static-h2" "label" "Static" "sublabel" "HTTP/2" "proto" "h2" "conns" (slice 256 1024) "scored" true)
   (dict "id" "baseline-h3" "label" "Baseline" "sublabel" "HTTP/3" "proto" "h3" "conns" (slice 256 512) "scored" true)
@@ -20,7 +21,7 @@
     {{ $data := index site.Data $key }}
     {{ if $data }}
       {{ range $data }}
-        {{ $entries = $entries | append (dict "profile" $p.id "label" $p.label "framework" .framework "rps" .rps "language" (.language | default "") "cpu" (.cpu | default "") "memory" (.memory | default "") "bandwidth" (.bandwidth | default "")) }}
+        {{ $entries = $entries | append (dict "profile" $p.id "label" $p.label "framework" .framework "rps" .rps "language" (.language | default "") "cpu" (.cpu | default "") "memory" (.memory | default "") "bandwidth" (.bandwidth | default "") "tpl_baseline" (.tpl_baseline | default 0) "tpl_json" (.tpl_json | default 0) "tpl_db" (.tpl_db | default 0) "tpl_upload" (.tpl_upload | default 0) "tpl_compression" (.tpl_compression | default 0)) }}
       {{ end }}
     {{ end }}
   {{ end }}
@@ -146,7 +147,7 @@ function entriesFromRound(roundData) {
       var data = roundData[key];
       if (data) {
         data.forEach(function(d) {
-          entries.push({ profile: p.id, label: p.label, framework: d.framework, rps: d.rps, language: d.language || '', cpu: d.cpu || '', memory: d.memory || '', bandwidth: d.bandwidth || '' });
+          entries.push({ profile: p.id, label: p.label, framework: d.framework, rps: d.rps, language: d.language || '', cpu: d.cpu || '', memory: d.memory || '', bandwidth: d.bandwidth || '', tpl_baseline: d.tpl_baseline || 0, tpl_json: d.tpl_json || 0, tpl_db: d.tpl_db || 0, tpl_upload: d.tpl_upload || 0, tpl_compression: d.tpl_compression || 0 });
         });
       }
     });
@@ -154,14 +155,15 @@ function entriesFromRound(roundData) {
   return entries;
 }
 
-var entries, meta, avgByProfile, avgCpuByProfile, avgMemByProfile, avgBwByProfile, fwLang, allFw;
+var entries, meta, avgByProfile, avgCpuByProfile, avgMemByProfile, avgBwByProfile, avgTplMixed, fwLang, allFw;
 
 function loadData(newEntries, newMeta) {
   entries = newEntries;
   meta = newMeta;
-  avgByProfile = {}; avgCpuByProfile = {}; avgMemByProfile = {}; avgBwByProfile = {};
+  avgByProfile = {}; avgCpuByProfile = {}; avgMemByProfile = {}; avgBwByProfile = {}; avgTplMixed = {};
   allProfileIds.forEach(function(pid) { avgByProfile[pid] = {}; avgCpuByProfile[pid] = {}; avgMemByProfile[pid] = {}; avgBwByProfile[pid] = {}; });
   var sums = {}, cpuSums = {}, memSums = {}, bwSums = {}, counts = {};
+  var tplSums = {};
   entries.forEach(function(e) {
     var key = e.profile + '|' + e.framework;
     sums[key] = (sums[key] || 0) + e.rps;
@@ -169,6 +171,16 @@ function loadData(newEntries, newMeta) {
     memSums[key] = (memSums[key] || 0) + parseMem(e.memory);
     bwSums[key] = (bwSums[key] || 0) + parseBandwidth(e.bandwidth);
     counts[key] = (counts[key] || 0) + 1;
+    if (e.profile === 'mixed') {
+      var fw = e.framework;
+      if (!tplSums[fw]) tplSums[fw] = {baseline:0, json:0, db:0, upload:0, compression:0, count:0};
+      tplSums[fw].baseline += (e.tpl_baseline || 0);
+      tplSums[fw].json += (e.tpl_json || 0);
+      tplSums[fw].db += (e.tpl_db || 0);
+      tplSums[fw].upload += (e.tpl_upload || 0);
+      tplSums[fw].compression += (e.tpl_compression || 0);
+      tplSums[fw].count++;
+    }
   });
   Object.keys(sums).forEach(function(key) {
     var parts = key.split('|');
@@ -177,6 +189,16 @@ function loadData(newEntries, newMeta) {
     avgCpuByProfile[parts[0]][parts[1]] = cpuSums[key] / c;
     avgMemByProfile[parts[0]][parts[1]] = memSums[key] / c;
     avgBwByProfile[parts[0]][parts[1]] = bwSums[key] / c;
+  });
+  Object.keys(tplSums).forEach(function(fw) {
+    var t = tplSums[fw];
+    avgTplMixed[fw] = {
+      baseline: t.baseline / t.count,
+      json: t.json / t.count,
+      db: t.db / t.count,
+      upload: t.upload / t.count,
+      compression: t.compression / t.count
+    };
   });
   fwLang = {};
   entries.forEach(function(e) { if (e.language) fwLang[e.framework] = e.language; });
@@ -247,6 +269,20 @@ function renderComposite() {
     });
   });
 
+  // For mixed: compute weighted scores and re-normalize
+  var mixedWeights = {baseline:0.1, json:1, db:15, upload:15, compression:8};
+  if (activeIds.indexOf('mixed') >= 0) {
+    var maxWeighted = 0;
+    Object.keys(avgTplMixed).forEach(function(fw) {
+      var fmeta = meta[fw] || {};
+      if ((fmeta.type || 'realistic') === 'stripped') return;
+      var t = avgTplMixed[fw];
+      var w = t.baseline * mixedWeights.baseline + t.json * mixedWeights.json + t.db * mixedWeights.db + t.upload * mixedWeights.upload + t.compression * mixedWeights.compression;
+      if (w > maxWeighted) maxWeighted = w;
+    });
+    if (maxWeighted > 0) maxRpsByProfile['mixed'] = maxWeighted;
+  }
+
   // For compression: compute bandwidth-adjusted RPS and re-normalize
   // Frameworks with larger responses (worse compression) get penalized
   var minBwPerReq = {};
@@ -296,6 +332,11 @@ function renderComposite() {
       if (avgByProfile[pid] && avgByProfile[pid][fw] && maxRpsByProfile[pid] > 0) {
         var rps = avgByProfile[pid][fw];
         var effectiveRps = rps;
+        // For mixed: use weighted template score
+        if (pid === 'mixed' && avgTplMixed[fw]) {
+          var t = avgTplMixed[fw];
+          effectiveRps = t.baseline * mixedWeights.baseline + t.json * mixedWeights.json + t.db * mixedWeights.db + t.upload * mixedWeights.upload + t.compression * mixedWeights.compression;
+        }
         // For compression: use bandwidth-adjusted RPS
         if (pid === 'compression' && minBwPerReq[pid]) {
           var bw = avgBwByProfile[pid][fw] || 0;
@@ -405,10 +446,14 @@ function renderComposite() {
       if (s === 0) {
         profileCells += '<div class="lb-stat" style="text-align:right; color:#cbd5e1;' + bgStyle + '">—</div>';
       } else {
-        var rps = avgByProfile[pid][r.framework];
-        var rpsStr = rps >= 1000000 ? (rps / 1000000).toFixed(1) + 'M' : rps >= 10000 ? (rps / 1000).toFixed(0) + 'K' : rps >= 1000 ? (rps / 1000).toFixed(1) + 'K' : Math.round(rps);
         var color = scored ? (s >= 80 ? '#16a34a' : s >= 50 ? '#ca8a04' : '#dc2626') : '#94a3b8';
-        profileCells += '<div class="lb-stat" style="text-align:right; color:' + color + '; font-weight:500;' + bgStyle + '">' + s.toFixed(1) + ' <span style="font-size:0.6rem; color:#94a3b8; font-weight:400;">(' + rpsStr + ')</span></div>';
+        var suffix = '';
+        if (pid !== 'mixed') {
+          var rps = avgByProfile[pid][r.framework];
+          var rpsStr = rps >= 1000000 ? (rps / 1000000).toFixed(1) + 'M' : rps >= 10000 ? (rps / 1000).toFixed(0) + 'K' : rps >= 1000 ? (rps / 1000).toFixed(1) + 'K' : Math.round(rps);
+          suffix = ' <span style="font-size:0.6rem; color:#94a3b8; font-weight:400;">(' + rpsStr + ')</span>';
+        }
+        profileCells += '<div class="lb-stat" style="text-align:right; color:' + color + '; font-weight:500;' + bgStyle + '">' + s.toFixed(1) + suffix + '</div>';
       }
     });
 
@@ -433,10 +478,11 @@ function renderComposite() {
             '</div>';
         } else {
           var protoTag = profileProtos[pid] === 'h3' ? ' (H3)' : profileProtos[pid] === 'h2' ? ' (H2)' : ' (H1)';
+          var popupSuffix = pid !== 'mixed' ? ' <span style="font-size:0.7rem; color:#94a3b8;">(' + Number(rps).toLocaleString() + ' req/s)</span>' : '';
           profileDetails +=
             '<div>' +
               '<div class="lb-popup-stat-label">' + profileLabels[pid] + protoTag + '</div>' +
-              '<div class="lb-popup-stat-value">' + s.toFixed(1) + ' <span style="font-size:0.7rem; color:#94a3b8;">(' + Number(rps).toLocaleString() + ' req/s)</span></div>' +
+              '<div class="lb-popup-stat-value">' + s.toFixed(1) + popupSuffix + '</div>' +
             '</div>';
         }
       });

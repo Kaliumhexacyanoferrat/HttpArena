@@ -1,6 +1,7 @@
 package httparenahandler
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"hash/crc32"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 
@@ -16,6 +18,7 @@ import (
 	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
 	"github.com/caddyserver/caddy/v2/caddyconfig/httpcaddyfile"
 	"github.com/caddyserver/caddy/v2/modules/caddyhttp"
+	_ "modernc.org/sqlite"
 )
 
 func init() {
@@ -54,6 +57,7 @@ type Handler struct {
 	jsonResponse      []byte
 	jsonLargeResponse []byte
 	staticFiles       map[string]staticFile
+	db                *sql.DB
 }
 
 func (Handler) CaddyModule() caddy.ModuleInfo {
@@ -149,6 +153,13 @@ func (h *Handler) Provision(ctx caddy.Context) error {
 		}
 	}
 
+	// Open SQLite database
+	db, err := sql.Open("sqlite", "file:/data/benchmark.db?mode=ro&immutable=1")
+	if err == nil {
+		db.SetMaxOpenConns(runtime.NumCPU())
+		h.db = db
+	}
+
 	return nil
 }
 
@@ -225,6 +236,57 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddyht
 		} else {
 			http.Error(w, "No dataset", 500)
 		}
+		return nil
+
+	case "/db":
+		if h.db == nil {
+			http.Error(w, "DB not available", 500)
+			return nil
+		}
+		minStr := r.URL.Query().Get("min")
+		maxStr := r.URL.Query().Get("max")
+		minPrice := 10.0
+		maxPrice := 50.0
+		if v, err := strconv.ParseFloat(minStr, 64); err == nil {
+			minPrice = v
+		}
+		if v, err := strconv.ParseFloat(maxStr, 64); err == nil {
+			maxPrice = v
+		}
+		rows, err := h.db.Query("SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ? AND ? LIMIT 50", minPrice, maxPrice)
+		if err != nil {
+			http.Error(w, "Query failed", 500)
+			return nil
+		}
+		defer rows.Close()
+		var items []map[string]interface{}
+		for rows.Next() {
+			var dbId int
+			var name, category, tags string
+			var price float64
+			var quantity int
+			var active int
+			var ratingScore float64
+			var ratingCount int
+			if err := rows.Scan(&dbId, &name, &category, &price, &quantity, &active, &tags, &ratingScore, &ratingCount); err != nil {
+				continue
+			}
+			var tagsArr []string
+			json.Unmarshal([]byte(tags), &tagsArr)
+			items = append(items, map[string]interface{}{
+				"id": dbId, "name": name, "category": category,
+				"price": price, "quantity": quantity, "active": active == 1,
+				"tags": tagsArr,
+				"rating": map[string]interface{}{"score": ratingScore, "count": ratingCount},
+			})
+		}
+		resp := map[string]interface{}{
+			"items": items,
+			"count": len(items),
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Server", "caddy")
+		json.NewEncoder(w).Encode(resp)
 		return nil
 	}
 

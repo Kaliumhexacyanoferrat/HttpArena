@@ -2,6 +2,7 @@
 #include <ngx_core.h>
 #include <ngx_http.h>
 #include "cJSON.h"
+#include <sqlite3.h>
 #include <math.h>
 
 /* ---------- Pre-loaded data ---------- */
@@ -20,6 +21,9 @@ typedef struct {
 static sfile_t g_sf[MAX_STATIC];
 static ngx_int_t g_sf_n = 0;
 
+static sqlite3 *g_db = NULL;
+static sqlite3_stmt *g_db_stmt = NULL;
+
 /* ---------- Integer parser ---------- */
 
 static int64_t
@@ -35,6 +39,19 @@ parse_int(u_char *start, u_char *end)
         p++;
     }
     return neg ? -n : n;
+}
+
+/* ---------- Double parser ---------- */
+
+static double
+parse_double(u_char *start, u_char *end)
+{
+    char buf[64];
+    size_t len = end - start;
+    if (len >= sizeof(buf)) len = sizeof(buf) - 1;
+    ngx_memcpy(buf, start, len);
+    buf[len] = '\0';
+    return atof(buf);
 }
 
 /* ---------- Query string sum ---------- */
@@ -179,6 +196,137 @@ baseline11_post_handler(ngx_http_request_t *r)
     ngx_http_finalize_request(r, rc);
 }
 
+/* ---------- SQLite DB ---------- */
+
+static void
+load_db(void)
+{
+    if (sqlite3_open_v2("/data/benchmark.db", &g_db,
+                        SQLITE_OPEN_READONLY, NULL) != SQLITE_OK) {
+        g_db = NULL;
+        return;
+    }
+    sqlite3_exec(g_db, "PRAGMA mmap_size=268435456", NULL, NULL, NULL);
+    sqlite3_prepare_v2(g_db,
+        "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count "
+        "FROM items WHERE price BETWEEN ? AND ? LIMIT 50",
+        -1, &g_db_stmt, NULL);
+}
+
+/* Append a JSON-escaped string to buffer */
+static u_char *
+json_escape_append(u_char *dst, u_char *end, const char *src)
+{
+    if (!src) src = "";
+    if (dst < end) *dst++ = '"';
+    while (*src && dst < end - 1) {
+        u_char c = (u_char)*src++;
+        if (c == '"' || c == '\\') {
+            if (dst + 1 < end) { *dst++ = '\\'; *dst++ = c; }
+        } else if (c < 0x20) {
+            /* skip control chars */
+        } else {
+            *dst++ = c;
+        }
+    }
+    if (dst < end) *dst++ = '"';
+    return dst;
+}
+
+static ngx_int_t
+on_db(ngx_http_request_t *r)
+{
+    ngx_http_discard_request_body(r);
+
+    if (!g_db || !g_db_stmt) {
+        return send_resp(r, 500,
+                         (u_char *)"text/plain", 10,
+                         (u_char *)"DB not loaded", 13, 0);
+    }
+
+    /* Parse min and max from query string */
+    double min_price = 10.0;
+    double max_price = 50.0;
+    if (r->args.len) {
+        u_char *p = r->args.data, *end = p + r->args.len;
+        while (p < end) {
+            u_char *eq = ngx_strlchr(p, end, '=');
+            if (!eq) break;
+            u_char *v = eq + 1;
+            u_char *amp = ngx_strlchr(v, end, '&');
+            if (!amp) amp = end;
+            if ((eq - p) == 3 && ngx_strncmp(p, "min", 3) == 0) {
+                min_price = parse_double(v, amp);
+            } else if ((eq - p) == 3 && ngx_strncmp(p, "max", 3) == 0) {
+                max_price = parse_double(v, amp);
+            }
+            p = (amp < end) ? amp + 1 : end;
+        }
+    }
+
+    sqlite3_bind_double(g_db_stmt, 1, min_price);
+    sqlite3_bind_double(g_db_stmt, 2, max_price);
+
+    /* Build JSON directly into a pool-allocated buffer (no cJSON overhead) */
+    #define DB_BUF_SIZE (64 * 1024)
+    u_char *buf = ngx_palloc(r->pool, DB_BUF_SIZE);
+    if (!buf) {
+        sqlite3_reset(g_db_stmt);
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+    }
+    u_char *p = buf;
+    u_char *end = buf + DB_BUF_SIZE - 1;
+    int count = 0;
+
+    p = ngx_cpymem(p, "{\"items\":[", 10);
+
+    while (sqlite3_step(g_db_stmt) == SQLITE_ROW && count < 50) {
+        int db_id = sqlite3_column_int(g_db_stmt, 0);
+        const char *name = (const char *)sqlite3_column_text(g_db_stmt, 1);
+        const char *category = (const char *)sqlite3_column_text(g_db_stmt, 2);
+        double price = sqlite3_column_double(g_db_stmt, 3);
+        int quantity = sqlite3_column_int(g_db_stmt, 4);
+        int active = sqlite3_column_int(g_db_stmt, 5);
+        const char *tags_str = (const char *)sqlite3_column_text(g_db_stmt, 6);
+        double rating_score = sqlite3_column_double(g_db_stmt, 7);
+        int rating_count = sqlite3_column_int(g_db_stmt, 8);
+
+        if (count > 0 && p < end) *p++ = ',';
+
+        /* {"id":N,"name":"...","category":"...","price":N,"quantity":N,"active":T/F, */
+        p = ngx_slprintf(p, end, "{\"id\":%d,\"name\":", db_id);
+        p = json_escape_append(p, end, name);
+        p = ngx_cpymem(p, ",\"category\":", 12);
+        p = json_escape_append(p, end, category);
+        p = ngx_slprintf(p, end, ",\"price\":%.2f,\"quantity\":%d,\"active\":%s,",
+                         price, quantity, active ? "true" : "false");
+
+        /* "tags": pass through raw JSON from DB (already a JSON array) */
+        p = ngx_cpymem(p, "\"tags\":", 7);
+        if (tags_str) {
+            size_t tlen = strlen(tags_str);
+            if (p + tlen < end) {
+                p = ngx_cpymem(p, tags_str, tlen);
+            }
+        } else {
+            p = ngx_cpymem(p, "[]", 2);
+        }
+
+        /* "rating":{"score":N,"count":N}} */
+        p = ngx_slprintf(p, end, ",\"rating\":{\"score\":%.1f,\"count\":%d}}",
+                         rating_score, rating_count);
+        count++;
+    }
+
+    sqlite3_reset(g_db_stmt);
+
+    p = ngx_slprintf(p, end, "],\"count\":%d}", count);
+
+    return send_resp(r, 200,
+                     (u_char *)"application/json", 16,
+                     buf, p - buf, 0);
+}
+
 /* ---------- Main request handler ---------- */
 
 static ngx_int_t
@@ -186,6 +334,11 @@ ngx_http_httparena_handler(ngx_http_request_t *r)
 {
     u_char *uri = r->uri.data;
     size_t uri_len = r->uri.len;
+
+    /* /db */
+    if (uri_len == 3 && ngx_strncmp(uri, "/db", 3) == 0) {
+        return on_db(r);
+    }
 
     /* /pipeline */
     if (uri_len == 9 && ngx_strncmp(uri, "/pipeline", 9) == 0) {
@@ -404,6 +557,13 @@ ngx_http_httparena_init_module(ngx_cycle_t *cycle)
     return NGX_OK;
 }
 
+static ngx_int_t
+ngx_http_httparena_init_process(ngx_cycle_t *cycle)
+{
+    load_db();
+    return NGX_OK;
+}
+
 static ngx_command_t ngx_http_httparena_commands[] = {
     {
         ngx_string("httparena"),
@@ -427,7 +587,7 @@ ngx_module_t ngx_http_httparena_module = {
     NGX_HTTP_MODULE,
     NULL,                                /* init master */
     ngx_http_httparena_init_module,      /* init module */
-    NULL,                                /* init process */
+    ngx_http_httparena_init_process,     /* init process */
     NULL,                                /* init thread */
     NULL,                                /* exit thread */
     NULL,                                /* exit process */

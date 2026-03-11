@@ -4,8 +4,9 @@ use salvo::http::header::{self, HeaderValue};
 use salvo::http::StatusCode;
 use salvo::prelude::*;
 use serde::{Deserialize, Serialize};
+use rusqlite::Connection;
 use std::collections::HashMap;
-use std::sync::OnceLock;
+use std::sync::{Mutex, OnceLock};
 
 static CRC32_TABLE: OnceLock<[[u32; 256]; 8]> = OnceLock::new();
 
@@ -52,6 +53,7 @@ struct AppState {
     json_cache: Vec<u8>,
     json_large_cache: Vec<u8>,
     static_files: HashMap<String, StaticFile>,
+    db: Option<Mutex<Connection>>,
 }
 
 struct StaticFile {
@@ -252,6 +254,63 @@ async fn upload(req: &mut Request, res: &mut Response) {
 }
 
 #[handler]
+async fn db_endpoint(req: &mut Request, res: &mut Response) {
+    let state = STATE.get().unwrap();
+    let empty = serde_json::json!({"items": [], "count": 0});
+    if let Some(db_mutex) = &state.db {
+        let min_price: f64 = req.query("min").unwrap_or(10.0);
+        let max_price: f64 = req.query("max").unwrap_or(50.0);
+        let conn = db_mutex.lock().unwrap();
+        let mut stmt = conn
+            .prepare_cached(
+                "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ?1 AND ?2 LIMIT 50",
+            )
+            .unwrap();
+        let rows = stmt.query_map(rusqlite::params![min_price, max_price], |row| {
+            Ok(serde_json::json!({
+                "id": row.get::<_, i64>(0)?,
+                "name": row.get::<_, String>(1)?,
+                "category": row.get::<_, String>(2)?,
+                "price": row.get::<_, f64>(3)?,
+                "quantity": row.get::<_, i64>(4)?,
+                "active": row.get::<_, i64>(5)? == 1,
+                "tags": serde_json::from_str::<serde_json::Value>(&row.get::<_, String>(6)?).unwrap_or_default(),
+                "rating": serde_json::json!({
+                    "score": row.get::<_, f64>(7)?,
+                    "count": row.get::<_, i64>(8)?
+                })
+            }))
+        });
+        let items: Vec<serde_json::Value> = match rows {
+            Ok(mapped) => mapped.filter_map(|r| r.ok()).collect(),
+            Err(_) => {
+                res.headers_mut().insert(
+                    header::CONTENT_TYPE,
+                    HeaderValue::from_static("application/json"),
+                );
+                res.render(empty.to_string());
+                return;
+            }
+        };
+        let result = serde_json::json!({
+            "items": items,
+            "count": items.len()
+        });
+        res.headers_mut().insert(
+            header::CONTENT_TYPE,
+            HeaderValue::from_static("application/json"),
+        );
+        res.render(result.to_string());
+    } else {
+        res.headers_mut().insert(
+            header::CONTENT_TYPE,
+            HeaderValue::from_static("application/json"),
+        );
+        res.render(empty.to_string());
+    }
+}
+
+#[handler]
 async fn static_file(req: &mut Request, res: &mut Response) {
     let state = STATE.get().unwrap();
     let filename: String = req.param("filename").unwrap_or_default();
@@ -277,11 +336,22 @@ async fn main() {
     };
     let json_large_cache = build_json_cache(&large_dataset);
 
+    let db = Connection::open_with_flags(
+        "/data/benchmark.db",
+        rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+    )
+    .ok()
+    .map(|conn| {
+        conn.execute_batch("PRAGMA mmap_size=268435456").ok();
+        Mutex::new(conn)
+    });
+
     STATE
         .set(AppState {
             json_cache,
             json_large_cache,
             static_files: load_static_files(),
+            db,
         })
         .ok();
 
@@ -295,6 +365,7 @@ async fn main() {
         )
         .push(Router::with_path("baseline2").get(baseline2))
         .push(Router::with_path("json").get(json_endpoint))
+        .push(Router::with_path("db").get(db_endpoint))
         .push(
             Router::with_path("compression")
                 .hoop(Compression::new().enable_gzip(salvo::compression::CompressionLevel::Fastest))

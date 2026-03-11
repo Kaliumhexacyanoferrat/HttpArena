@@ -58,7 +58,7 @@ html.dark .test-card-endpoint { color: #64748b; }
 </style>
 
 <div class="tests-section">
-<h2>11 Test Profiles Across HTTP/1.1, HTTP/2 and HTTP/3</h2>
+<h2>12 Test Profiles Across HTTP/1.1, HTTP/2 and HTTP/3</h2>
 <p class="tests-sub">Every framework is tested under diverse, realistic workloads — from raw throughput to compression, caching, and file serving.</p>
 
 <div class="tests-proto">
@@ -93,6 +93,11 @@ html.dark .test-card-endpoint { color: #64748b; }
     <div class="test-card-title">Noisy (Resilience)</div>
     <div class="test-card-desc">Valid requests mixed with malformed noise — bad paths, bad content-length, binary. Only 2xx count.</div>
     <div class="test-card-endpoint">GET/POST /baseline11 + noise</div>
+  </a>
+  <a class="test-card" href="docs/tests/h1/mixed">
+    <div class="test-card-title">Mixed Workload</div>
+    <div class="test-card-desc">Realistic mix of baseline, JSON, DB, upload, and compression requests with weighted scoring.</div>
+    <div class="test-card-endpoint">GET/POST mixed endpoints (100 req/conn)</div>
   </a>
   <a class="test-card" href="docs/tests/h1/pipelined">
     <div class="test-card-title">Pipelined (16x)</div>

@@ -12,11 +12,14 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <openssl/ssl.h>
+#include <sqlite3.h>
 #include <yajl/yajl_gen.h>
 #include <yajl/yajl_tree.h>
 
 static h2o_globalconf_t globalconf;
 static SSL_CTX *ssl_ctx;
+static __thread sqlite3 *tl_db = NULL;
+static __thread sqlite3_stmt *tl_db_stmt = NULL;
 static char *json_response;
 static size_t json_response_len;
 static char *json_large_response;
@@ -251,6 +254,167 @@ static int on_compression(h2o_handler_t *h, h2o_req_t *req)
     return 0;
 }
 
+/* SQLite DB — open per-thread for lock-free concurrent reads */
+static int g_db_available = 0;
+
+static void load_db_check(void)
+{
+    /* Just verify the DB file is accessible; actual open happens per-thread */
+    sqlite3 *tmp = NULL;
+    if (sqlite3_open_v2("/data/benchmark.db", &tmp,
+                        SQLITE_OPEN_READONLY, NULL) == SQLITE_OK) {
+        g_db_available = 1;
+        sqlite3_close(tmp);
+    }
+}
+
+static void load_db_thread(void)
+{
+    if (!g_db_available) return;
+    if (sqlite3_open_v2("/data/benchmark.db", &tl_db,
+                        SQLITE_OPEN_READONLY, NULL) != SQLITE_OK) {
+        tl_db = NULL;
+        return;
+    }
+    sqlite3_exec(tl_db, "PRAGMA mmap_size=268435456", NULL, NULL, NULL);
+    sqlite3_prepare_v2(tl_db,
+        "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count "
+        "FROM items WHERE price BETWEEN ? AND ? LIMIT 50",
+        -1, &tl_db_stmt, NULL);
+}
+
+/* GET /db — query SQLite by price range and return JSON array */
+static int on_db(h2o_handler_t *h, h2o_req_t *req)
+{
+    (void)h;
+    if (!tl_db || !tl_db_stmt) {
+        h2o_send_error_500(req, "Error", "DB not loaded", 0);
+        return 0;
+    }
+
+    /* Parse min and max from query string (defaults: 10.0, 50.0) */
+    double min_price = 10.0;
+    double max_price = 50.0;
+    if (req->query_at != SIZE_MAX) {
+        const char *p = req->path.base + req->query_at + 1;
+        const char *end = req->path.base + req->path.len;
+        while (p < end) {
+            const char *eq = memchr(p, '=', end - p);
+            if (!eq) break;
+            const char *v = eq + 1;
+            const char *amp = memchr(v, '&', end - v);
+            if (!amp) amp = end;
+            if ((eq - p) == 3 && memcmp(p, "min", 3) == 0) {
+                char *ep;
+                double d = strtod(v, &ep);
+                if (ep > v) min_price = d;
+            } else if ((eq - p) == 3 && memcmp(p, "max", 3) == 0) {
+                char *ep;
+                double d = strtod(v, &ep);
+                if (ep > v) max_price = d;
+            }
+            p = amp < end ? amp + 1 : end;
+        }
+    }
+
+    sqlite3_bind_double(tl_db_stmt, 1, min_price);
+    sqlite3_bind_double(tl_db_stmt, 2, max_price);
+
+    yajl_gen gen = yajl_gen_alloc(NULL);
+    yajl_gen_map_open(gen);
+    yajl_gen_string(gen, (const unsigned char *)"items", 5);
+    yajl_gen_array_open(gen);
+
+    int row_count = 0;
+    while (sqlite3_step(tl_db_stmt) == SQLITE_ROW && row_count < 50) {
+        int db_id = sqlite3_column_int(tl_db_stmt, 0);
+        const char *name = (const char *)sqlite3_column_text(tl_db_stmt, 1);
+        const char *category = (const char *)sqlite3_column_text(tl_db_stmt, 2);
+        double price = sqlite3_column_double(tl_db_stmt, 3);
+        int quantity = sqlite3_column_int(tl_db_stmt, 4);
+        int active = sqlite3_column_int(tl_db_stmt, 5);
+        const char *tags_str = (const char *)sqlite3_column_text(tl_db_stmt, 6);
+        double rating_score = sqlite3_column_double(tl_db_stmt, 7);
+        int rating_count = sqlite3_column_int(tl_db_stmt, 8);
+
+        yajl_gen_map_open(gen);
+
+        yajl_gen_string(gen, (const unsigned char *)"id", 2);
+        yajl_gen_integer(gen, db_id);
+
+        yajl_gen_string(gen, (const unsigned char *)"name", 4);
+        const char *n = name ? name : "";
+        yajl_gen_string(gen, (const unsigned char *)n, strlen(n));
+
+        yajl_gen_string(gen, (const unsigned char *)"category", 8);
+        const char *cat = category ? category : "";
+        yajl_gen_string(gen, (const unsigned char *)cat, strlen(cat));
+
+        yajl_gen_string(gen, (const unsigned char *)"price", 5);
+        yajl_gen_double(gen, price);
+
+        yajl_gen_string(gen, (const unsigned char *)"quantity", 8);
+        yajl_gen_integer(gen, quantity);
+
+        yajl_gen_string(gen, (const unsigned char *)"active", 6);
+        yajl_gen_bool(gen, active ? 1 : 0);
+
+        yajl_gen_string(gen, (const unsigned char *)"tags", 4);
+        yajl_gen_array_open(gen);
+        if (tags_str) {
+            char errbuf[1024];
+            yajl_val tags = yajl_tree_parse(tags_str, errbuf, sizeof(errbuf));
+            if (tags && YAJL_IS_ARRAY(tags)) {
+                for (size_t j = 0; j < YAJL_GET_ARRAY(tags)->len; j++) {
+                    yajl_val t = YAJL_GET_ARRAY(tags)->values[j];
+                    if (YAJL_IS_STRING(t)) {
+                        const char *s = YAJL_GET_STRING(t);
+                        yajl_gen_string(gen, (const unsigned char *)s, strlen(s));
+                    }
+                }
+            }
+            if (tags) yajl_tree_free(tags);
+        }
+        yajl_gen_array_close(gen);
+
+        yajl_gen_string(gen, (const unsigned char *)"rating", 6);
+        yajl_gen_map_open(gen);
+        yajl_gen_string(gen, (const unsigned char *)"score", 5);
+        yajl_gen_double(gen, rating_score);
+        yajl_gen_string(gen, (const unsigned char *)"count", 5);
+        yajl_gen_integer(gen, rating_count);
+        yajl_gen_map_close(gen);
+
+        yajl_gen_map_close(gen);
+        row_count++;
+    }
+
+    sqlite3_reset(tl_db_stmt);
+
+    yajl_gen_array_close(gen);
+    yajl_gen_string(gen, (const unsigned char *)"count", 5);
+    yajl_gen_integer(gen, row_count);
+    yajl_gen_map_close(gen);
+
+    const unsigned char *buf;
+    size_t len;
+    yajl_gen_get_buf(gen, &buf, &len);
+
+    h2o_iovec_t body = h2o_strdup(&req->pool, (const char *)buf, len);
+    yajl_gen_free(gen);
+
+    h2o_generator_t hgen;
+    memset(&hgen, 0, sizeof(hgen));
+    req->res.status = 200;
+    req->res.reason = "OK";
+    req->res.content_length = body.len;
+    h2o_add_header(&req->pool, &req->res.headers, H2O_TOKEN_CONTENT_TYPE,
+                   NULL, H2O_STRLIT("application/json"));
+    h2o_start_response(req, &hgen);
+    h2o_send(req, &body, 1, H2O_SEND_STATE_FINAL);
+    return 0;
+}
+
 /* Load all static files from /data/static/ into memory */
 static void load_static_files(void)
 {
@@ -314,6 +478,7 @@ static void setup_host(h2o_hostconf_t *host)
     register_handler(host, "/baseline2", on_baseline2);
     register_handler(host, "/json", on_json);
     register_handler(host, "/static", on_static);
+    register_handler(host, "/db", on_db);
     register_handler(host, "/upload", on_upload);
     h2o_pathconf_t *pc_compress = register_handler(host, "/compression", on_compression);
     h2o_compress_args_t compress_args = {.min_size = 100, .gzip = {.quality = 1}, .brotli = {.quality = -1}};
@@ -615,6 +780,7 @@ static void on_accept(h2o_socket_t *listener, const char *err)
 static void *worker_run(void *arg)
 {
     (void)arg;
+    load_db_thread();
     h2o_evloop_t *loop = h2o_evloop_create();
     h2o_context_t ctx;
     h2o_context_init(&ctx, loop, &globalconf);
@@ -682,6 +848,7 @@ int main(void)
     load_dataset();
     load_dataset_large();
     load_static_files();
+    load_db_check();
     init_tls();
 
     h2o_config_init(&globalconf);

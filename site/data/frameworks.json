@@ -1,7 +1,7 @@
 {
   "actix": {"description": "Actix-web 4 with rustls for HTTP/2 support, compiled with -O3 and thin LTO.", "repo": "https://github.com/actix/actix-web", "type": "realistic", "engine": "actix"},
   "aspnet-minimal": {"description": "Minimal ASP.NET Core server using .NET 10 preview with Kestrel and minimal API routing.", "repo": "https://github.com/dotnet/aspnetcore", "type": "realistic", "engine": "Kestrel"},
-  "bun": {"description": "Bun's built-in HTTP server using JavaScriptCore engine with multi-core clustering.", "repo": "https://github.com/oven-sh/bun", "type": "realistic", "engine": "JavaScriptCore"},
+  "bun": {"description": "Bun's built-in HTTP server using JavaScriptCore engine with multi-core clustering.", "repo": "https://github.com/oven-sh/bun", "type": "realistic", "engine": "JSC"},
   "caddy": {"description": "Caddy web server with a custom handler module for benchmark endpoints, native HTTP/2 support.", "repo": "https://github.com/caddyserver/caddy", "type": "realistic", "engine": "caddy"},
   "deno": {"description": "Deno HTTP server using deno serve --parallel with zero-dependency native fetch handler.", "repo": "https://github.com/denoland/deno", "type": "realistic", "engine": "V8"},
   "drogon": {"description": "Drogon C++ framework with sync advice for fast dispatch, mimalloc allocator, and -flto optimization.", "repo": "https://github.com/drogonframework/drogon", "type": "realistic", "engine": "drogon"},

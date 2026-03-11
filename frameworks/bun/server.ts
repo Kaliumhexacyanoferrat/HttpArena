@@ -1,5 +1,6 @@
 const zlib = require("zlib");
 const fs = require("fs");
+const { Database } = require("bun:sqlite");
 
 const MIME_TYPES: Record<string, string> = {
   ".css": "text/css", ".js": "application/javascript", ".html": "text/html",
@@ -25,6 +26,19 @@ const largeItems = largeData.map((d: any) => ({
   total: Math.round(d.price * d.quantity * 100) / 100,
 }));
 const largeJsonBuf = Buffer.from(JSON.stringify({ items: largeItems, count: largeItems.length }));
+
+// Open SQLite database read-only (retry on transient failure)
+let dbStmt: any = null;
+for (let attempt = 0; attempt < 3 && !dbStmt; attempt++) {
+  try {
+    const db = new Database("/data/benchmark.db", { readonly: true });
+    db.exec("PRAGMA mmap_size=268435456");
+    dbStmt = db.prepare("SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ? AND ? LIMIT 50");
+  } catch (e) {
+    console.error(`SQLite open attempt ${attempt + 1} failed:`, e);
+    if (attempt < 2) Bun.sleepSync(50);
+  }
+}
 
 // Pre-load static files
 const staticFiles: Record<string, { buf: Buffer; ct: string }> = {};
@@ -60,6 +74,36 @@ function handleRequest(req: Request): Response | Promise<Response> {
   const pathStart = url.indexOf("/", protoEnd);
   const qIdx = url.indexOf("?", pathStart);
   const path = qIdx === -1 ? url.slice(pathStart) : url.slice(pathStart, qIdx);
+
+  if (path === "/db") {
+    if (!dbStmt) return new Response("DB not available", { status: 500 });
+    try {
+      let min = 10, max = 50;
+      if (qIdx !== -1) {
+        const qs = url.slice(qIdx + 1);
+        for (const pair of qs.split("&")) {
+          const eq = pair.indexOf("=");
+          if (eq === -1) continue;
+          const k = pair.slice(0, eq), v = pair.slice(eq + 1);
+          if (k === "min") min = parseFloat(v) || 10;
+          else if (k === "max") max = parseFloat(v) || 50;
+        }
+      }
+      const rows = dbStmt.all(min, max) as any[];
+      const items = rows.map((r: any) => ({
+        id: r.id, name: r.name, category: r.category,
+        price: r.price, quantity: r.quantity, active: r.active === 1,
+        tags: JSON.parse(r.tags),
+        rating: { score: r.rating_score, count: r.rating_count },
+      }));
+      const body = JSON.stringify({ items, count: items.length });
+      return new Response(body, {
+        headers: { "content-type": "application/json" },
+      });
+    } catch (e: any) {
+      return new Response(e.message || "db error", { status: 500 });
+    }
+  }
 
   if (path === "/pipeline") {
     return new Response("ok", { headers: { "content-type": "text/plain" } });

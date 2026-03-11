@@ -2,7 +2,7 @@
   "display_name": "bun",
   "language": "TS",
   "type": "realistic",
-  "engine": "JavaScriptCore",
+  "engine": "JSC",
   "description": "Bun's built-in HTTP server using JavaScriptCore engine with multi-core clustering.",
   "repo": "https://github.com/oven-sh/bun",
   "enabled": true,
@@ -14,6 +14,7 @@
     "upload",
     "compression",
     "noisy",
+    "mixed",
     "baseline-h2",
     "static-h2"
   ]
