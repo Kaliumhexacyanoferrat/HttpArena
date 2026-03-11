@@ -98,7 +98,7 @@ function handleRequest(req: Request): Response | Promise<Response> {
       }));
       const body = JSON.stringify({ items, count: items.length });
       return new Response(body, {
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", "content-length": String(Buffer.byteLength(body)) },
       });
     } catch (e: any) {
       return new Response(e.message || "db error", { status: 500 });

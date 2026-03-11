@@ -1,14 +1,22 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
+	"hash/crc32"
+	"log"
 	"math"
 	"os"
+	"runtime"
 	"strconv"
+	"sync"
 
 	"compress/flate"
 
 	"github.com/valyala/fasthttp"
+	"github.com/valyala/fasthttp/reuseport"
+	_ "modernc.org/sqlite"
 )
 
 type Rating struct {
@@ -46,6 +54,7 @@ type ProcessResponse struct {
 
 var dataset []DatasetItem
 var jsonLargeResponse []byte
+var db *sql.DB
 
 func loadDataset() {
 	path := os.Getenv("DATASET_PATH")
@@ -139,11 +148,78 @@ func processHandler(ctx *fasthttp.RequestCtx) {
 	ctx.SetBody(body)
 }
 
+func loadDB() {
+	d, err := sql.Open("sqlite", "file:/data/benchmark.db?mode=ro&immutable=1")
+	if err != nil {
+		return
+	}
+	d.SetMaxOpenConns(runtime.NumCPU())
+	db = d
+}
+
+func uploadHandler(ctx *fasthttp.RequestCtx) {
+	body := ctx.PostBody()
+	checksum := crc32.ChecksumIEEE(body)
+	ctx.Response.Header.Set("Server", "go-fasthttp")
+	ctx.SetContentType("text/plain")
+	ctx.SetBodyString(fmt.Sprintf("%08x", checksum))
+}
+
+func dbHandler(ctx *fasthttp.RequestCtx) {
+	if db == nil {
+		ctx.SetStatusCode(500)
+		ctx.SetBodyString("DB not available")
+		return
+	}
+	minPrice := 10.0
+	maxPrice := 50.0
+	if v := ctx.QueryArgs().Peek("min"); len(v) > 0 {
+		if f, err := strconv.ParseFloat(string(v), 64); err == nil {
+			minPrice = f
+		}
+	}
+	if v := ctx.QueryArgs().Peek("max"); len(v) > 0 {
+		if f, err := strconv.ParseFloat(string(v), 64); err == nil {
+			maxPrice = f
+		}
+	}
+	rows, err := db.Query("SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ? AND ? LIMIT 50", minPrice, maxPrice)
+	if err != nil {
+		ctx.SetStatusCode(500)
+		ctx.SetBodyString("Query failed")
+		return
+	}
+	defer rows.Close()
+	var items []map[string]interface{}
+	for rows.Next() {
+		var id, quantity, active, ratingCount int
+		var name, category, tags string
+		var price, ratingScore float64
+		if err := rows.Scan(&id, &name, &category, &price, &quantity, &active, &tags, &ratingScore, &ratingCount); err != nil {
+			continue
+		}
+		var tagsArr []string
+		json.Unmarshal([]byte(tags), &tagsArr)
+		items = append(items, map[string]interface{}{
+			"id": id, "name": name, "category": category,
+			"price": price, "quantity": quantity, "active": active == 1,
+			"tags": tagsArr,
+			"rating": map[string]interface{}{"score": ratingScore, "count": ratingCount},
+		})
+	}
+	resp := map[string]interface{}{"items": items, "count": len(items)}
+	ctx.Response.Header.Set("Server", "go-fasthttp")
+	ctx.SetContentType("application/json")
+	body, _ := json.Marshal(resp)
+	ctx.SetBody(body)
+}
+
 var compressedHandler fasthttp.RequestHandler
 
 func main() {
 	loadDataset()
 	loadDatasetLarge()
+	loadDB()
 
 	compressedHandler = fasthttp.CompressHandlerLevel(func(ctx *fasthttp.RequestCtx) {
 		ctx.Response.Header.Set("Server", "go-fasthttp")
@@ -159,12 +235,30 @@ func main() {
 			processHandler(ctx)
 		case "/compression":
 			compressedHandler(ctx)
+		case "/upload":
+			uploadHandler(ctx)
+		case "/db":
+			dbHandler(ctx)
 		default:
 			baseline11Handler(ctx)
 		}
 	}
-	server := &fasthttp.Server{
-		Handler: handler,
+	numCPU := runtime.NumCPU()
+	var wg sync.WaitGroup
+	for i := 0; i < numCPU; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			ln, err := reuseport.Listen("tcp4", ":8080")
+			if err != nil {
+				log.Fatal(err)
+			}
+			s := &fasthttp.Server{
+				Handler:            handler,
+				MaxRequestBodySize: 25 * 1024 * 1024, // 25 MB
+			}
+			s.Serve(ln)
+		}()
 	}
-	server.ListenAndServe(":8080")
+	wg.Wait()
 }

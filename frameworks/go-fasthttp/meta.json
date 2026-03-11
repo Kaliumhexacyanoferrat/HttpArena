@@ -11,6 +11,8 @@
     "noisy",
     "limited-conn",
     "json",
-    "compression"
+    "compression",
+    "upload",
+    "mixed"
   ]
 }

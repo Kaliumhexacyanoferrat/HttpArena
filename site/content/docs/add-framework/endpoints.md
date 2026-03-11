@@ -4,6 +4,16 @@ title: Endpoints
 
 Your framework must implement endpoints depending on which test profiles it participates in. All endpoints are served on **port 8080** (HTTP/1.1) unless noted otherwise.
 
+Data files are **mounted automatically** by the benchmark runner — your Dockerfile does not need to include them. The following paths are available inside the container at runtime:
+
+| Path | Description |
+|------|-------------|
+| `/data/dataset.json` | 50-item dataset for `/json` |
+| `/data/dataset-large.json` | 6000-item dataset for `/compression` |
+| `/data/benchmark.db` | SQLite database (100K rows) for `/db` |
+| `/data/static/` | 20 static files for `/static/*` |
+| `/certs/server.crt`, `/certs/server.key` | TLS certificate and key for HTTPS/H2/H3 |
+
 ## Core endpoints
 
 These are required for the `baseline`, `limited-conn`, and `noisy` profiles.
@@ -55,6 +65,29 @@ POST /upload (body: 20MB binary) → "a1b2c3d4"
 ```
 
 The CRC32 uses the ISO 3309 polynomial (`0xEDB88320`), the same as `zlib.crc32`.
+
+## Database
+
+Required for the `db` and `mixed` profiles.
+
+### `GET /db?min=N&max=N`
+
+Open `/data/benchmark.db` (a SQLite database with 100K rows) at startup in read-only mode. For each request, query items where `price BETWEEN min AND max` (default 10–50), limit 50 rows.
+
+Return JSON with parsed tags and structured rating:
+
+```json
+{
+  "items": [
+    {"id": 1, "name": "Widget", "category": "electronics", "price": 29.99, "quantity": 5, "active": true, "tags": ["fast"], "rating": {"score": 4.2, "count": 127}}
+  ],
+  "count": 42
+}
+```
+
+The `tags` column is stored as a JSON string in the database — parse it into an array. The `active` column is an integer (0/1) — return it as a boolean. The `rating_score` and `rating_count` columns should be returned as a nested `rating` object.
+
+Response must have `Content-Type: application/json`.
 
 ## Compression
 
