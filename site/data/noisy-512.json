@@ -1,5 +1,25 @@
 [
   {
+    "framework": "GenHTTP",
+    "language": "C#",
+    "rps": 1032879,
+    "avg_latency": "270us",
+    "p99_latency": "2.09ms",
+    "cpu": "6458.0%",
+    "memory": "314.0MiB",
+    "connections": 512,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 1,
+    "bandwidth": "193.29MB/s",
+    "input_bw": "104.41MB/s",
+    "reconnects": 0,
+    "status_2xx": 5164396,
+    "status_3xx": 0,
+    "status_4xx": 1324512,
+    "status_5xx": 0
+  },
+  {
     "framework": "actix",
     "language": "Rust",
     "rps": 1769470,
@@ -377,26 +397,6 @@
     "status_2xx": 5537576,
     "status_3xx": 0,
     "status_4xx": 1288824,
-    "status_5xx": 0
-  },
-  {
-    "framework": "GenHTTP",
-    "language": "C#",
-    "rps": 1032879,
-    "avg_latency": "270us",
-    "p99_latency": "2.09ms",
-    "cpu": "6458.0%",
-    "memory": "314.0MiB",
-    "connections": 512,
-    "threads": 64,
-    "duration": "5s",
-    "pipeline": 1,
-    "bandwidth": "193.29MB/s",
-    "input_bw": "104.41MB/s",
-    "reconnects": 0,
-    "status_2xx": 5164396,
-    "status_3xx": 0,
-    "status_4xx": 1324512,
     "status_5xx": 0
   }
 ]
