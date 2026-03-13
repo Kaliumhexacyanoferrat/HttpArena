@@ -26,7 +26,7 @@ A framework must meet **both** requirements:
 1. **Built-in compression** — the framework must have native gzip support. Custom gzip implementations or third-party compression libraries are not permitted.
 2. **Configurable compression level** — the framework must allow setting gzip to its fastest level (level 1). Frameworks that hardcode the compression level and don't expose configuration are excluded, since compression level has a significant impact on both throughput and output size.
 
-Frameworks excluded due to no built-in compression: hyper, ntex, Node.js, Express, Deno, Flask.
+Frameworks excluded due to no built-in compression: hyper, Node.js, Express, Deno, Flask.
 
 Frameworks excluded due to non-configurable compression level: actix, drogon, Spring Boot (Tomcat).
 

@@ -1,10 +1,11 @@
 use actix_web::http::header::{ContentType, HeaderValue, SERVER};
 use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer};
+use rusqlite::Connection;
 use rustls::ServerConfig;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::io;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 static SERVER_HDR: HeaderValue = HeaderValue::from_static("actix");
 
@@ -61,6 +62,8 @@ struct AppState {
     json_large_cache: Vec<u8>,
     static_files: HashMap<String, StaticFile>,
 }
+
+struct WorkerDb(Mutex<Connection>);
 
 fn load_dataset() -> Vec<DatasetItem> {
     let path = std::env::var("DATASET_PATH").unwrap_or_else(|_| "/data/dataset.json".to_string());
@@ -157,41 +160,11 @@ async fn baseline11_get(req: HttpRequest) -> HttpResponse {
         .body(sum.to_string())
 }
 
-fn crc32_compute(data: &[u8]) -> u32 {
-    static TABLE: std::sync::OnceLock<[[u32; 256]; 8]> = std::sync::OnceLock::new();
-    let t = TABLE.get_or_init(|| {
-        let mut t = [[0u32; 256]; 8];
-        for i in 0..256u32 {
-            let mut c = i;
-            for _ in 0..8 { c = if c & 1 != 0 { 0xEDB88320 ^ (c >> 1) } else { c >> 1 }; }
-            t[0][i as usize] = c;
-        }
-        for i in 0..256 {
-            for s in 1..8 { t[s][i] = (t[s-1][i] >> 8) ^ t[0][(t[s-1][i] & 0xFF) as usize]; }
-        }
-        t
-    });
-    let mut crc = 0xFFFFFFFFu32;
-    let mut i = 0;
-    while i + 8 <= data.len() {
-        let a = u32::from_le_bytes([data[i], data[i+1], data[i+2], data[i+3]]) ^ crc;
-        let b = u32::from_le_bytes([data[i+4], data[i+5], data[i+6], data[i+7]]);
-        crc = t[7][(a & 0xFF) as usize] ^ t[6][((a >> 8) & 0xFF) as usize]
-            ^ t[5][((a >> 16) & 0xFF) as usize] ^ t[4][(a >> 24) as usize]
-            ^ t[3][(b & 0xFF) as usize] ^ t[2][((b >> 8) & 0xFF) as usize]
-            ^ t[1][((b >> 16) & 0xFF) as usize] ^ t[0][(b >> 24) as usize];
-        i += 8;
-    }
-    while i < data.len() { crc = (crc >> 8) ^ t[0][((crc ^ data[i] as u32) & 0xFF) as usize]; i += 1; }
-    crc ^ 0xFFFFFFFF
-}
-
 async fn upload(body: web::Bytes) -> HttpResponse {
-    let crc = crc32_compute(&body);
     HttpResponse::Ok()
         .insert_header((SERVER, SERVER_HDR.clone()))
         .content_type(ContentType::plaintext())
-        .body(format!("{:08x}", crc))
+        .body(body.len().to_string())
 }
 
 async fn baseline11_post(req: HttpRequest, body: web::Bytes) -> HttpResponse {
@@ -253,6 +226,43 @@ async fn compression(state: web::Data<Arc<AppState>>) -> HttpResponse {
         .body(state.json_large_cache.clone())
 }
 
+async fn db_endpoint(req: HttpRequest, db: web::Data<WorkerDb>) -> HttpResponse {
+    let min: f64 = req.uri().query().and_then(|q| {
+        q.split('&').find_map(|p| p.strip_prefix("min=").and_then(|v| v.parse().ok()))
+    }).unwrap_or(10.0);
+    let max: f64 = req.uri().query().and_then(|q| {
+        q.split('&').find_map(|p| p.strip_prefix("max=").and_then(|v| v.parse().ok()))
+    }).unwrap_or(50.0);
+    let conn = db.0.lock().unwrap();
+    let mut stmt = conn.prepare_cached(
+        "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ?1 AND ?2 LIMIT 50"
+    ).unwrap();
+    let rows = stmt.query_map(rusqlite::params![min, max], |row| {
+        Ok(serde_json::json!({
+            "id": row.get::<_, i64>(0)?,
+            "name": row.get::<_, String>(1)?,
+            "category": row.get::<_, String>(2)?,
+            "price": row.get::<_, f64>(3)?,
+            "quantity": row.get::<_, i64>(4)?,
+            "active": row.get::<_, i64>(5)? == 1,
+            "tags": serde_json::from_str::<serde_json::Value>(&row.get::<_, String>(6)?).unwrap_or_default(),
+            "rating": serde_json::json!({
+                "score": row.get::<_, f64>(7)?,
+                "count": row.get::<_, i64>(8)?
+            })
+        }))
+    });
+    let items: Vec<serde_json::Value> = match rows {
+        Ok(mapped) => mapped.filter_map(|r| r.ok()).collect(),
+        Err(_) => Vec::new(),
+    };
+    let result = serde_json::json!({"items": items, "count": items.len()});
+    HttpResponse::Ok()
+        .insert_header((SERVER, SERVER_HDR.clone()))
+        .content_type(ContentType::json())
+        .body(result.to_string())
+}
+
 async fn static_file(
     state: web::Data<Arc<AppState>>,
     path: web::Path<String>,
@@ -307,9 +317,19 @@ async fn main() -> io::Result<()> {
     let mut server = HttpServer::new({
         let state = state.clone();
         move || {
+            let worker_db = Connection::open_with_flags(
+                "/data/benchmark.db",
+                rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+            )
+            .map(|conn| {
+                conn.execute_batch("PRAGMA mmap_size=268435456").ok();
+                WorkerDb(Mutex::new(conn))
+            })
+            .expect("Failed to open database");
             App::new()
                 .wrap(actix_web::middleware::Compress::default())
                 .app_data(web::Data::new(state.clone()))
+                .app_data(web::Data::new(worker_db))
                 .app_data(web::PayloadConfig::new(25 * 1024 * 1024))
                 .route("/pipeline", web::get().to(pipeline))
                 .route("/baseline11", web::get().to(baseline11_get))
@@ -317,6 +337,7 @@ async fn main() -> io::Result<()> {
                 .route("/baseline2", web::get().to(baseline2))
                 .route("/json", web::get().to(json_endpoint))
                 .route("/compression", web::get().to(compression))
+                .route("/db", web::get().to(db_endpoint))
                 .route("/upload", web::post().to(upload))
                 .route("/static/{filename}", web::get().to(static_file))
         }

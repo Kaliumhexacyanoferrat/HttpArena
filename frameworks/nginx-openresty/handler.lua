@@ -172,7 +172,7 @@ function _M.upload()
         return
     end
     ngx.header["Content-Type"] = "text/plain"
-    ngx.print(string.format("%08x", ngx.crc32_long(body)))
+    ngx.print(tostring(#body))
 end
 
 function _M.static_file()

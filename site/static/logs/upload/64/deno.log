@@ -1,0 +1,1233 @@
+[serve-worker-0 ] deno serve: Listening on http://0.0.0.0:8080/ with 128 threads
+[serve-worker-0 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-4 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-64] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-21] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-55] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-41] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-123] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-70] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-21] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-21] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-21] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-2 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-0 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-0 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-0 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-0 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-123] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-123] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-64] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-64] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-64] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-64] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-2 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-55] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-55] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-55] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-55] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-55] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-55] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-2 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-70] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-70] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-70] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-70] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-70] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-4 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-4 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-4 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-4 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-4 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-4 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-4 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-41] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-41] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-41] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-41] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-41] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-41] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-2 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-2 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-2 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-2 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-73] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-73] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-73] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-73] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-73] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-73] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-74] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-78] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-50] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-45] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-17] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-46] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-38] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-123] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-125] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-93] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-27] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-106] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-65] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-81] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-34] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-58] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-28] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-60] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-90] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-86] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-0 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-75] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-61] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-34] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-31] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-108] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-26] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-102] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-11] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-52] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-37] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-92] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-29] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-120] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-54] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-22] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-18] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-36] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-67] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-118] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-110] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-80] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-6 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-10] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-59] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-95] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-32] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-37] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-91] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-91] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-42] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-14] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-87] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-111] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-47] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-113] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-68] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-68] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-4 ] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-76] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-106] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-76] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-50] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-113] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-75] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-117] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-19] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-57] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-10] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-17] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-78] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-40] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-108] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-31] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-52] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-65] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-109] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-53] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-125] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-74] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-38] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-15] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-25] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-42] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-96] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-100] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-84] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-11] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-56] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-54] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-28] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-87] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-14] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-47] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-61] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-107] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-71] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-89] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-59] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-112] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-49] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-103] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-91] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-86] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-92] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-35] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-34] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-34] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-81] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-27] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-27] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-37] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-37] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-63] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-67] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-67] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-64] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}
+[serve-worker-70] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}

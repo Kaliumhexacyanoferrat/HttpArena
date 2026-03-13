@@ -1,4 +1,5 @@
 #include <drogon/drogon.h>
+#include <sqlite3.h>
 #include <dirent.h>
 #include <fstream>
 #include <sstream>
@@ -7,34 +8,21 @@
 
 using namespace drogon;
 
-static uint32_t crc32_tab[8][256];
-static void crc32_init() {
-    for (uint32_t i = 0; i < 256; i++) {
-        uint32_t c = i;
-        for (int j = 0; j < 8; j++) c = (c >> 1) ^ (0xEDB88320 & (-(c & 1)));
-        crc32_tab[0][i] = c;
-    }
-    for (uint32_t i = 0; i < 256; i++)
-        for (int s = 1; s < 8; s++)
-            crc32_tab[s][i] = (crc32_tab[s-1][i] >> 8) ^ crc32_tab[0][crc32_tab[s-1][i] & 0xFF];
-}
-static uint32_t crc32_compute(const void *data, size_t len) {
-    uint32_t crc = 0xFFFFFFFF;
-    const uint8_t *p = (const uint8_t *)data;
-    while (len >= 8) {
-        uint32_t a = *(const uint32_t *)p ^ crc;
-        uint32_t b = *(const uint32_t *)(p + 4);
-        crc = crc32_tab[7][a & 0xFF] ^ crc32_tab[6][(a >> 8) & 0xFF]
-            ^ crc32_tab[5][(a >> 16) & 0xFF] ^ crc32_tab[4][(a >> 24)]
-            ^ crc32_tab[3][b & 0xFF] ^ crc32_tab[2][(b >> 8) & 0xFF]
-            ^ crc32_tab[1][(b >> 16) & 0xFF] ^ crc32_tab[0][(b >> 24)];
-        p += 8; len -= 8;
-    }
-    while (len--) crc = (crc >> 8) ^ crc32_tab[0][(crc ^ *p++) & 0xFF];
-    return crc ^ 0xFFFFFFFF;
-}
+// ── Shared data ──
 
-static Json::Value dataset_root;
+struct Rating { double score; int64_t count; };
+struct DataItem {
+    int64_t id;
+    std::string name, category;
+    double price;
+    int quantity;
+    bool active;
+    std::vector<std::string> tags;
+    Rating rating;
+    double total;
+};
+static std::vector<DataItem> dataset;
+
 static std::string json_large_response;
 
 struct StaticFile {
@@ -43,33 +31,75 @@ struct StaticFile {
 };
 static std::unordered_map<std::string, StaticFile> static_files;
 
+static bool db_available = false;
+
+static sqlite3 *openDb()
+{
+    sqlite3 *h = nullptr;
+    if (sqlite3_open_v2("/data/benchmark.db", &h,
+                        SQLITE_OPEN_READONLY | SQLITE_OPEN_NOMUTEX, nullptr) != SQLITE_OK) {
+        if (h) sqlite3_close(h);
+        return nullptr;
+    }
+    sqlite3_exec(h, "PRAGMA mmap_size=268435456", nullptr, nullptr, nullptr);
+    return h;
+}
+
+static thread_local sqlite3 *tl_db = nullptr;
+static thread_local sqlite3_stmt *tl_stmt = nullptr;
+
+static sqlite3 *getDb()
+{
+    if (!tl_db) {
+        tl_db = openDb();
+        if (tl_db) {
+            const char *sql = "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ?1 AND ?2 LIMIT 50";
+            sqlite3_prepare_v2(tl_db, sql, -1, &tl_stmt, nullptr);
+        }
+    }
+    return tl_db;
+}
+
 static void loadDataset()
 {
     const char *path = getenv("DATASET_PATH");
     if (!path) path = "/data/dataset.json";
     std::ifstream f(path);
     if (!f.is_open()) return;
-
     std::stringstream ss;
     ss << f.rdbuf();
     f.close();
-
     Json::CharReaderBuilder rb;
+    Json::Value root;
     std::string errs;
     std::istringstream is(ss.str());
-    Json::parseFromStream(rb, is, &dataset_root, &errs);
+    Json::parseFromStream(rb, is, &root, &errs);
+    if (!root.isArray()) return;
+
+    for (const auto &d : root) {
+        DataItem item;
+        item.id = d["id"].asInt64();
+        item.name = d["name"].asString();
+        item.category = d["category"].asString();
+        item.price = d["price"].asDouble();
+        item.quantity = d["quantity"].asInt();
+        item.active = d["active"].asBool();
+        if (d["tags"].isArray())
+            for (const auto &t : d["tags"]) item.tags.push_back(t.asString());
+        item.rating.score = d["rating"]["score"].asDouble();
+        item.rating.count = d["rating"]["count"].asInt64();
+        item.total = std::round(item.price * item.quantity * 100.0) / 100.0;
+        dataset.push_back(std::move(item));
+    }
 }
 
 static void loadDatasetLarge()
 {
-    const char *path = "/data/dataset-large.json";
-    std::ifstream f(path);
+    std::ifstream f("/data/dataset-large.json");
     if (!f.is_open()) return;
-
     std::stringstream ss;
     ss << f.rdbuf();
     f.close();
-
     Json::CharReaderBuilder rb;
     Json::Value root;
     std::string errs;
@@ -80,22 +110,15 @@ static void loadDatasetLarge()
     Json::Value items(Json::arrayValue);
     for (const auto &d : root) {
         Json::Value item;
-        item["id"] = d["id"];
-        item["name"] = d["name"];
-        item["category"] = d["category"];
-        item["price"] = d["price"];
-        item["quantity"] = d["quantity"];
-        item["active"] = d["active"];
-        item["tags"] = d["tags"];
-        item["rating"] = d["rating"];
-        double price = d["price"].asDouble();
-        int qty = d["quantity"].asInt();
-        item["total"] = std::round(price * qty * 100.0) / 100.0;
+        item["id"] = d["id"]; item["name"] = d["name"];
+        item["category"] = d["category"]; item["price"] = d["price"];
+        item["quantity"] = d["quantity"]; item["active"] = d["active"];
+        item["tags"] = d["tags"]; item["rating"] = d["rating"];
+        item["total"] = std::round(d["price"].asDouble() * d["quantity"].asInt() * 100.0) / 100.0;
         items.append(std::move(item));
     }
     resp["items"] = std::move(items);
     resp["count"] = static_cast<int>(root.size());
-
     Json::StreamWriterBuilder wb;
     wb["indentation"] = "";
     json_large_response = Json::writeString(wb, resp);
@@ -113,8 +136,7 @@ static void loadStaticFiles()
     while ((e = readdir(d)) != nullptr) {
         if (e->d_type != DT_REG) continue;
         std::string name(e->d_name);
-        std::string fpath = "/data/static/" + name;
-        std::ifstream f(fpath, std::ios::binary);
+        std::ifstream f("/data/static/" + name, std::ios::binary);
         if (!f) continue;
         std::ostringstream ss;
         ss << f.rdbuf();
@@ -136,133 +158,205 @@ static int64_t sumQuery(const HttpRequestPtr &req)
     return sum;
 }
 
+// ── Controller ──
+
+class BenchmarkCtrl : public drogon::HttpController<BenchmarkCtrl>
+{
+public:
+    METHOD_LIST_BEGIN
+    ADD_METHOD_TO(BenchmarkCtrl::pipeline,    "/pipeline",         Get);
+    ADD_METHOD_TO(BenchmarkCtrl::json,        "/json",             Get);
+    ADD_METHOD_TO(BenchmarkCtrl::compression, "/compression",      Get);
+    ADD_METHOD_TO(BenchmarkCtrl::baseline2,   "/baseline2",        Get);
+    ADD_METHOD_TO(BenchmarkCtrl::upload,      "/upload",           Post);
+    ADD_METHOD_TO(BenchmarkCtrl::baseline11,  "/baseline11",       Get, Post);
+    ADD_METHOD_TO(BenchmarkCtrl::dbEndpoint,  "/db",               Get);
+    ADD_METHOD_TO(BenchmarkCtrl::staticFile,  "/static/{1}",       Get);
+    METHOD_LIST_END
+
+    void pipeline(const HttpRequestPtr &req,
+                  std::function<void(const HttpResponsePtr &)> &&callback)
+    {
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setBody("ok");
+        resp->setContentTypeCode(CT_TEXT_PLAIN);
+        callback(resp);
+    }
+
+    void json(const HttpRequestPtr &req,
+              std::function<void(const HttpResponsePtr &)> &&callback)
+    {
+        if (!dataset.empty()) {
+            Json::Value respJson;
+            Json::Value items(Json::arrayValue);
+            for (const auto &d : dataset) {
+                Json::Value item;
+                item["id"] = static_cast<Json::Int64>(d.id);
+                item["name"] = d.name;
+                item["category"] = d.category;
+                item["price"] = d.price;
+                item["quantity"] = d.quantity;
+                item["active"] = d.active;
+                Json::Value tags(Json::arrayValue);
+                for (const auto &t : d.tags) tags.append(t);
+                item["tags"] = std::move(tags);
+                Json::Value rating;
+                rating["score"] = d.rating.score;
+                rating["count"] = static_cast<Json::Int64>(d.rating.count);
+                item["rating"] = std::move(rating);
+                item["total"] = d.total;
+                items.append(std::move(item));
+            }
+            respJson["items"] = std::move(items);
+            respJson["count"] = static_cast<int>(dataset.size());
+            Json::StreamWriterBuilder wb;
+            wb["indentation"] = "";
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setBody(Json::writeString(wb, respJson));
+            resp->setContentTypeCode(CT_APPLICATION_JSON);
+            callback(resp);
+        } else {
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setStatusCode(k500InternalServerError);
+            resp->setBody("No dataset");
+            callback(resp);
+        }
+    }
+
+    void compression(const HttpRequestPtr &req,
+                     std::function<void(const HttpResponsePtr &)> &&callback)
+    {
+        if (!json_large_response.empty()) {
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setBody(json_large_response);
+            resp->setContentTypeCode(CT_APPLICATION_JSON);
+            callback(resp);
+        } else {
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setStatusCode(k500InternalServerError);
+            resp->setBody("No dataset");
+            callback(resp);
+        }
+    }
+
+    void baseline2(const HttpRequestPtr &req,
+                   std::function<void(const HttpResponsePtr &)> &&callback)
+    {
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setBody(std::to_string(sumQuery(req)));
+        resp->setContentTypeCode(CT_TEXT_PLAIN);
+        callback(resp);
+    }
+
+    void upload(const HttpRequestPtr &req,
+                std::function<void(const HttpResponsePtr &)> &&callback)
+    {
+        const auto &body = req->body();
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setBody(std::to_string(body.size()));
+        resp->setContentTypeCode(CT_TEXT_PLAIN);
+        callback(resp);
+    }
+
+    void baseline11(const HttpRequestPtr &req,
+                    std::function<void(const HttpResponsePtr &)> &&callback)
+    {
+        int64_t sum = sumQuery(req);
+        if (req->method() == Post) {
+            const auto &body = req->body();
+            if (!body.empty()) {
+                try { sum += std::stoll(std::string(body)); } catch (...) {}
+            }
+        }
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setBody(std::to_string(sum));
+        resp->setContentTypeCode(CT_TEXT_PLAIN);
+        callback(resp);
+    }
+
+    void dbEndpoint(const HttpRequestPtr &req,
+                    std::function<void(const HttpResponsePtr &)> &&callback)
+    {
+        if (!db_available || !getDb() || !tl_stmt) {
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setBody("{\"items\":[],\"count\":0}");
+            resp->setContentTypeCode(CT_APPLICATION_JSON);
+            callback(resp);
+            return;
+        }
+        double minPrice = 10.0, maxPrice = 50.0;
+        for (auto &[k, v] : req->parameters()) {
+            if (k == "min") { try { minPrice = std::stod(v); } catch (...) {} }
+            else if (k == "max") { try { maxPrice = std::stod(v); } catch (...) {} }
+        }
+        Json::Value respJson;
+        Json::Value items(Json::arrayValue);
+        sqlite3_reset(tl_stmt);
+        sqlite3_bind_double(tl_stmt, 1, minPrice);
+        sqlite3_bind_double(tl_stmt, 2, maxPrice);
+        while (sqlite3_step(tl_stmt) == SQLITE_ROW) {
+            Json::Value item;
+            item["id"] = static_cast<Json::Int64>(sqlite3_column_int64(tl_stmt, 0));
+            item["name"] = reinterpret_cast<const char *>(sqlite3_column_text(tl_stmt, 1));
+            item["category"] = reinterpret_cast<const char *>(sqlite3_column_text(tl_stmt, 2));
+            item["price"] = sqlite3_column_double(tl_stmt, 3);
+            item["quantity"] = static_cast<Json::Int64>(sqlite3_column_int64(tl_stmt, 4));
+            item["active"] = sqlite3_column_int(tl_stmt, 5) == 1;
+            const char *tagsStr = reinterpret_cast<const char *>(sqlite3_column_text(tl_stmt, 6));
+            Json::CharReaderBuilder rb;
+            Json::Value tags;
+            std::string errs;
+            std::istringstream tis(tagsStr ? tagsStr : "[]");
+            Json::parseFromStream(rb, tis, &tags, &errs);
+            item["tags"] = tags;
+            Json::Value rating;
+            rating["score"] = sqlite3_column_double(tl_stmt, 7);
+            rating["count"] = static_cast<Json::Int64>(sqlite3_column_int64(tl_stmt, 8));
+            item["rating"] = rating;
+            items.append(std::move(item));
+        }
+        respJson["items"] = std::move(items);
+        respJson["count"] = static_cast<int>(respJson["items"].size());
+        Json::StreamWriterBuilder wb;
+        wb["indentation"] = "";
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setBody(Json::writeString(wb, respJson));
+        resp->setContentTypeCode(CT_APPLICATION_JSON);
+        callback(resp);
+    }
+
+    void staticFile(const HttpRequestPtr &req,
+                    std::function<void(const HttpResponsePtr &)> &&callback,
+                    const std::string &filename)
+    {
+        auto it = static_files.find(filename);
+        if (it != static_files.end()) {
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setBody(it->second.data);
+            resp->addHeader("Content-Type", it->second.content_type);
+            callback(resp);
+        } else {
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setStatusCode(k404NotFound);
+            callback(resp);
+        }
+    }
+};
+
+// ── Main ──
+
 int main()
 {
-    crc32_init();
     loadDataset();
     loadDatasetLarge();
     loadStaticFiles();
-
-    // Register sync advice for fastest dispatch (bypasses controller pipeline)
-    app().registerSyncAdvice(
-        [](const HttpRequestPtr &req) -> HttpResponsePtr {
-            if (req->method() != Get && req->method() != Post)
-                return {};
-
-            const auto &path = req->path();
-
-            if (path == "/pipeline") {
-                auto resp = HttpResponse::newHttpResponse();
-                resp->setBody("ok");
-                resp->setContentTypeCode(CT_TEXT_PLAIN);
-                resp->addHeader("Server", "drogon");
-                return resp;
-            }
-
-            if (path == "/json") {
-                if (dataset_root.isArray() && dataset_root.size() > 0) {
-                    Json::Value resp;
-                    Json::Value items(Json::arrayValue);
-                    for (const auto &d : dataset_root) {
-                        Json::Value item;
-                        item["id"] = d["id"];
-                        item["name"] = d["name"];
-                        item["category"] = d["category"];
-                        item["price"] = d["price"];
-                        item["quantity"] = d["quantity"];
-                        item["active"] = d["active"];
-                        item["tags"] = d["tags"];
-                        item["rating"] = d["rating"];
-                        double price = d["price"].asDouble();
-                        int qty = d["quantity"].asInt();
-                        item["total"] = std::round(price * qty * 100.0) / 100.0;
-                        items.append(std::move(item));
-                    }
-                    resp["items"] = std::move(items);
-                    resp["count"] = static_cast<int>(dataset_root.size());
-                    Json::StreamWriterBuilder wb;
-                    wb["indentation"] = "";
-                    auto httpResp = HttpResponse::newHttpResponse();
-                    httpResp->setBody(Json::writeString(wb, resp));
-                    httpResp->setContentTypeCode(CT_APPLICATION_JSON);
-                    httpResp->addHeader("Server", "drogon");
-                    return httpResp;
-                }
-                auto resp = HttpResponse::newHttpResponse();
-                resp->setStatusCode(k500InternalServerError);
-                resp->setBody("No dataset");
-                return resp;
-            }
-
-            if (path == "/compression") {
-                if (!json_large_response.empty()) {
-                    auto resp = HttpResponse::newHttpResponse();
-                    resp->setBody(json_large_response);
-                    resp->setContentTypeCode(CT_APPLICATION_JSON);
-                    resp->addHeader("Server", "drogon");
-                    return resp;
-                }
-                auto resp = HttpResponse::newHttpResponse();
-                resp->setStatusCode(k500InternalServerError);
-                resp->setBody("No dataset");
-                return resp;
-            }
-
-            if (path == "/baseline2") {
-                int64_t sum = sumQuery(req);
-                auto resp = HttpResponse::newHttpResponse();
-                resp->setBody(std::to_string(sum));
-                resp->setContentTypeCode(CT_TEXT_PLAIN);
-                resp->addHeader("Server", "drogon");
-                return resp;
-            }
-
-            if (path == "/upload" && req->method() == Post) {
-                const auto &body = req->body();
-                uint32_t crc = crc32_compute(body.data(), body.size());
-                char buf[16];
-                snprintf(buf, sizeof(buf), "%08x", crc);
-                auto resp = HttpResponse::newHttpResponse();
-                resp->setBody(std::string(buf));
-                resp->setContentTypeCode(CT_TEXT_PLAIN);
-                resp->addHeader("Server", "drogon");
-                return resp;
-            }
-
-            if (path == "/baseline11") {
-                int64_t sum = sumQuery(req);
-                if (req->method() == Post) {
-                    const auto &body = req->body();
-                    if (!body.empty()) {
-                        try { sum += std::stoll(std::string(body)); } catch (...) {}
-                    }
-                }
-                auto resp = HttpResponse::newHttpResponse();
-                resp->setBody(std::to_string(sum));
-                resp->setContentTypeCode(CT_TEXT_PLAIN);
-                resp->addHeader("Server", "drogon");
-                return resp;
-            }
-
-            if (path.size() > 8 && path.substr(0, 8) == "/static/") {
-                auto it = static_files.find(path.substr(8));
-                if (it != static_files.end()) {
-                    auto resp = HttpResponse::newHttpResponse();
-                    resp->setBody(it->second.data);
-                    resp->addHeader("Content-Type", it->second.content_type);
-                    resp->addHeader("Server", "drogon");
-                    return resp;
-                }
-                auto resp = HttpResponse::newHttpResponse();
-                resp->setStatusCode(k404NotFound);
-                return resp;
-            }
-
-            return {};
-        });
+    {
+        sqlite3 *test = openDb();
+        if (test) { db_available = true; sqlite3_close(test); }
+    }
 
     app().setLogLevel(trantor::Logger::kWarn);
-    app().setThreadNum(0); // auto-detect CPU cores
+    app().setThreadNum(0);
     app().setClientMaxBodySize(25 * 1024 * 1024);
     app().setIdleConnectionTimeout(0);
     app().setKeepaliveRequestsNumber(0);
@@ -270,7 +364,6 @@ int main()
     app().setServerHeaderField("drogon");
     app().addListener("0.0.0.0", 8080);
 
-    // HTTPS/H2 on port 8443
     const char *cert = getenv("TLS_CERT");
     const char *key = getenv("TLS_KEY");
     if (!cert) cert = "/certs/server.crt";

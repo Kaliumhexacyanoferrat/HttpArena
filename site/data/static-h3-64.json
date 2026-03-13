@@ -1,7 +1,7 @@
 [
   {
     "framework": "h2o-mruby",
-    "language": "C",
+    "language": "Ruby",
     "rps": 409534,
     "avg_latency": "19.70ms",
     "p99_latency": "43.86ms",

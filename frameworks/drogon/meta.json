@@ -1,9 +1,9 @@
 {
   "display_name": "drogon",
   "language": "C++",
-  "type": "realistic",
+  "type": "framework",
   "engine": "drogon",
-  "description": "Drogon C++ framework with sync advice for fast dispatch, mimalloc allocator, and -flto optimization.",
+  "description": "Drogon C++ framework using HttpController with async callbacks, mimalloc allocator, and -flto optimization.",
   "repo": "https://github.com/drogonframework/drogon",
   "enabled": true,
   "tests": [
@@ -13,6 +13,8 @@
     "limited-conn",
     "json",
     "upload",
+    "compression",
+    "mixed",
     "baseline-h2",
     "static-h2"
   ]

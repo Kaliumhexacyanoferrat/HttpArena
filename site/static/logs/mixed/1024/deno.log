@@ -1,0 +1,8 @@
+[serve-worker-0 ] deno serve: Listening on http://0.0.0.0:8080/ with 128 threads
+[serve-worker-115] Http: error reading a body from connection
+    at async readableStreamCollectIntoUint8Array (ext:deno_web/06_streams.js:1095:19)
+    at async consumeBody (ext:deno_fetch/22_body.js:268:9)
+    at async Object.fetch (file:///app/main.ts:125:40)
+    at async mapped (ext:deno_http/00_serve.ts:391:18) {
+  name: "Http"
+}

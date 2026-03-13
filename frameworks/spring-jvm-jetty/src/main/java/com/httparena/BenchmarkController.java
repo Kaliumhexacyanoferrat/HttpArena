@@ -97,9 +97,7 @@ public class BenchmarkController {
 
     @PostMapping(value = "/upload", produces = MediaType.TEXT_PLAIN_VALUE)
     public String upload(@RequestBody byte[] body) {
-        java.util.zip.CRC32 crc = new java.util.zip.CRC32();
-        crc.update(body);
-        return String.format("%08x", crc.getValue());
+        return String.valueOf(body.length);
     }
 
     @GetMapping(value = "/baseline2", produces = MediaType.TEXT_PLAIN_VALUE)

@@ -1,7 +1,7 @@
 {
   "display_name": "spring-jvm-jetty",
   "language": "Java",
-  "type": "realistic",
+  "type": "framework",
   "engine": "Jetty",
   "description": "Spring Boot with embedded Jetty 12 on JDK 21, supporting HTTP/1.1 and HTTP/2.",
   "repo": "https://github.com/spring-projects/spring-boot",

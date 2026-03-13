@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"hash/crc32"
 	"io"
 	"math"
 	"net/http"
@@ -220,10 +219,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddyht
 	case "/upload":
 		if r.Method == "POST" && r.Body != nil {
 			body, _ := io.ReadAll(r.Body)
-			checksum := crc32.ChecksumIEEE(body)
 			w.Header().Set("Content-Type", "text/plain")
 			w.Header().Set("Server", "caddy")
-			fmt.Fprintf(w, "%08x", checksum)
+			fmt.Fprintf(w, "%d", len(body))
 		} else {
 			http.Error(w, "POST required", 405)
 		}

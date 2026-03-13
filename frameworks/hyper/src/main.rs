@@ -116,42 +116,12 @@ fn parse_query_params(query: Option<&str>) -> i64 {
     sum
 }
 
-fn crc32_compute(data: &[u8]) -> u32 {
-    static TABLE: std::sync::OnceLock<[[u32; 256]; 8]> = std::sync::OnceLock::new();
-    let t = TABLE.get_or_init(|| {
-        let mut t = [[0u32; 256]; 8];
-        for i in 0..256u32 {
-            let mut c = i;
-            for _ in 0..8 { c = if c & 1 != 0 { 0xEDB88320 ^ (c >> 1) } else { c >> 1 }; }
-            t[0][i as usize] = c;
-        }
-        for i in 0..256 {
-            for s in 1..8 { t[s][i] = (t[s-1][i] >> 8) ^ t[0][(t[s-1][i] & 0xFF) as usize]; }
-        }
-        t
-    });
-    let mut crc = 0xFFFFFFFFu32;
-    let mut i = 0;
-    while i + 8 <= data.len() {
-        let a = u32::from_le_bytes([data[i], data[i+1], data[i+2], data[i+3]]) ^ crc;
-        let b = u32::from_le_bytes([data[i+4], data[i+5], data[i+6], data[i+7]]);
-        crc = t[7][(a & 0xFF) as usize] ^ t[6][((a >> 8) & 0xFF) as usize]
-            ^ t[5][((a >> 16) & 0xFF) as usize] ^ t[4][(a >> 24) as usize]
-            ^ t[3][(b & 0xFF) as usize] ^ t[2][((b >> 8) & 0xFF) as usize]
-            ^ t[1][((b >> 16) & 0xFF) as usize] ^ t[0][(b >> 24) as usize];
-        i += 8;
-    }
-    while i < data.len() { crc = (crc >> 8) ^ t[0][((crc ^ data[i] as u32) & 0xFF) as usize]; i += 1; }
-    crc ^ 0xFFFFFFFF
-}
-
 async fn upload_handler(req: Request<Incoming>) -> Result<Response<BoxBody<Bytes, Infallible>>, http::Error> {
     let body_bytes = req.collect().await.map(|b| b.to_bytes()).unwrap_or_default();
-    let crc = crc32_compute(&body_bytes);
     Response::builder()
         .header(SERVER, SERVER_HEADER.clone())
         .header(CONTENT_TYPE, TEXT_PLAIN.clone())
-        .body(Full::from(format!("{:08x}", crc)).boxed())
+        .body(Full::from(body_bytes.len().to_string()).boxed())
 }
 
 fn pipeline_response() -> Result<Response<BoxBody<Bytes, Infallible>>, http::Error> {

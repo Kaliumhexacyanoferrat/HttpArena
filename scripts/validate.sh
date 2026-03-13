@@ -231,22 +231,22 @@ fi
 
 if has_test "upload"; then
     echo "[test] upload endpoint"
-    # Small upload: known CRC32
+    # Small upload: returns byte count
     UPLOAD_BODY="Hello, HttpArena!"
-    EXPECTED_CRC=$(python3 -c "import zlib; print(format(zlib.crc32(b'$UPLOAD_BODY') & 0xFFFFFFFF, '08x'))")
-    check "POST /upload small body" "$EXPECTED_CRC" \
+    EXPECTED_LEN=${#UPLOAD_BODY}
+    check "POST /upload small body" "$EXPECTED_LEN" \
         -X POST -H "Content-Type: application/octet-stream" --data-binary "$UPLOAD_BODY" \
         "http://localhost:$PORT/upload"
 
-    # Anti-cheat: random body to detect hardcoded CRC
+    # Anti-cheat: random body to detect hardcoded responses
     RANDOM_BODY=$(head -c 64 /dev/urandom | base64 | head -c 48)
-    EXPECTED_RANDOM_CRC=$(echo -n "$RANDOM_BODY" | python3 -c "import sys,zlib; print(format(zlib.crc32(sys.stdin.buffer.read()) & 0xFFFFFFFF, '08x'))")
-    ACTUAL_CRC=$(curl -s -X POST -H "Content-Type: application/octet-stream" --data-binary "$RANDOM_BODY" "http://localhost:$PORT/upload")
-    if [ "$ACTUAL_CRC" = "$EXPECTED_RANDOM_CRC" ]; then
-        echo "  PASS [POST /upload random body] (CRC32: $ACTUAL_CRC)"
+    EXPECTED_RANDOM_LEN=${#RANDOM_BODY}
+    ACTUAL_LEN=$(curl -s -X POST -H "Content-Type: application/octet-stream" --data-binary "$RANDOM_BODY" "http://localhost:$PORT/upload")
+    if [ "$ACTUAL_LEN" = "$EXPECTED_RANDOM_LEN" ]; then
+        echo "  PASS [POST /upload random body] (bytes: $ACTUAL_LEN)"
         PASS=$((PASS + 1))
     else
-        echo "  FAIL [POST /upload random body]: expected CRC '$EXPECTED_RANDOM_CRC', got '$ACTUAL_CRC'"
+        echo "  FAIL [POST /upload random body]: expected '$EXPECTED_RANDOM_LEN', got '$ACTUAL_LEN'"
         FAIL=$((FAIL + 1))
     fi
 fi

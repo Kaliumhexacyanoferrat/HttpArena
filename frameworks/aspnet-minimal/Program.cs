@@ -197,8 +197,7 @@ app.MapPost("/upload", async (HttpRequest req) =>
 {
     using var ms = new MemoryStream();
     await req.Body.CopyToAsync(ms);
-    uint crc = Crc32Helper.Compute(ms.GetBuffer().AsSpan(0, (int)ms.Length));
-    return Results.Text(crc.ToString("x8"));
+    return Results.Text(ms.Length.ToString());
 });
 
 app.MapGet("/json", () =>
@@ -277,41 +276,4 @@ class RatingInfo
 {
     public double Score { get; set; }
     public int Count { get; set; }
-}
-
-static class Crc32Helper
-{
-    private static readonly uint[][] T = new uint[8][];
-    static Crc32Helper()
-    {
-        for (int s = 0; s < 8; s++) T[s] = new uint[256];
-        for (uint i = 0; i < 256; i++)
-        {
-            uint c = i;
-            for (int j = 0; j < 8; j++)
-                c = (c >> 1) ^ (0xEDB88320u & (0u - (c & 1u)));
-            T[0][i] = c;
-        }
-        for (uint i = 0; i < 256; i++)
-            for (int s = 1; s < 8; s++)
-                T[s][i] = (T[s-1][i] >> 8) ^ T[0][T[s-1][i] & 0xFF];
-    }
-    public static uint Compute(ReadOnlySpan<byte> data)
-    {
-        uint crc = 0xFFFFFFFF;
-        int i = 0;
-        while (i + 8 <= data.Length)
-        {
-            uint a = (uint)(data[i] | (data[i+1] << 8) | (data[i+2] << 16) | (data[i+3] << 24)) ^ crc;
-            uint b = (uint)(data[i+4] | (data[i+5] << 8) | (data[i+6] << 16) | (data[i+7] << 24));
-            crc = T[7][a & 0xFF] ^ T[6][(a >> 8) & 0xFF]
-                ^ T[5][(a >> 16) & 0xFF] ^ T[4][a >> 24]
-                ^ T[3][b & 0xFF] ^ T[2][(b >> 8) & 0xFF]
-                ^ T[1][(b >> 16) & 0xFF] ^ T[0][b >> 24];
-            i += 8;
-        }
-        while (i < data.Length)
-            crc = (crc >> 8) ^ T[0][(crc ^ data[i++]) & 0xFF];
-        return crc ^ 0xFFFFFFFF;
-    }
 }

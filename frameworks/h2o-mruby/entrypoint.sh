@@ -10,21 +10,32 @@ if [ -f /data/dataset-large.json ]; then
 fi
 
 # Generate h2o.conf
+CERT_FILE=${TLS_CERT:-/certs/server.crt}
+KEY_FILE=${TLS_KEY:-/certs/server.key}
+
 cat > /tmp/h2o.conf << EOF
 num-threads: ${NPROC}
 
 listen:
   port: 8080
+EOF
+
+if [ -f "$CERT_FILE" ] && [ -f "$KEY_FILE" ]; then
+cat >> /tmp/h2o.conf << EOF
 
 listen: &ssl_listen
   port: 8443
   ssl:
-    certificate-file: /certs/server.crt
-    key-file: /certs/server.key
+    certificate-file: ${CERT_FILE}
+    key-file: ${KEY_FILE}
 
 listen:
   <<: *ssl_listen
   type: quic
+EOF
+fi
+
+cat >> /tmp/h2o.conf << EOF
 
 hosts:
   default:

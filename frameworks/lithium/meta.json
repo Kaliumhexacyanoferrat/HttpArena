@@ -1,7 +1,7 @@
 {
   "display_name": "lithium",
   "language": "C++",
-  "type": "realistic",
+  "type": "framework",
   "engine": "li/http",
   "description": "Lithium C++ HTTP framework with compile-time reflection, boost::context coroutines, and -O3 -march=native -flto.",
   "repo": "https://github.com/matt-42/lithium",

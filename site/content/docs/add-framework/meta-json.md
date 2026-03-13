@@ -9,7 +9,7 @@ Create a `meta.json` file in your framework directory:
   "display_name": "your-framework",
   "language": "Go",
   "engine": "net/http",
-  "type": "realistic",
+  "type": "framework",
   "description": "Short description of the framework and its key features.",
   "repo": "https://github.com/org/repo",
   "enabled": true,
@@ -24,7 +24,7 @@ Create a `meta.json` file in your framework directory:
 | `display_name` | Name shown on the leaderboard |
 | `language` | Programming language (e.g., `Go`, `Rust`, `C#`, `Java`) |
 | `engine` | HTTP server engine (e.g., `Kestrel`, `Tomcat`, `hyper`) |
-| `type` | `realistic` for production-ready frameworks, `stripped` for custom/bare-metal implementations |
+| `type` | `framework` for production-ready frameworks, `engine` for bare-metal/engine-level implementations |
 | `description` | Shown in the framework detail popup on the leaderboard |
 | `repo` | Link to the framework's source repository |
 | `enabled` | Set to `false` to skip this framework during benchmark runs |

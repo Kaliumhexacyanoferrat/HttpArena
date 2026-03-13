@@ -7,4 +7,4 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -flto")
 find_package(Drogon REQUIRED)
 
 add_executable(server main.cc)
-target_link_libraries(server PRIVATE Drogon::Drogon)
+target_link_libraries(server PRIVATE Drogon::Drogon sqlite3)

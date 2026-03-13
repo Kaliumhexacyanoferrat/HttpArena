@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"hash/crc32"
 	"log"
 	"math"
 	"os"
@@ -159,10 +158,9 @@ func loadDB() {
 
 func uploadHandler(ctx *fasthttp.RequestCtx) {
 	body := ctx.PostBody()
-	checksum := crc32.ChecksumIEEE(body)
 	ctx.Response.Header.Set("Server", "go-fasthttp")
 	ctx.SetContentType("text/plain")
-	ctx.SetBodyString(fmt.Sprintf("%08x", checksum))
+	ctx.SetBodyString(fmt.Sprintf("%d", len(body)))
 }
 
 func dbHandler(ctx *fasthttp.RequestCtx) {

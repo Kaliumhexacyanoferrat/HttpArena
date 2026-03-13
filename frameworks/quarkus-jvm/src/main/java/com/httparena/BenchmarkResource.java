@@ -121,9 +121,7 @@ public class BenchmarkResource {
     @Produces(MediaType.TEXT_PLAIN)
     @NonBlocking
     public String upload(byte[] body) {
-        java.util.zip.CRC32 crc = new java.util.zip.CRC32();
-        crc.update(body);
-        return String.format("%08x", crc.getValue());
+        return String.valueOf(body.length);
     }
 
     @GET

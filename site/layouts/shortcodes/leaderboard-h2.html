@@ -51,12 +51,6 @@ var lbH2Profiles = {{ $profiles | jsonify | safeJS }};
       <div class="lb-lang-filter active" data-lang="{{ . }}">{{ . }}</div>
       {{ end }}
     </div>
-    <div class="lb-filters" style="margin-top:0.5rem;">
-      <span class="lb-filters-label">Type</span>
-      <span class="lb-filters-hint">(Toggle)</span>
-      <div class="lb-type-filter lb-type-realistic active" data-type="realistic">Realistic</div>
-      <div class="lb-type-filter lb-type-stripped active" data-type="stripped">Stripped</div>
-    </div>
     <div class="lb-search">
       <span class="lb-filters-label">Filter</span>
       <input type="text" class="lb-search-input" placeholder="e.g. aspnet-minimal, C#" />
@@ -76,6 +70,11 @@ var lbH2Profiles = {{ $profiles | jsonify | safeJS }};
 
   <div class="lb-desc">{{ $p.desc | safeHTML }}</div>
 
+  <div class="lb-filters" style="margin:0 0 0.5rem 0;">
+    <span class="lb-filters-label">Type</span>
+    <div class="lb-type-filter lb-type-framework active" data-type="framework">Framework</div>
+    <div class="lb-type-filter lb-type-engine" data-type="engine">Engine</div>
+  </div>
   <div class="lb-filters" style="margin:0 0 0 0;">
     <span class="lb-filters-label">Conn</span>
     <div class="lb-conn-tabs" data-for="{{ $p.id }}">
@@ -94,7 +93,7 @@ var lbH2Profiles = {{ $profiles | jsonify | safeJS }};
         <div title="HTTP server framework name">Framework</div>
         <div title="Programming language">Lang</div>
         <div title="HTTP server engine">Engine</div>
-        <div title="realistic = production-ready framework, stripped = custom bare-metal implementation">Type</div>
+        <div title="framework = production-ready framework, engine = bare-metal/engine-level implementation">Type</div>
         <div title="Number of concurrent connections" style="text-align:right">Conn</div>
         <div class="lb-sortable" data-sort="rps" title="Requests per second — higher is better" style="text-align:right">Req/s</div>
         <div class="lb-sortable" data-sort="bandwidth" title="Bandwidth — MB/s transferred" style="text-align:right">BW</div>
@@ -118,7 +117,7 @@ var lbH2Profiles = {{ $profiles | jsonify | safeJS }};
       <div title="HTTP server framework name">Framework</div>
       <div title="Programming language">Lang</div>
       <div title="HTTP server engine">Engine</div>
-      <div title="realistic = production-ready framework, stripped = custom bare-metal implementation">Type</div>
+      <div title="framework = production-ready framework, engine = bare-metal/engine-level implementation">Type</div>
       <div title="Number of concurrent connections" style="text-align:right">Conn</div>
       <div class="lb-sortable" data-sort="rps" title="Requests per second — higher is better" style="text-align:right">Req/s</div>
       <div class="lb-sortable" data-sort="errors" title="HTTP error count (4xx+5xx) — hover for breakdown" style="text-align:right">Err</div>
@@ -136,8 +135,8 @@ var lbH2Profiles = {{ $profiles | jsonify | safeJS }};
     {{ $pct := mul (div (float $r.rps) (float $maxRps)) 100.0 }}
     {{ $meta := index site.Data.frameworks $r.framework }}
     {{ $s2xx := int ($r.status_2xx | default 0) }}{{ $s3xx := int ($r.status_3xx | default 0) }}{{ $s4xx := int ($r.status_4xx | default 0) }}{{ $s5xx := int ($r.status_5xx | default 0) }}{{ $errs := add $s4xx $s5xx }}
-    <div class="lb-row" data-lang="{{ $r.language | default "" }}" data-name="{{ $r.framework }}" data-rps="{{ printf "%.0f" $r.rps }}" data-type="{{ with $meta }}{{ .type | default "realistic" }}{{ end }}" data-desc="{{ with $meta }}{{ .description }}{{ end }}" data-repo="{{ with $meta }}{{ .repo }}{{ end }}" data-s2xx="{{ $s2xx }}" data-s3xx="{{ $s3xx }}" data-s4xx="{{ $s4xx }}" data-s5xx="{{ $s5xx }}">
-      {{ $ftype := "realistic" }}{{ with $meta }}{{ $ftype = .type | default "realistic" }}{{ end }}
+    <div class="lb-row" data-lang="{{ $r.language | default "" }}" data-name="{{ $r.framework }}" data-rps="{{ printf "%.0f" $r.rps }}" data-type="{{ with $meta }}{{ .type | default "framework" }}{{ end }}" data-desc="{{ with $meta }}{{ .description }}{{ end }}" data-repo="{{ with $meta }}{{ .repo }}{{ end }}" data-s2xx="{{ $s2xx }}" data-s3xx="{{ $s3xx }}" data-s4xx="{{ $s4xx }}" data-s5xx="{{ $s5xx }}">
+      {{ $ftype := "framework" }}{{ with $meta }}{{ $ftype = .type | default "framework" }}{{ end }}
       <div class="lb-rank">{{ if eq $j 0 }}🥇{{ else if eq $j 1 }}🥈{{ else if eq $j 2 }}🥉{{ else }}{{ add $j 1 }}{{ end }}</div>
       <div class="lb-name">{{ $r.framework }}</div>
       <div class="lb-lang">{{ $r.language | default "—" }}</div>
@@ -279,8 +278,8 @@ function applyFilters() {
   var allBtn = w.querySelector('.lb-lang-filter[data-lang="all"]');
   var allLangs = filters.length === 0 || (allBtn && allBtn.classList.contains('active'));
 
-  var showStripped = w.querySelector('.lb-type-filter[data-type="stripped"]').classList.contains('active');
-  var showRealistic = w.querySelector('.lb-type-filter[data-type="realistic"]').classList.contains('active');
+  var showEngine = w.querySelector('.lb-type-filter[data-type="engine"]').classList.contains('active');
+  var showFramework = w.querySelector('.lb-type-filter[data-type="framework"]').classList.contains('active');
 
   var searchVal = w.querySelector('.lb-search-input').value.toLowerCase().trim();
   var terms = searchVal ? searchVal.split(',').map(function(s) { return s.trim(); }).filter(Boolean) : [];
@@ -294,9 +293,9 @@ function applyFilters() {
     rows.forEach(function(row) {
       var lang = row.dataset.lang;
       var name = row.dataset.name.toLowerCase();
-      var type = row.dataset.type || 'realistic';
+      var type = row.dataset.type || 'framework';
       var langMatch = allLangs || activeLangs.has(lang);
-      var typeMatch = (type === 'stripped' && showStripped) || (type !== 'stripped' && showRealistic);
+      var typeMatch = (type === 'engine' && showEngine) || (type !== 'engine' && showFramework);
       var textMatch = terms.length === 0 || terms.some(function(t) {
         return name.indexOf(t) !== -1 || lang.toLowerCase().indexOf(t) !== -1;
       });
@@ -350,7 +349,10 @@ w.querySelector('.lb-search-input').addEventListener('input', function() { apply
 
 w.querySelectorAll('.lb-type-filter').forEach(function(btn) {
   btn.addEventListener('click', function() {
-    btn.classList.toggle('active');
+    var type = btn.dataset.type;
+    w.querySelectorAll('.lb-type-filter').forEach(function(f) {
+      f.classList.toggle('active', f.dataset.type === type);
+    });
     applyFilters();
   });
 });
@@ -511,7 +513,7 @@ window.addEventListener('roundChanged', function(ev) {
 
     sorted.forEach(function(r, j) {
       var m = fwMeta[r.framework] || {};
-      var ftype = m.type || 'realistic';
+      var ftype = m.type || 'framework';
       var pct = (r.rps / maxRps * 100).toFixed(1);
       var rank = j < 3 ? medals[j] : String(j + 1);
       var rs2 = r.status_2xx || 0, rs3 = r.status_3xx || 0, rs4 = r.status_4xx || 0, rs5 = r.status_5xx || 0;

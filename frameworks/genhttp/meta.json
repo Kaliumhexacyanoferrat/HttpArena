@@ -1,7 +1,7 @@
 {
   "display_name": "genhttp",
   "language": "C#",
-  "type": "realistic",
+  "type": "framework",
   "engine": "Kestrel",
   "description": "Lightweight embeddable C# web server using the Kestrel engine for HTTP/1.1, HTTP/2, and HTTP/3 support.",
   "repo": "https://github.com/Kaliumhexacyanoferrat/GenHTTP",

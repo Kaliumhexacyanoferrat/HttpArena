@@ -33,8 +33,8 @@ var compositeProfiles = {{ $profiles | jsonify | safeJS }};
 var compositeMeta = {{ site.Data.frameworks | jsonify | safeJS }};
 </script>
 
-<div class="composite-disclaimer" style="margin-top:1rem; padding:0.75rem 1.25rem; border-radius:0.5rem; background:rgba(234,179,8,0.08); border:1px solid rgba(234,179,8,0.3); color:#78350f; font-size:0.95rem; line-height:1.6;">
-  <span style="margin-right:0.4rem;">&#9888;&#65039;</span><strong>Note:</strong> Stripped frameworks are excluded from the composite ranking and normalization. Only realistic frameworks — those using standard, production-grade HTTP libraries — are scored here. Stripped entries can still be compared in individual test profiles.
+<div id="composite-disclaimer" class="composite-disclaimer" style="margin-top:1rem; padding:0.75rem 1.25rem; border-radius:0.5rem; background:rgba(234,179,8,0.08); border:1px solid rgba(234,179,8,0.3); color:#78350f; font-size:0.95rem; line-height:1.6;">
+  <span style="margin-right:0.4rem;">&#9888;&#65039;</span><strong>Note:</strong> Showing <strong>framework</strong> entries — production-grade HTTP libraries. Use the type filter to switch to engine-level implementations.
 </div>
 <style>
 html.dark .composite-disclaimer { color: #fff !important; background: rgba(234,179,8,0.12) !important; border-color: rgba(234,179,8,0.4) !important; }
@@ -49,7 +49,24 @@ html.dark .composite-disclaimer { color: #fff !important; background: rgba(234,1
     <a href="{{ "docs/scoring/composite-score" | relURL }}" style="color:#3b82f6; text-decoration:none; font-weight:500;"> Learn more &rarr;</a>
   </div>
 
-  <div class="lb-filters composite-profiles-wrap" style="margin:0.75rem 0 0 0; padding:0.75rem 1rem; background:rgba(0,0,0,0.04); border-radius:8px; border:1px solid rgba(0,0,0,0.08);">
+  <div class="lb-filters composite-type-wrap" style="margin:0.75rem 0 0 0; padding:0.5rem 1rem; background:rgba(0,0,0,0.04); border-radius:8px; border:1px solid rgba(0,0,0,0.08);">
+    <span class="lb-filters-label">Type</span>
+    <div class="composite-type-filter active" data-type="framework">Framework</div>
+    <div class="composite-type-filter" data-type="engine">Engine</div>
+  </div>
+  <style>
+  .composite-type-filter { padding:0.3rem 0.75rem; font-size:0.8rem; font-weight:500; color:#94a3b8; cursor:pointer; border-radius:6px; border:1.5px solid #e2e8f0; background:transparent; transition:all 0.15s ease; user-select:none; }
+  .composite-type-filter:hover { color:#475569; border-color:#cbd5e1; transform:translateY(-1px); box-shadow:0 2px 4px rgba(0,0,0,0.08); }
+  .composite-type-filter[data-type="framework"].active { color:#8b5cf6; border-color:#8b5cf6; background:rgba(139,92,246,0.06); font-weight:600; }
+  .composite-type-filter[data-type="engine"].active { color:#f59e0b; border-color:#f59e0b; background:rgba(245,158,11,0.06); font-weight:600; }
+  html.dark .composite-type-wrap { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.10); }
+  html.dark .composite-type-filter { color:#64748b; border-color:#334155; }
+  html.dark .composite-type-filter:hover { color:#94a3b8; border-color:#475569; }
+  html.dark .composite-type-filter[data-type="framework"].active { color:#a78bfa; border-color:#8b5cf6; background:rgba(139,92,246,0.12); }
+  html.dark .composite-type-filter[data-type="engine"].active { color:#fbbf24; border-color:#f59e0b; background:rgba(245,158,11,0.12); }
+  </style>
+
+  <div class="lb-filters composite-profiles-wrap" style="margin:0.5rem 0 0 0; padding:0.75rem 1rem; background:rgba(0,0,0,0.04); border-radius:8px; border:1px solid rgba(0,0,0,0.08);">
     <span class="lb-filters-label">Tests</span>
     <span class="lb-filters-hint">(Toggle)</span>
     <div class="composite-profile-filter active" data-profile="all">All</div>
@@ -230,6 +247,11 @@ function getActiveProfiles() {
   return active;
 }
 
+function getActiveType() {
+  var el = document.querySelector('.composite-type-filter.active');
+  return el ? el.dataset.type : 'framework';
+}
+
 function renderComposite() {
   var activeIds = getActiveProfiles();
   var activeCount = activeIds.length;
@@ -238,22 +260,27 @@ function renderComposite() {
 
   var useCpu = document.querySelector('.composite-resource-toggle[data-resource="cpu"]').classList.contains('active');
   var useMem = document.querySelector('.composite-resource-toggle[data-resource="mem"]').classList.contains('active');
+  var activeType = getActiveType();
 
   // Separate scored and reference-only profiles
   var scoredIds = activeIds.filter(function(pid) { return profileScored[pid]; });
   var scoredCount = scoredIds.length;
 
-  // Compute max RPS and max efficiency per active profile (realistic only)
+  function isExcluded(fw) {
+    var fmeta = meta[fw] || {};
+    return (fmeta.type || 'framework') !== activeType;
+  }
+
+  // Compute max RPS and max efficiency per active profile (filtered by type)
   var maxRpsByProfile = {};
-  var maxCpuEffByProfile = {};  // max rps/cpu% (best efficiency)
-  var maxMemEffByProfile = {};  // max rps/MB (best efficiency)
+  var maxCpuEffByProfile = {};
+  var maxMemEffByProfile = {};
   activeIds.forEach(function(pid) {
     maxRpsByProfile[pid] = 0;
     maxCpuEffByProfile[pid] = 0;
     maxMemEffByProfile[pid] = 0;
     Object.keys(avgByProfile[pid] || {}).forEach(function(fw) {
-      var fmeta = meta[fw] || {};
-      if ((fmeta.type || 'realistic') === 'stripped') return;
+      if (isExcluded(fw)) return;
       var rps = avgByProfile[pid][fw] || 0;
       if (rps > maxRpsByProfile[pid]) maxRpsByProfile[pid] = rps;
       var cpu = avgCpuByProfile[pid][fw] || 0;
@@ -274,8 +301,7 @@ function renderComposite() {
   if (activeIds.indexOf('mixed') >= 0) {
     var maxWeighted = 0;
     Object.keys(avgTplMixed).forEach(function(fw) {
-      var fmeta = meta[fw] || {};
-      if ((fmeta.type || 'realistic') === 'stripped') return;
+      if (isExcluded(fw)) return;
       var t = avgTplMixed[fw];
       var w = t.baseline * mixedWeights.baseline + t.json * mixedWeights.json + t.db * mixedWeights.db + t.upload * mixedWeights.upload + t.compression * mixedWeights.compression;
       if (w > maxWeighted) maxWeighted = w;
@@ -284,14 +310,12 @@ function renderComposite() {
   }
 
   // For compression: compute bandwidth-adjusted RPS and re-normalize
-  // Frameworks with larger responses (worse compression) get penalized
   var minBwPerReq = {};
   activeIds.forEach(function(pid) {
     if (pid !== 'compression') return;
     var minVal = Infinity;
     Object.keys(avgByProfile[pid] || {}).forEach(function(fw) {
-      var fmeta = meta[fw] || {};
-      if ((fmeta.type || 'realistic') === 'stripped') return;
+      if (isExcluded(fw)) return;
       var rps = avgByProfile[pid][fw] || 0;
       var bw = avgBwByProfile[pid][fw] || 0;
       if (rps > 0 && bw > 0) {
@@ -301,11 +325,9 @@ function renderComposite() {
     });
     if (minVal < Infinity) {
       minBwPerReq[pid] = minVal;
-      // Recompute max using adjusted RPS so top scorer = 100
       var maxAdj = 0;
       Object.keys(avgByProfile[pid] || {}).forEach(function(fw) {
-        var fmeta = meta[fw] || {};
-        if ((fmeta.type || 'realistic') === 'stripped') return;
+        if (isExcluded(fw)) return;
         var rps = avgByProfile[pid][fw] || 0;
         var bw = avgBwByProfile[pid][fw] || 0;
         if (rps > 0 && bw > 0) {
@@ -324,8 +346,7 @@ function renderComposite() {
   // Compute scores
   var results = [];
   Object.keys(allFw).forEach(function(fw) {
-    var fmeta = meta[fw] || {};
-    if ((fmeta.type || 'realistic') === 'stripped') return;
+    if (isExcluded(fw)) return;
     var scores = [];
     var participated = 0;
     activeIds.forEach(function(pid) {
@@ -415,7 +436,7 @@ function renderComposite() {
 
   results.forEach(function(r, idx) {
     var fmeta = meta[r.framework] || {};
-    var ftype = fmeta.type || 'realistic';
+    var ftype = fmeta.type || 'framework';
     var row = document.createElement('div');
     row.className = 'lb-row';
     row.dataset.name = r.framework;
@@ -543,6 +564,21 @@ document.querySelectorAll('.composite-profile-filter').forEach(function(btn) {
 document.querySelectorAll('.composite-resource-toggle').forEach(function(btn) {
   btn.addEventListener('click', function() {
     btn.classList.toggle('active');
+    renderComposite();
+  });
+});
+
+// Type filter click handlers (mutual exclusion)
+document.querySelectorAll('.composite-type-filter').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.composite-type-filter').forEach(function(f) { f.classList.remove('active'); });
+    btn.classList.add('active');
+    var disc = document.getElementById('composite-disclaimer');
+    if (btn.dataset.type === 'engine') {
+      disc.innerHTML = '<span style="margin-right:0.4rem;">&#9888;&#65039;</span><strong>Note:</strong> Showing <strong>engine</strong> entries \u2014 bare-metal and engine-level HTTP implementations. These are normalized independently from framework entries.';
+    } else {
+      disc.innerHTML = '<span style="margin-right:0.4rem;">&#9888;&#65039;</span><strong>Note:</strong> Showing <strong>framework</strong> entries \u2014 production-grade HTTP libraries. Use the type filter to switch to engine-level implementations.';
+    }
     renderComposite();
   });
 });

@@ -8,9 +8,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Properties;
 
 @RestController
 public class BenchmarkController {
@@ -18,7 +25,10 @@ public class BenchmarkController {
     private final ObjectMapper mapper = new ObjectMapper();
     private List<Map<String, Object>> dataset;
     private byte[] largeJsonResponse;
+    private boolean dbAvailable = false;
     private final Map<String, byte[]> staticFiles = new ConcurrentHashMap<>();
+    private static final String DB_QUERY = "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ? AND ? LIMIT 50";
+    private static final ThreadLocal<Connection> tlConn = new ThreadLocal<>();
     private static final Map<String, String> MIME_TYPES = Map.of(
         ".css", "text/css", ".js", "application/javascript", ".html", "text/html",
         ".woff2", "font/woff2", ".svg", "image/svg+xml", ".webp", "image/webp", ".json", "application/json"
@@ -45,6 +55,7 @@ public class BenchmarkController {
             }
             largeJsonResponse = mapper.writeValueAsBytes(Map.of("items", largeItems, "count", largeItems.size()));
         }
+        dbAvailable = new File("/data/benchmark.db").exists();
         File staticDir = new File("/data/static");
         if (staticDir.isDirectory()) {
             File[] files = staticDir.listFiles();
@@ -100,6 +111,65 @@ public class BenchmarkController {
             items.add(processed);
         }
         return Map.of("items", items, "count", items.size());
+    }
+
+    @PostMapping(value = "/upload", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String upload(InputStream body) throws IOException {
+        byte[] buf = new byte[65536];
+        long total = 0;
+        int n;
+        while ((n = body.read(buf)) != -1) {
+            total += n;
+        }
+        return String.valueOf(total);
+    }
+
+    @GetMapping(value = "/db", produces = MediaType.APPLICATION_JSON_VALUE)
+    public byte[] db(@RequestParam(defaultValue = "10") double min, @RequestParam(defaultValue = "50") double max) throws IOException {
+        if (!dbAvailable) {
+            return "{\"items\":[],\"count\":0}".getBytes();
+        }
+        Connection conn = getDbConnection();
+        List<Map<String, Object>> items = new ArrayList<>();
+        try {
+            PreparedStatement stmt = conn.prepareStatement(DB_QUERY);
+            stmt.setDouble(1, min);
+            stmt.setDouble(2, max);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> item = new LinkedHashMap<>();
+                item.put("id", rs.getLong("id"));
+                item.put("name", rs.getString("name"));
+                item.put("category", rs.getString("category"));
+                item.put("price", rs.getDouble("price"));
+                item.put("quantity", rs.getInt("quantity"));
+                item.put("active", rs.getInt("active") == 1);
+                item.put("tags", mapper.readValue(rs.getString("tags"), new TypeReference<List<String>>() {}));
+                item.put("rating", Map.of("score", rs.getDouble("rating_score"), "count", rs.getInt("rating_count")));
+                items.add(item);
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            return "{\"items\":[],\"count\":0}".getBytes();
+        }
+        return mapper.writeValueAsBytes(Map.of("items", items, "count", items.size()));
+    }
+
+    private Connection getDbConnection() {
+        Connection conn = tlConn.get();
+        if (conn == null) {
+            try {
+                Properties props = new Properties();
+                props.setProperty("open_mode", "1");  // SQLITE_OPEN_READONLY
+                conn = DriverManager.getConnection("jdbc:sqlite:/data/benchmark.db", props);
+                conn.createStatement().execute("PRAGMA mmap_size=268435456");
+                tlConn.set(conn);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return conn;
     }
 
     @GetMapping("/static/{filename}")

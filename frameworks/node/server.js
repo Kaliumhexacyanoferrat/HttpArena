@@ -5,11 +5,18 @@ const os = require('os');
 const fs = require('fs');
 
 const zlib = require('zlib');
+const Database = require('better-sqlite3');
 
 const SERVER_HEADERS = { 'server': 'node' };
 
 // Raw dataset for per-request JSON processing
 let datasetItems;
+
+// Pre-serialized large dataset for compression endpoint
+let largeJsonBuf;
+
+// SQLite prepared statement (per-worker process)
+let dbStmt;
 
 // Pre-loaded static files
 const staticFiles = {};
@@ -33,6 +40,27 @@ function loadDataset() {
     const path = process.env.DATASET_PATH || '/data/dataset.json';
     try {
         datasetItems = JSON.parse(fs.readFileSync(path, 'utf8'));
+    } catch (e) {}
+}
+
+function loadLargeDataset() {
+    try {
+        const raw = JSON.parse(fs.readFileSync('/data/dataset-large.json', 'utf8'));
+        const items = raw.map(d => ({
+            id: d.id, name: d.name, category: d.category,
+            price: d.price, quantity: d.quantity, active: d.active,
+            tags: d.tags, rating: d.rating,
+            total: Math.round(d.price * d.quantity * 100) / 100
+        }));
+        largeJsonBuf = Buffer.from(JSON.stringify({ items, count: items.length }));
+    } catch (e) {}
+}
+
+function loadDatabase() {
+    try {
+        const db = new Database('/data/benchmark.db', { readonly: true });
+        db.pragma('mmap_size=268435456');
+        dbStmt = db.prepare('SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ? AND ? LIMIT 50');
     } catch (e) {}
 }
 
@@ -81,18 +109,61 @@ const server = http.createServer((req, res) => {
             res.writeHead(500);
             res.end('No dataset');
         }
+    } else if (path === '/compression') {
+        if (largeJsonBuf) {
+            const compressed = zlib.gzipSync(largeJsonBuf, { level: 1 });
+            res.writeHead(200, {
+                'content-type': 'application/json',
+                'content-encoding': 'gzip',
+                'content-length': compressed.length,
+                ...SERVER_HEADERS
+            });
+            res.end(compressed);
+        } else {
+            res.writeHead(500);
+            res.end('No dataset');
+        }
+    } else if (path === '/db') {
+        if (!dbStmt) {
+            res.writeHead(200, { 'content-type': 'application/json', ...SERVER_HEADERS });
+            res.end('{"items":[],"count":0}');
+        } else {
+            let min = 10, max = 50;
+            if (q !== -1) {
+                const qs = url.slice(q + 1);
+                for (const pair of qs.split('&')) {
+                    const eq = pair.indexOf('=');
+                    if (eq === -1) continue;
+                    const k = pair.slice(0, eq), v = pair.slice(eq + 1);
+                    if (k === 'min') min = parseFloat(v) || 10;
+                    else if (k === 'max') max = parseFloat(v) || 50;
+                }
+            }
+            const rows = dbStmt.all(min, max);
+            const items = rows.map(r => ({
+                id: r.id, name: r.name, category: r.category,
+                price: r.price, quantity: r.quantity, active: r.active === 1,
+                tags: JSON.parse(r.tags),
+                rating: { score: r.rating_score, count: r.rating_count }
+            }));
+            const body = JSON.stringify({ items, count: items.length });
+            res.writeHead(200, {
+                'content-type': 'application/json',
+                'content-length': Buffer.byteLength(body),
+                ...SERVER_HEADERS
+            });
+            res.end(body);
+        }
     } else if (path === '/baseline2') {
         const body = String(sumQuery(url));
         res.writeHead(200, { 'content-type': 'text/plain', ...SERVER_HEADERS });
         res.end(body);
     } else if (path === '/upload' && req.method === 'POST') {
-        const chunks = [];
-        req.on('data', chunk => chunks.push(chunk));
+        let size = 0;
+        req.on('data', chunk => size += chunk.length);
         req.on('end', () => {
-            const buf = Buffer.concat(chunks);
-            const crc = zlib.crc32(buf);
             res.writeHead(200, { 'content-type': 'text/plain', ...SERVER_HEADERS });
-            res.end((crc >>> 0).toString(16).padStart(8, '0'));
+            res.end(String(size));
         });
     } else {
         // /baseline11 — GET or POST
@@ -157,7 +228,9 @@ if (cluster.isPrimary) {
     for (let i = 0; i < numCPUs; i++) cluster.fork();
 } else {
     loadDataset();
+    loadLargeDataset();
     loadStaticFiles();
+    loadDatabase();
     server.listen(8080);
     startH2();
 }

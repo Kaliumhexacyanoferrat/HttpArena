@@ -180,13 +180,13 @@ html.dark .lb-filters-hint { color: #4b5563; }
   transform: translateY(-1px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
-.lb-type-stripped.active {
+.lb-type-engine.active {
   color: #f59e0b;
   border-color: #f59e0b;
   background: rgba(245, 158, 11, 0.06);
   font-weight: 600;
 }
-.lb-type-realistic.active {
+.lb-type-framework.active {
   color: #22c55e;
   border-color: #22c55e;
   background: rgba(34, 197, 94, 0.06);
@@ -194,8 +194,8 @@ html.dark .lb-filters-hint { color: #4b5563; }
 }
 html.dark .lb-type-filter { color: #64748b; border-color: #334155; }
 html.dark .lb-type-filter:hover { color: #94a3b8; border-color: #475569; background: rgba(255, 255, 255, 0.03); }
-html.dark .lb-type-stripped.active { color: #fbbf24; border-color: #f59e0b; background: rgba(245, 158, 11, 0.12); }
-html.dark .lb-type-realistic.active { color: #4ade80; border-color: #22c55e; background: rgba(34, 197, 94, 0.12); }
+html.dark .lb-type-engine.active { color: #fbbf24; border-color: #f59e0b; background: rgba(245, 158, 11, 0.12); }
+html.dark .lb-type-framework.active { color: #4ade80; border-color: #22c55e; background: rgba(34, 197, 94, 0.12); }
 
 /* Type pills */
 .lb-pill {
@@ -208,22 +208,22 @@ html.dark .lb-type-realistic.active { color: #4ade80; border-color: #22c55e; bac
   letter-spacing: 0.03em;
   line-height: 1.4;
 }
-.lb-pill-realistic {
+.lb-pill-framework {
   color: #15803d;
   background: rgba(34, 197, 94, 0.15);
   border: 1px solid rgba(34, 197, 94, 0.3);
 }
-.lb-pill-stripped {
+.lb-pill-engine {
   color: #b45309;
   background: rgba(245, 158, 11, 0.15);
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
-html.dark .lb-pill-realistic {
+html.dark .lb-pill-framework {
   color: #4ade80;
   background: rgba(34, 197, 94, 0.15);
   border-color: rgba(34, 197, 94, 0.3);
 }
-html.dark .lb-pill-stripped {
+html.dark .lb-pill-engine {
   color: #fbbf24;
   background: rgba(245, 158, 11, 0.15);
   border-color: rgba(245, 158, 11, 0.3);
@@ -475,12 +475,6 @@ var lbProfiles = {{ $profiles | jsonify | safeJS }};
       <div class="lb-lang-filter active" data-lang="{{ . }}">{{ . }}</div>
       {{ end }}
     </div>
-    <div class="lb-filters" style="margin-top:0.5rem;">
-      <span class="lb-filters-label">Type</span>
-      <span class="lb-filters-hint">(Toggle)</span>
-      <div class="lb-type-filter lb-type-realistic active" data-type="realistic">Realistic</div>
-      <div class="lb-type-filter lb-type-stripped active" data-type="stripped">Stripped</div>
-    </div>
     <div class="lb-search">
       <span class="lb-filters-label">Filter</span>
       <input type="text" class="lb-search-input" placeholder="e.g. ringzero, fasthttp, C, C#" />
@@ -500,6 +494,11 @@ var lbProfiles = {{ $profiles | jsonify | safeJS }};
 
   <div class="lb-desc">{{ $p.desc | safeHTML }}</div>
 
+  <div class="lb-filters" style="margin:0 0 0.5rem 0;">
+    <span class="lb-filters-label">Type</span>
+    <div class="lb-type-filter lb-type-framework active" data-type="framework">Framework</div>
+    <div class="lb-type-filter lb-type-engine" data-type="engine">Engine</div>
+  </div>
   <div class="lb-filters" style="margin:0 0 0 0;">
     <span class="lb-filters-label">Conn</span>
     <div class="lb-conn-tabs" data-for="{{ $p.id }}">
@@ -520,11 +519,11 @@ var lbProfiles = {{ $profiles | jsonify | safeJS }};
         <div title="HTTP server framework name">Framework</div>
         <div title="Programming language">Lang</div>
         <div title="HTTP server engine">Engine</div>
-        <div title="realistic = production-ready framework, stripped = custom bare-metal implementation">Type</div>
+        <div title="framework = production-ready framework, engine = bare-metal/engine-level implementation">Type</div>
         <div title="Number of concurrent connections maintained by the load generator" style="text-align:right">Conn</div>
         {{ if $isReconn }}<div title="Total TCP connections established during the benchmark (reconnects)" style="text-align:right">TCP Conn</div>{{ end }}
         <div class="lb-sortable" data-sort="rps" title="Requests per second — higher is better" style="text-align:right">Req/s</div>
-        <div class="lb-sortable" data-sort="bandwidth" title="Bandwidth — MB/s transferred" style="text-align:right">BW</div>
+        <div class="lb-sortable" data-sort="bandwidth" title="{{ if eq $p.id "upload" }}Input bandwidth — request data throughput{{ else }}Bandwidth — MB/s transferred{{ end }}" style="text-align:right">{{ if eq $p.id "upload" }}In BW{{ else }}BW{{ end }}</div>
         <div class="lb-sortable" data-sort="errors" title="HTTP error count (4xx+5xx) — hover for breakdown" style="text-align:right">Err</div>
         <div class="lb-bar-cell"></div>
         <div class="lb-sortable" data-sort="cpu" title="Average CPU usage of the server container during the benchmark" style="text-align:right">CPU</div>
@@ -545,11 +544,11 @@ var lbProfiles = {{ $profiles | jsonify | safeJS }};
       <div title="HTTP server framework name">Framework</div>
       <div title="Programming language">Lang</div>
       <div title="HTTP server engine">Engine</div>
-      <div title="realistic = production-ready framework, stripped = custom bare-metal implementation">Type</div>
+      <div title="framework = production-ready framework, engine = bare-metal/engine-level implementation">Type</div>
       <div title="Number of concurrent connections maintained by the load generator" style="text-align:right">Conn</div>
       {{ if $isReconn }}<div title="Total TCP connections established during the benchmark (reconnects)" style="text-align:right">TCP Conn</div>{{ end }}
       <div class="lb-sortable" data-sort="rps" title="Requests per second — higher is better" style="text-align:right">Req/s</div>
-      <div class="lb-sortable" data-sort="bandwidth" title="Bandwidth — MB/s transferred" style="text-align:right">BW</div>
+      <div class="lb-sortable" data-sort="bandwidth" title="{{ if eq $p.id "upload" }}Input bandwidth — request data throughput{{ else }}Bandwidth — MB/s transferred{{ end }}" style="text-align:right">{{ if eq $p.id "upload" }}In BW{{ else }}BW{{ end }}</div>
       <div class="lb-sortable" data-sort="errors" title="HTTP error count (4xx+5xx) — hover for breakdown" style="text-align:right">Err</div>
       <div class="lb-bar-cell"></div>
       <div class="lb-sortable" data-sort="cpu" title="Average CPU usage of the server container during the benchmark" style="text-align:right">CPU</div>
@@ -565,8 +564,8 @@ var lbProfiles = {{ $profiles | jsonify | safeJS }};
     {{ $pct := mul (div (float $r.rps) (float $maxRps)) 100.0 }}
     {{ $meta := index site.Data.frameworks $r.framework }}
     {{ $s2xx := int ($r.status_2xx | default 0) }}{{ $s3xx := int ($r.status_3xx | default 0) }}{{ $s4xx := int ($r.status_4xx | default 0) }}{{ $s5xx := int ($r.status_5xx | default 0) }}{{ $errs := add $s4xx $s5xx }}
-    <div class="lb-row{{ if $isReconn }} lb-row-reconn{{ end }}{{ if $isNoisy }} lb-row-noisy{{ end }}" data-lang="{{ $r.language | default "" }}" data-name="{{ $r.framework }}" data-rps="{{ printf "%.0f" $r.rps }}" data-bandwidth="{{ $r.bandwidth | default "" }}" data-type="{{ with $meta }}{{ .type | default "realistic" }}{{ end }}" data-desc="{{ with $meta }}{{ .description }}{{ end }}" data-repo="{{ with $meta }}{{ .repo }}{{ end }}" data-s2xx="{{ $s2xx }}" data-s3xx="{{ $s3xx }}" data-s4xx="{{ $s4xx }}" data-s5xx="{{ $s5xx }}" {{ if $r.tpl_baseline }}data-tpl-baseline="{{ $r.tpl_baseline }}" data-tpl-json="{{ $r.tpl_json }}" data-tpl-db="{{ $r.tpl_db }}" data-tpl-upload="{{ $r.tpl_upload }}" data-tpl-compression="{{ $r.tpl_compression }}"{{ end }}>
-      {{ $ftype := "realistic" }}{{ with $meta }}{{ $ftype = .type | default "realistic" }}{{ end }}
+    <div class="lb-row{{ if $isReconn }} lb-row-reconn{{ end }}{{ if $isNoisy }} lb-row-noisy{{ end }}" data-lang="{{ $r.language | default "" }}" data-name="{{ $r.framework }}" data-rps="{{ printf "%.0f" $r.rps }}" data-bandwidth="{{ $r.bandwidth | default "" }}" data-input-bw="{{ $r.input_bw | default "" }}" data-type="{{ with $meta }}{{ .type | default "framework" }}{{ end }}" data-desc="{{ with $meta }}{{ .description }}{{ end }}" data-repo="{{ with $meta }}{{ .repo }}{{ end }}" data-s2xx="{{ $s2xx }}" data-s3xx="{{ $s3xx }}" data-s4xx="{{ $s4xx }}" data-s5xx="{{ $s5xx }}" {{ if $r.tpl_baseline }}data-tpl-baseline="{{ $r.tpl_baseline }}" data-tpl-json="{{ $r.tpl_json }}" data-tpl-db="{{ $r.tpl_db }}" data-tpl-upload="{{ $r.tpl_upload }}" data-tpl-compression="{{ $r.tpl_compression }}"{{ end }}>
+      {{ $ftype := "framework" }}{{ with $meta }}{{ $ftype = .type | default "framework" }}{{ end }}
       <div class="lb-rank">{{ if eq $j 0 }}🥇{{ else if eq $j 1 }}🥈{{ else if eq $j 2 }}🥉{{ else }}{{ add $j 1 }}{{ end }}</div>
       <div class="lb-name">{{ $r.framework }}</div>
       <div class="lb-lang">{{ $r.language | default "—" }}</div>
@@ -575,7 +574,7 @@ var lbProfiles = {{ $profiles | jsonify | safeJS }};
       <div class="lb-conns">{{ lang.FormatNumber 0 $r.connections }}</div>
       {{ if $isReconn }}<div class="lb-stat">{{ lang.FormatNumber 0 $r.reconnects }}</div>{{ end }}
       <div class="lb-rps">{{ lang.FormatNumber 0 $r.rps }}</div>
-      <div class="lb-stat">{{ $r.bandwidth | default "—" }}</div>
+      <div class="lb-stat">{{ if and (eq $p.id "upload") $r.input_bw }}{{ $r.input_bw }}{{ else }}{{ $r.bandwidth | default "—" }}{{ end }}</div>
       <div class="lb-status">{{ if or (gt $s2xx 0) (gt $s3xx 0) (gt $errs 0) }}<span class="{{ if gt $errs 0 }}lb-status-err{{ else }}lb-status-ok{{ end }}">{{ if gt $errs 0 }}{{ lang.FormatNumber 0 $errs }}{{ else }}✓{{ end }}</span><div class="lb-status-tip"><div><b>2xx:</b> {{ lang.FormatNumber 0 $s2xx }}</div><div><b>3xx:</b> {{ lang.FormatNumber 0 $s3xx }}</div><div><b>4xx:</b> {{ lang.FormatNumber 0 $s4xx }}</div><div><b>5xx:</b> {{ lang.FormatNumber 0 $s5xx }}</div></div>{{ else }}<span class="lb-status-na">—</span>{{ end }}</div>
       <div class="lb-bar-cell">
         <div class="lb-bar lb-bar-{{ add $j 1 }}" style="width: {{ printf "%.1f" $pct }}%"></div>
@@ -691,8 +690,8 @@ function applyFilters() {
     else allBtn.classList.remove('active');
   }
 
-  var showStripped = document.querySelector('.lb-type-filter[data-type="stripped"]').classList.contains('active');
-  var showRealistic = document.querySelector('.lb-type-filter[data-type="realistic"]').classList.contains('active');
+  var showEngine = document.querySelector('.lb-type-filter[data-type="engine"]').classList.contains('active');
+  var showFramework = document.querySelector('.lb-type-filter[data-type="framework"]').classList.contains('active');
 
   var searchVal = document.querySelector('.lb-search-input').value.toLowerCase().trim();
   var terms = searchVal ? searchVal.split(',').map(function(s) { return s.trim(); }).filter(Boolean) : [];
@@ -708,9 +707,9 @@ function applyFilters() {
     rows.forEach(function(row) {
       var lang = row.dataset.lang;
       var name = row.dataset.name.toLowerCase();
-      var type = row.dataset.type || 'realistic';
+      var type = row.dataset.type || 'framework';
       var langMatch = allLangs || activeLangs.has(lang);
-      var typeMatch = (type === 'stripped' && showStripped) || (type !== 'stripped' && showRealistic);
+      var typeMatch = (type === 'engine' && showEngine) || (type !== 'engine' && showFramework);
       var textMatch = terms.length === 0 || terms.some(function(t) {
         return name.indexOf(t) !== -1 || lang.toLowerCase().indexOf(t) !== -1;
       });
@@ -775,10 +774,13 @@ document.querySelector('.lb-search-input').addEventListener('input', function() 
   applyFilters();
 });
 
-/* Type filters */
+/* Type filters (mutually exclusive, synced across panels) */
 document.querySelectorAll('.lb-type-filter').forEach(function(btn) {
   btn.addEventListener('click', function() {
-    btn.classList.toggle('active');
+    var type = btn.dataset.type;
+    document.querySelectorAll('.lb-type-filter').forEach(function(f) {
+      f.classList.toggle('active', f.dataset.type === type);
+    });
     applyFilters();
   });
 });
@@ -971,7 +973,7 @@ window.addEventListener('roundChanged', function(ev) {
 
     sorted.forEach(function(r, j) {
       var m = fwMeta[r.framework] || {};
-      var ftype = m.type || 'realistic';
+      var ftype = m.type || 'framework';
       var pct = (r.rps / maxRps * 100).toFixed(1);
       var rank = j < 3 ? medals[j] : String(j + 1);
       var rs2 = r.status_2xx || 0, rs3 = r.status_3xx || 0, rs4 = r.status_4xx || 0, rs5 = r.status_5xx || 0;
@@ -993,6 +995,7 @@ window.addEventListener('roundChanged', function(ev) {
       row.dataset.s4xx = String(rs4);
       row.dataset.s5xx = String(rs5);
       row.dataset.bandwidth = r.bandwidth || '';
+      row.dataset.inputBw = r.input_bw || '';
       if (r.tpl_baseline) {
         row.dataset.tplBaseline = String(r.tpl_baseline);
         row.dataset.tplJson = String(r.tpl_json || 0);
@@ -1009,7 +1012,7 @@ window.addEventListener('roundChanged', function(ev) {
         '<div class="lb-conns">' + Number(r.connections).toLocaleString() + '</div>' +
         (isReconn ? '<div class="lb-stat">' + Number(r.reconnects || 0).toLocaleString() + '</div>' : '') +
         '<div class="lb-rps">' + Number(r.rps).toLocaleString() + '</div>' +
-        '<div class="lb-stat">' + (r.bandwidth || '\u2014') + '</div>' +
+        '<div class="lb-stat">' + ((profile === 'upload' && r.input_bw) ? r.input_bw : (r.bandwidth || '\u2014')) + '</div>' +
         statusCell +
         '<div class="lb-bar-cell"><div class="lb-bar lb-bar-' + (j + 1) + '" style="width:' + pct + '%"></div></div>' +
         '<div class="lb-stat">' + (r.cpu || '\u2014') + '</div>' +

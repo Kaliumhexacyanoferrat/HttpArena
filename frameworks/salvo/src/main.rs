@@ -5,46 +5,9 @@ use salvo::http::StatusCode;
 use salvo::prelude::*;
 use serde::{Deserialize, Serialize};
 use rusqlite::Connection;
+use std::cell::RefCell;
 use std::collections::HashMap;
-use std::sync::{Mutex, OnceLock};
-
-static CRC32_TABLE: OnceLock<[[u32; 256]; 8]> = OnceLock::new();
-
-fn init_crc32_table() -> [[u32; 256]; 8] {
-    let mut tab = [[0u32; 256]; 8];
-    for i in 0..256u32 {
-        let mut c = i;
-        for _ in 0..8 {
-            c = if c & 1 != 0 { 0xEDB88320 ^ (c >> 1) } else { c >> 1 };
-        }
-        tab[0][i as usize] = c;
-    }
-    for i in 0..256usize {
-        for s in 1..8usize {
-            tab[s][i] = (tab[s - 1][i] >> 8) ^ tab[0][(tab[s - 1][i] & 0xFF) as usize];
-        }
-    }
-    tab
-}
-
-fn crc32_compute(data: &[u8]) -> u32 {
-    let tab = CRC32_TABLE.get_or_init(init_crc32_table);
-    let mut crc = 0xFFFFFFFFu32;
-    let mut p = data;
-    while p.len() >= 8 {
-        let a = u32::from_le_bytes([p[0], p[1], p[2], p[3]]) ^ crc;
-        let b = u32::from_le_bytes([p[4], p[5], p[6], p[7]]);
-        crc = tab[7][(a & 0xFF) as usize] ^ tab[6][((a >> 8) & 0xFF) as usize]
-            ^ tab[5][((a >> 16) & 0xFF) as usize] ^ tab[4][(a >> 24) as usize]
-            ^ tab[3][(b & 0xFF) as usize] ^ tab[2][((b >> 8) & 0xFF) as usize]
-            ^ tab[1][((b >> 16) & 0xFF) as usize] ^ tab[0][(b >> 24) as usize];
-        p = &p[8..];
-    }
-    for &byte in p {
-        crc = (crc >> 8) ^ tab[0][((crc ^ byte as u32) & 0xFF) as usize];
-    }
-    crc ^ 0xFFFFFFFF
-}
+use std::sync::OnceLock;
 
 static STATE: OnceLock<AppState> = OnceLock::new();
 static SERVER_HDR: HeaderValue = HeaderValue::from_static("salvo");
@@ -53,7 +16,27 @@ struct AppState {
     dataset: Vec<DatasetItem>,
     json_large_cache: Vec<u8>,
     static_files: HashMap<String, StaticFile>,
-    db: Option<Mutex<Connection>>,
+    db_available: bool,
+}
+
+thread_local! {
+    static TL_DB: RefCell<Option<Connection>> = RefCell::new(None);
+}
+
+fn get_tl_conn() -> bool {
+    TL_DB.with(|cell| {
+        let mut opt = cell.borrow_mut();
+        if opt.is_none() {
+            if let Ok(conn) = Connection::open_with_flags(
+                "/data/benchmark.db",
+                rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
+            ) {
+                conn.execute_batch("PRAGMA mmap_size=268435456").ok();
+                *opt = Some(conn);
+            }
+        }
+        opt.is_some()
+    })
 }
 
 struct StaticFile {
@@ -261,10 +244,9 @@ async fn compression(res: &mut Response) {
 #[handler]
 async fn upload(req: &mut Request, res: &mut Response) {
     if let Ok(body) = req.payload_with_max_size(25 * 1024 * 1024).await {
-        let crc = crc32_compute(body);
         res.headers_mut()
             .insert(header::CONTENT_TYPE, HeaderValue::from_static("text/plain"));
-        res.render(format!("{:08x}", crc));
+        res.render(body.len().to_string());
     } else {
         res.status_code(StatusCode::BAD_REQUEST);
     }
@@ -273,11 +255,19 @@ async fn upload(req: &mut Request, res: &mut Response) {
 #[handler]
 async fn db_endpoint(req: &mut Request, res: &mut Response) {
     let state = STATE.get().unwrap();
-    let empty = serde_json::json!({"items": [], "count": 0});
-    if let Some(db_mutex) = &state.db {
-        let min_price: f64 = req.query("min").unwrap_or(10.0);
-        let max_price: f64 = req.query("max").unwrap_or(50.0);
-        let conn = db_mutex.lock().unwrap();
+    if !state.db_available || !get_tl_conn() {
+        res.headers_mut().insert(
+            header::CONTENT_TYPE,
+            HeaderValue::from_static("application/json"),
+        );
+        res.render("{\"items\":[],\"count\":0}");
+        return;
+    }
+    let min_price: f64 = req.query("min").unwrap_or(10.0);
+    let max_price: f64 = req.query("max").unwrap_or(50.0);
+    let result = TL_DB.with(|cell| {
+        let borrow = cell.borrow();
+        let conn = borrow.as_ref().unwrap();
         let mut stmt = conn
             .prepare_cached(
                 "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ?1 AND ?2 LIMIT 50",
@@ -300,31 +290,15 @@ async fn db_endpoint(req: &mut Request, res: &mut Response) {
         });
         let items: Vec<serde_json::Value> = match rows {
             Ok(mapped) => mapped.filter_map(|r| r.ok()).collect(),
-            Err(_) => {
-                res.headers_mut().insert(
-                    header::CONTENT_TYPE,
-                    HeaderValue::from_static("application/json"),
-                );
-                res.render(empty.to_string());
-                return;
-            }
+            Err(_) => Vec::new(),
         };
-        let result = serde_json::json!({
-            "items": items,
-            "count": items.len()
-        });
-        res.headers_mut().insert(
-            header::CONTENT_TYPE,
-            HeaderValue::from_static("application/json"),
-        );
-        res.render(result.to_string());
-    } else {
-        res.headers_mut().insert(
-            header::CONTENT_TYPE,
-            HeaderValue::from_static("application/json"),
-        );
-        res.render(empty.to_string());
-    }
+        serde_json::json!({"items": items, "count": items.len()})
+    });
+    res.headers_mut().insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_static("application/json"),
+    );
+    res.render(result.to_string());
 }
 
 #[handler]
@@ -352,22 +326,18 @@ async fn main() {
     };
     let json_large_cache = build_json_cache(&large_dataset);
 
-    let db = Connection::open_with_flags(
+    let db_available = Connection::open_with_flags(
         "/data/benchmark.db",
         rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY,
     )
-    .ok()
-    .map(|conn| {
-        conn.execute_batch("PRAGMA mmap_size=268435456").ok();
-        Mutex::new(conn)
-    });
+    .is_ok();
 
     STATE
         .set(AppState {
             dataset,
             json_large_cache,
             static_files: load_static_files(),
-            db,
+            db_available,
         })
         .ok();
 

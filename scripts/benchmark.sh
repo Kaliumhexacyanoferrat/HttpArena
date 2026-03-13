@@ -527,6 +527,34 @@ for profile in "${profiles_to_run[@]}"; do
         status_5xx=$(echo "$best_output" | grep -oP '5xx=\K\d+' || echo "0")
     fi
 
+    # Compute input bandwidth from raw template sizes × RPS
+    input_bw=""
+    if [ "$USE_H2LOAD" = "false" ] && [ "$USE_OHA" = "false" ]; then
+        raw_arg=""
+        prev_was_raw=false
+        for arg in "${gc_args[@]}"; do
+            if [ "$prev_was_raw" = "true" ]; then
+                raw_arg="$arg"
+                break
+            fi
+            [ "$arg" = "--raw" ] && prev_was_raw=true || prev_was_raw=false
+        done
+        if [ -n "$raw_arg" ]; then
+            avg_tpl_size=$(IFS=','; total=0; count=0; for f in $raw_arg; do s=$(wc -c < "$f" 2>/dev/null); total=$((total + s)); count=$((count + 1)); done; echo "$((total / count))")
+            input_bw=$(python3 -c "
+bps = $best_rps * $avg_tpl_size
+if bps >= 1073741824: print(f'{bps/1073741824:.2f}GB/s')
+elif bps >= 1048576: print(f'{bps/1048576:.2f}MB/s')
+elif bps >= 1024: print(f'{bps/1024:.2f}KB/s')
+else: print(f'{bps}B/s')
+" 2>/dev/null || echo "")
+        fi
+    fi
+
+    if [ -n "$input_bw" ]; then
+        echo "  Input BW: $input_bw (avg template: ${avg_tpl_size} bytes)"
+    fi
+
     # Parse per-template response counts (gcannon mixed/multi-template output)
     tpl_json=""
     if [ "$USE_H2LOAD" = "false" ] && [ "$USE_OHA" = "false" ]; then
@@ -565,6 +593,7 @@ for profile in "${profiles_to_run[@]}"; do
   "duration": "$DURATION",
   "pipeline": $pipeline,
   "bandwidth": "$bandwidth",
+  "input_bw": "$input_bw",
   "reconnects": $reconnects,
   "status_2xx": ${status_2xx:-0},
   "status_3xx": ${status_3xx:-0},

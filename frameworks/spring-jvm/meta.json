@@ -1,7 +1,7 @@
 {
   "display_name": "spring-jvm",
   "language": "Java",
-  "type": "realistic",
+  "type": "framework",
   "engine": "Tomcat",
   "description": "Spring Boot with embedded Tomcat on JDK 21 (HotSpot JVM with ZGC).",
   "repo": "https://github.com/spring-projects/spring-boot",
@@ -11,6 +11,9 @@
     "limited-conn",
     "json",
     "noisy",
+    "upload",
+    "compression",
+    "mixed",
     "baseline-h2",
     "static-h2"
   ]

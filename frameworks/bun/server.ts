@@ -144,9 +144,7 @@ function handleRequest(req: Request): Response | Promise<Response> {
 
   if (path === "/upload" && req.method === "POST") {
     return req.arrayBuffer().then((ab) => {
-      const buf = Buffer.from(ab);
-      const c = zlib.crc32(buf);
-      return new Response((c >>> 0).toString(16).padStart(8, "0"), {
+      return new Response(String(ab.byteLength), {
         headers: { "content-type": "text/plain" },
       });
     });

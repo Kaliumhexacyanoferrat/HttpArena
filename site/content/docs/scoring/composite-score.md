@@ -12,7 +12,7 @@ For each framework and profile, compute the average RPS across all connection co
 
 ### Step 2: Normalize per profile
 
-For each profile, normalize against the best-performing realistic framework:
+For each profile, normalize against the best-performing framework:
 
 ```
 rpsScore = (framework_avg_rps / best_avg_rps) × 100
@@ -97,9 +97,9 @@ With both factors on (`totalWeight = 2.5`):
 
 Framework A still leads because its raw throughput advantage outweighs B's CPU efficiency, but the gap narrows from 5× to 1.5×.
 
-## Stripped frameworks
+## Engine-level implementations
 
-Frameworks with type `stripped` are excluded from the composite ranking and from the normalization pool. They can still be compared in individual test profiles. Only `realistic` frameworks — those using standard, production-grade HTTP libraries — are scored here.
+Frameworks with type `engine` are excluded from the composite ranking and from the normalization pool. They can still be compared in individual test profiles. Only `framework` entries — those using standard, production-grade HTTP libraries — are scored here.
 
 ## Why this approach
 
