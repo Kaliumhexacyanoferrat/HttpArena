@@ -16,7 +16,7 @@ The Mixed Workload profile measures overall framework performance under a divers
    - 1× SQLite DB query (`GET /db?min=10&max=50`)
    - 1× file upload (`POST /upload` with 1 MB body)
    - 2× gzip compression (`GET /compression` with `Accept-Encoding: gzip`)
-3. Each connection sends 100 requests of its assigned type, then disconnects and **reconnects with the next template type** (round-robin rotation)
+3. Each connection sends 5 requests of its assigned type, then disconnects and **reconnects with the next template type** (round-robin rotation)
 4. This rotation ensures all frameworks face a roughly even distribution of request types — fast connections cycle through all templates rather than staying on one type
 
 ## Expected request/response
@@ -87,7 +87,7 @@ The leaderboard displays a **stacked bar** for each framework showing the actual
 | Endpoints | `/baseline11`, `/json`, `/db`, `/upload`, `/compression` |
 | Connections | 4,096, 16,384 |
 | Pipeline | 1 |
-| Requests per connection | 100 (then reconnect with next template) |
+| Requests per connection | 5 (then reconnect with next template) |
 | Duration | 5s |
 | Runs | 3 (best taken) |
 | Templates | 10 (3 baseline GET, 2 baseline POST, 1 JSON, 1 DB, 1 upload, 2 compression) |

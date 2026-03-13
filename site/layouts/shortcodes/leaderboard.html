@@ -531,7 +531,7 @@ var lbProfiles = {{ $profiles | jsonify | safeJS }};
     {{ $pct := mul (div (float $r.rps) (float $maxRps)) 100.0 }}
     {{ $meta := index site.Data.frameworks $r.framework }}
     {{ $s2xx := int ($r.status_2xx | default 0) }}{{ $s3xx := int ($r.status_3xx | default 0) }}{{ $s4xx := int ($r.status_4xx | default 0) }}{{ $s5xx := int ($r.status_5xx | default 0) }}{{ $errs := add $s4xx $s5xx }}
-    <div class="lb-row{{ if $isReconn }} lb-row-reconn{{ end }}{{ if $isNoisy }} lb-row-noisy{{ end }}" data-lang="{{ $r.language | default "" }}" data-name="{{ $r.framework }}" data-rps="{{ printf "%.0f" $r.rps }}" data-bandwidth="{{ $r.bandwidth | default "" }}" data-input-bw="{{ $r.input_bw | default "" }}" data-type="{{ with $meta }}{{ .type | default "framework" }}{{ end }}" data-desc="{{ with $meta }}{{ .description }}{{ end }}" data-repo="{{ with $meta }}{{ .repo }}{{ end }}" data-s2xx="{{ $s2xx }}" data-s3xx="{{ $s3xx }}" data-s4xx="{{ $s4xx }}" data-s5xx="{{ $s5xx }}" {{ if $r.tpl_baseline }}data-tpl-baseline="{{ $r.tpl_baseline }}" data-tpl-json="{{ $r.tpl_json }}" data-tpl-db="{{ $r.tpl_db }}" data-tpl-upload="{{ $r.tpl_upload }}" data-tpl-compression="{{ $r.tpl_compression }}"{{ end }}>
+    <div class="lb-row{{ if $isReconn }} lb-row-reconn{{ end }}{{ if $isNoisy }} lb-row-noisy{{ end }}" data-lang="{{ $r.language | default "" }}" data-name="{{ $r.framework }}" data-rps="{{ printf "%.0f" $r.rps }}" data-bandwidth="{{ $r.bandwidth | default "" }}" data-input-bw="{{ $r.input_bw | default "" }}" data-type="{{ with $meta }}{{ .type | default "framework" }}{{ end }}" data-desc="{{ with $meta }}{{ .description }}{{ end }}" data-repo="{{ with $meta }}{{ .repo }}{{ end }}" data-s2xx="{{ $s2xx }}" data-s3xx="{{ $s3xx }}" data-s4xx="{{ $s4xx }}" data-s5xx="{{ $s5xx }}" {{ if $r.tpl_baseline }}data-tpl-baseline="{{ int $r.tpl_baseline }}" data-tpl-json="{{ int ($r.tpl_json | default 0) }}" data-tpl-db="{{ int ($r.tpl_db | default 0) }}" data-tpl-upload="{{ int ($r.tpl_upload | default 0) }}" data-tpl-compression="{{ int ($r.tpl_compression | default 0) }}"{{ end }}>
       {{ $ftype := "framework" }}{{ with $meta }}{{ $ftype = .type | default "framework" }}{{ end }}
       <div class="lb-rank">{{ if eq $j 0 }}🥇{{ else if eq $j 1 }}🥈{{ else if eq $j 2 }}🥉{{ else }}{{ add $j 1 }}{{ end }}</div>
       <div class="lb-name">{{ $r.framework }}</div>
@@ -1210,11 +1210,11 @@ function applyMixedPanel(panel) {
   rows.forEach(function(row) {
     if (row.classList.contains('lb-hidden')) return;
     var d = {
-      baseline: parseInt(row.dataset.tplBaseline) || 0,
-      json: parseInt(row.dataset.tplJson) || 0,
-      db: parseInt(row.dataset.tplDb) || 0,
-      upload: parseInt(row.dataset.tplUpload) || 0,
-      compression: parseInt(row.dataset.tplCompression) || 0
+      baseline: Number(row.dataset.tplBaseline) || 0,
+      json: Number(row.dataset.tplJson) || 0,
+      db: Number(row.dataset.tplDb) || 0,
+      upload: Number(row.dataset.tplUpload) || 0,
+      compression: Number(row.dataset.tplCompression) || 0
     };
     var weighted = 0;
     mixedKeys.forEach(function(k) { weighted += d[k] * mixedWeights[k]; });
