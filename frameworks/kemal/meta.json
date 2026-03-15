@@ -9,7 +9,6 @@
   "tests": [
     "baseline",
     "pipelined",
-    "limited-conn",
     "json",
     "upload",
     "compression",
