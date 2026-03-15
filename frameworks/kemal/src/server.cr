@@ -192,19 +192,4 @@ end
 
 Kemal.config.port = 8080
 Kemal.config.env = "production"
-
-# Fork workers for multi-core utilization
-worker_count = System.cpu_count.to_i
-worker_count = 1 if worker_count < 1
-
-if worker_count > 1
-  worker_count.times do
-    fork do
-      Kemal.run
-    end
-  end
-  # Parent waits
-  sleep
-else
-  Kemal.run
-end
+Kemal.run

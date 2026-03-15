@@ -6,18 +6,18 @@ WORKDIR /app
 # Install SQLite dev headers
 RUN apk add --no-cache sqlite-dev sqlite-static
 
-# Copy dependency file first for caching
+# Copy vendored dependencies (no network needed)
 COPY shard.yml shard.lock ./
-RUN shards install --production
+COPY lib/ lib/
 
 # Copy source and build
 COPY src/ src/
-RUN crystal build src/server.cr -o server --release --no-debug --static
+RUN crystal build src/server.cr -o server --release --no-debug
 
-# Runtime stage
+# Runtime stage — need same libc as builder (musl on Alpine)
 FROM alpine:3.20
 
-RUN apk add --no-cache ca-certificates
+RUN apk add --no-cache ca-certificates libgcc gc libevent sqlite-libs pcre2
 
 WORKDIR /app
 COPY --from=builder /app/server /app/server
