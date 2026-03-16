@@ -149,7 +149,6 @@ func main() {
 	app := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
 		BodyLimit:             25 * 1024 * 1024, // 25 MB
-		Prefork:               true,
 	})
 
 	app.Get("/pipeline", func(c *fiber.Ctx) error {
