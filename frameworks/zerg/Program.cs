@@ -52,6 +52,7 @@ public class ProcessedItem
 [JsonSerializable(typeof(JsonResponse))]
 [JsonSerializable(typeof(DbResponse))]
 [JsonSerializable(typeof(List<DatasetItem>))]
+[JsonSerializable(typeof(List<string>))]
 partial class AppJsonContext : JsonSerializerContext { }
 
 public class JsonResponse
@@ -106,7 +107,7 @@ static class AppData
         var path = Environment.GetEnvironmentVariable("DATASET_PATH") ?? "/data/dataset.json";
         if (File.Exists(path))
         {
-            Dataset = JsonSerializer.Deserialize<List<DatasetItem>>(File.ReadAllText(path), JsonOpts) ?? new();
+            Dataset = JsonSerializer.Deserialize(File.ReadAllText(path), AppJsonContext.Default.ListDatasetItem) ?? new();
             JsonCache = BuildJsonCache(Dataset);
         }
 
@@ -114,7 +115,7 @@ static class AppData
         var largePath = "/data/dataset-large.json";
         if (File.Exists(largePath))
         {
-            var largeItems = JsonSerializer.Deserialize<List<DatasetItem>>(File.ReadAllText(largePath), JsonOpts) ?? new();
+            var largeItems = JsonSerializer.Deserialize(File.ReadAllText(largePath), AppJsonContext.Default.ListDatasetItem) ?? new();
             LargeJsonCache = BuildJsonCache(largeItems);
         }
 
@@ -531,7 +532,7 @@ static class Router
                     Price = reader.GetDouble(3),
                     Quantity = reader.GetInt32(4),
                     Active = reader.GetInt32(5) == 1,
-                    Tags = JsonSerializer.Deserialize<List<string>>(reader.GetString(6)) ?? new(),
+                    Tags = JsonSerializer.Deserialize(reader.GetString(6), AppJsonContext.Default.ListString) ?? new(),
                     Rating = new DbRating { Score = reader.GetDouble(7), Count = reader.GetInt32(8) }
                 });
             }
