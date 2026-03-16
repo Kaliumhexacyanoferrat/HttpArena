@@ -4,7 +4,7 @@
 
 **HTTP framework benchmark platform — who is the fastest?**
 
-35+ frameworks · 16 test profiles · 64-core dedicated hardware
+16 test profiles · 64-core dedicated hardware
 
 [**🏆 View Leaderboard**](https://MDA2AV.github.io/HttpArena/) · [**📖 Documentation**](https://MDA2AV.github.io/HttpArena/docs/) · [**➕ Add a Framework**](https://MDA2AV.github.io/HttpArena/docs/add-framework/)
 
