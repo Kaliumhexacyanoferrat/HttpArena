@@ -22,25 +22,27 @@ jobs:
       - name: Parse command
         id: parse
         run: |
-          COMMENT="${{ github.event.comment.body }}"
-          PR=${{ github.event.issue.number }}
+          PR="$PR_NUMBER"
           echo "pr=$PR" >> "$GITHUB_OUTPUT"
 
           # Detect changed frameworks from PR files via API (most reliable)
-          FRAMEWORKS=$(gh api "/repos/${{ github.repository }}/pulls/$PR/files" --jq '.[].filename' | grep '^frameworks/' | cut -d'/' -f2 | sort -u | head -1)
+          FRAMEWORKS=$(gh api "/repos/$REPO/pulls/$PR/files" --jq '.[].filename' | grep '^frameworks/' | cut -d'/' -f2 | sort -u | head -1)
           echo "framework=$FRAMEWORKS" >> "$GITHUB_OUTPUT"
           echo "Detected framework: $FRAMEWORKS"
 
-          if echo "$COMMENT" | grep -q '/benchmark'; then
+          if echo "$COMMENT_BODY" | grep -q '/benchmark'; then
             echo "command=benchmark" >> "$GITHUB_OUTPUT"
             # Extract optional profile: /benchmark baseline
-            PROFILE=$(echo "$COMMENT" | grep -oP '/benchmark\s+\K\S+' || echo "")
+            PROFILE=$(echo "$COMMENT_BODY" | grep -oP '/benchmark\s+\K\S+' || echo "")
             echo "profile=$PROFILE" >> "$GITHUB_OUTPUT"
-          elif echo "$COMMENT" | grep -q '/validate'; then
+          elif echo "$COMMENT_BODY" | grep -q '/validate'; then
             echo "command=validate" >> "$GITHUB_OUTPUT"
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
 
       - name: React to comment
         run: |
