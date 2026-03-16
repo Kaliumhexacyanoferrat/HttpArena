@@ -617,57 +617,63 @@ static class ConnectionHandler
 
 // ── Entry point ──
 
-AppData.Load();
-
-int reactorCount = Environment.ProcessorCount;
-if (args.Length > 0 && int.TryParse(args[0], out int rc))
-    reactorCount = rc;
-
-Console.WriteLine($"zerg HttpArena server starting on :8080 with {reactorCount} reactors");
-
-var engine = new Engine(new EngineOptions
+static class Program
 {
-    Ip = "0.0.0.0",
-    Port = 8080,
-    Backlog = 65535,
-    ReactorCount = reactorCount,
-    AcceptorConfig = new AcceptorConfig(
-        RingFlags: 0,
-        SqCpuThread: -1,
-        SqThreadIdleMs: 100,
-        RingEntries: 8 * 1024,
-        BatchSqes: 4096,
-        CqTimeout: 100_000_000,
-        IPVersion: IPVersion.IPv6DualStack
-    ),
-    ReactorConfigs = Enumerable.Range(0, reactorCount).Select(_ => new ReactorConfig(
-        RingFlags: (1u << 12) | (1u << 13), // SINGLE_ISSUER | DEFER_TASKRUN
-        SqCpuThread: -1,
-        SqThreadIdleMs: 100,
-        RingEntries: 8 * 1024,
-        RecvBufferSize: 16 * 1024,
-        BufferRingEntries: 16 * 1024,
-        BatchCqes: 4096,
-        MaxConnectionsPerReactor: 8 * 1024,
-        CqTimeout: 1_000_000,
-        ConnectionBufferRingEntries: 32,
-        IncrementalBufferConsumption: false
-    )).ToArray()
-});
-
-engine.Listen();
-
-var cts = new CancellationTokenSource();
-
-try
-{
-    while (engine.ServerRunning)
+    static async Task Main(string[] args)
     {
-        var connection = await engine.AcceptAsync(cts.Token);
-        if (connection is null) continue;
-        _ = ConnectionHandler.HandleAsync(connection);
+        AppData.Load();
+
+        int reactorCount = Environment.ProcessorCount;
+        if (args.Length > 0 && int.TryParse(args[0], out int rc))
+            reactorCount = rc;
+
+        Console.WriteLine($"zerg HttpArena server starting on :8080 with {reactorCount} reactors");
+
+        var engine = new Engine(new EngineOptions
+        {
+            Ip = "0.0.0.0",
+            Port = 8080,
+            Backlog = 65535,
+            ReactorCount = reactorCount,
+            AcceptorConfig = new AcceptorConfig(
+                RingFlags: 0,
+                SqCpuThread: -1,
+                SqThreadIdleMs: 100,
+                RingEntries: 8 * 1024,
+                BatchSqes: 4096,
+                CqTimeout: 100_000_000,
+                IPVersion: IPVersion.IPv6DualStack
+            ),
+            ReactorConfigs = Enumerable.Range(0, reactorCount).Select(_ => new ReactorConfig(
+                RingFlags: (1u << 12) | (1u << 13), // SINGLE_ISSUER | DEFER_TASKRUN
+                SqCpuThread: -1,
+                SqThreadIdleMs: 100,
+                RingEntries: 8 * 1024,
+                RecvBufferSize: 16 * 1024,
+                BufferRingEntries: 16 * 1024,
+                BatchCqes: 4096,
+                MaxConnectionsPerReactor: 8 * 1024,
+                CqTimeout: 1_000_000,
+                ConnectionBufferRingEntries: 32,
+                IncrementalBufferConsumption: false
+            )).ToArray()
+        });
+
+        engine.Listen();
+
+        var cts = new CancellationTokenSource();
+
+        try
+        {
+            while (engine.ServerRunning)
+            {
+                var connection = await engine.AcceptAsync(cts.Token);
+                if (connection is null) continue;
+                _ = ConnectionHandler.HandleAsync(connection);
+            }
+        }
+        catch (OperationCanceledException) { }
+
+        Console.WriteLine("Server stopped.");
     }
 }
-catch (OperationCanceledException) { }
-
-Console.WriteLine("Server stopped.");
