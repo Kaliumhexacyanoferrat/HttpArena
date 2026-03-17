@@ -13,7 +13,6 @@ ENTRYPOINT ["java", \
   "-server", \
   "-XX:+UseG1GC", \
   "-XX:+UseNUMA", \
-  "-XX:-StackTraceInThrowable", \
   "-Dio.netty.buffer.checkBounds=false", \
   "-Dio.netty.buffer.checkAccessible=false", \
   "-Dio.netty.allocator.maxOrder=10", \
