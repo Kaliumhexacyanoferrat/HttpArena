@@ -132,11 +132,7 @@ class App < Sinatra::Base
     JSON.generate({ 'items' => items, 'count' => items.length })
   end
 
-  post '/upload' do
-    request.body.rewind
-    data = request.body.read
-    content_type 'text/plain'
-    headers 'Server' => 'sinatra'
-    data.bytesize.to_s
-  end
+  # POST /upload is handled by UploadHandler middleware in config.ru
+  # to bypass Rack's body param parsing (binary data with no Content-Type
+  # causes "invalid %-encoding" errors in Rack's URL decoder)
 end
