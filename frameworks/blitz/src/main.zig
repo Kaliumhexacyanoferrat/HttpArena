@@ -146,13 +146,18 @@ fn handleCompression(req: *blitz.Request, res: *blitz.Response) void {
                 return;
             }
 
-            // Use a stack buffer for compressed output (input is ~1MB, compressed ~200KB)
-            var gzip_buf: [1048576]u8 = undefined;
-            var fbs = std.io.fixedBufferStream(&gzip_buf);
+            // Heap-allocate buffers to avoid stack overflow on worker threads
+            const alloc = std.heap.c_allocator;
+            const gzip_buf = alloc.alloc(u8, 1048576) catch {
+                _ = res.json(compression_json_body);
+                return;
+            };
+            defer alloc.free(gzip_buf);
+
+            var fbs = std.io.fixedBufferStream(gzip_buf);
             var compressor = std.compress.gzip.compressor(fbs.writer(), .{
                 .level = .fast,
             }) catch {
-                // Fallback to uncompressed
                 _ = res.json(compression_json_body);
                 return;
             };
@@ -167,8 +172,13 @@ fn handleCompression(req: *blitz.Request, res: *blitz.Response) void {
             const gzip_data = fbs.getWritten();
 
             // Build raw HTTP response with gzip headers
-            var resp_buf: [1048576 + 256]u8 = undefined;
-            const header = std.fmt.bufPrint(&resp_buf, "HTTP/1.1 200 OK\r\nServer: blitz\r\nContent-Type: application/json\r\nContent-Encoding: gzip\r\nVary: Accept-Encoding\r\nContent-Length: {d}\r\n\r\n", .{gzip_data.len}) catch {
+            const resp_buf = alloc.alloc(u8, gzip_data.len + 256) catch {
+                _ = res.json(compression_json_body);
+                return;
+            };
+            defer alloc.free(resp_buf);
+
+            const header = std.fmt.bufPrint(resp_buf, "HTTP/1.1 200 OK\r\nServer: blitz\r\nContent-Type: application/json\r\nContent-Encoding: gzip\r\nVary: Accept-Encoding\r\nContent-Length: {d}\r\n\r\n", .{gzip_data.len}) catch {
                 _ = res.json(compression_json_body);
                 return;
             };
