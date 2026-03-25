@@ -249,7 +249,9 @@ public class MainVerticle extends AbstractVerticle {
         }
         try {
             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-            java.util.zip.GZIPOutputStream gz = new java.util.zip.GZIPOutputStream(baos);
+            java.util.zip.GZIPOutputStream gz = new java.util.zip.GZIPOutputStream(baos) {{
+                def.setLevel(java.util.zip.Deflater.BEST_SPEED);
+            }};
             gz.write(largeJsonResponse);
             gz.close();
             ctx.response()
