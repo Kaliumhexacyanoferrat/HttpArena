@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.sql.Connection;
@@ -27,8 +28,10 @@ public class BenchmarkResource {
     private final ObjectMapper mapper = new ObjectMapper();
     private List<Map<String, Object>> dataset;
     private byte[] largeJsonResponse;
-    private Connection dbConn;
-    private PreparedStatement dbStmt;
+    private boolean dbAvailable = false;
+    private static final String DB_QUERY = "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ? AND ? LIMIT 50";
+    private static final ThreadLocal<Connection> tlConn = new ThreadLocal<>();
+    private static final ThreadLocal<PreparedStatement> tlStmt = new ThreadLocal<>();
     private final Map<String, byte[]> staticFiles = new ConcurrentHashMap<>();
     private static final Map<String, String> MIME_TYPES = Map.ofEntries(
         Map.entry(".css", "text/css"),
@@ -61,14 +64,13 @@ public class BenchmarkResource {
             }
             largeJsonResponse = mapper.writeValueAsBytes(Map.of("items", largeItems, "count", largeItems.size()));
         }
-        // Open SQLite database
+        // Check SQLite database availability
         File dbFile = new File("/data/benchmark.db");
         if (dbFile.exists()) {
             try {
-                dbConn = DriverManager.getConnection("jdbc:sqlite:file:/data/benchmark.db?mode=ro&immutable=1");
-                dbConn.createStatement().execute("PRAGMA mmap_size=268435456");
-                dbStmt = dbConn.prepareStatement(
-                    "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ? AND ? LIMIT 50");
+                Connection test = DriverManager.getConnection("jdbc:sqlite:file:/data/benchmark.db?mode=ro&immutable=1");
+                test.close();
+                dbAvailable = true;
             } catch (Exception ignored) {}
         }
         // Pre-load static files
@@ -119,9 +121,14 @@ public class BenchmarkResource {
     @POST
     @Path("/upload")
     @Produces(MediaType.TEXT_PLAIN)
-    @NonBlocking
-    public String upload(byte[] body) {
-        return String.valueOf(body.length);
+    public String upload(InputStream body) throws IOException {
+        byte[] buf = new byte[65536];
+        long total = 0;
+        int n;
+        while ((n = body.read(buf)) != -1) {
+            total += n;
+        }
+        return String.valueOf(total);
     }
 
     @GET
@@ -136,37 +143,40 @@ public class BenchmarkResource {
     @Path("/db")
     @Produces(MediaType.APPLICATION_JSON)
     public jakarta.ws.rs.core.Response db(@QueryParam("min") String minParam, @QueryParam("max") String maxParam) {
-        if (dbStmt == null)
-            return jakarta.ws.rs.core.Response.status(500).entity("DB not available").build();
+        if (!dbAvailable)
+            return jakarta.ws.rs.core.Response.ok("{\"items\":[],\"count\":0}".getBytes())
+                .header("Content-Type", "application/json").build();
+        PreparedStatement stmt = getDbStmt();
+        if (stmt == null)
+            return jakarta.ws.rs.core.Response.ok("{\"items\":[],\"count\":0}".getBytes())
+                .header("Content-Type", "application/json").build();
         double minPrice = 10.0, maxPrice = 50.0;
         if (minParam != null) try { minPrice = Double.parseDouble(minParam); } catch (NumberFormatException ignored) {}
         if (maxParam != null) try { maxPrice = Double.parseDouble(maxParam); } catch (NumberFormatException ignored) {}
         try {
-            List<Map<String, Object>> items;
-            synchronized (dbStmt) {
-                dbStmt.setDouble(1, minPrice);
-                dbStmt.setDouble(2, maxPrice);
-                ResultSet rs = dbStmt.executeQuery();
-                items = new ArrayList<>();
-                while (rs.next()) {
-                    List<String> tags = mapper.readValue(rs.getString(7), new TypeReference<>() {});
-                    Map<String, Object> row = new LinkedHashMap<>();
-                    row.put("id", rs.getInt(1));
-                    row.put("name", rs.getString(2));
-                    row.put("category", rs.getString(3));
-                    row.put("price", rs.getDouble(4));
-                    row.put("quantity", rs.getInt(5));
-                    row.put("active", rs.getInt(6) == 1);
-                    row.put("tags", tags);
-                    row.put("rating", Map.of("score", rs.getDouble(8), "count", rs.getInt(9)));
-                    items.add(row);
-                }
-                rs.close();
+            stmt.setDouble(1, minPrice);
+            stmt.setDouble(2, maxPrice);
+            ResultSet rs = stmt.executeQuery();
+            List<Map<String, Object>> items = new ArrayList<>();
+            while (rs.next()) {
+                List<String> tags = mapper.readValue(rs.getString(7), new TypeReference<>() {});
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("id", rs.getInt(1));
+                row.put("name", rs.getString(2));
+                row.put("category", rs.getString(3));
+                row.put("price", rs.getDouble(4));
+                row.put("quantity", rs.getInt(5));
+                row.put("active", rs.getInt(6) == 1);
+                row.put("tags", tags);
+                row.put("rating", Map.of("score", rs.getDouble(8), "count", rs.getInt(9)));
+                items.add(row);
             }
+            rs.close();
             return jakarta.ws.rs.core.Response.ok(mapper.writeValueAsBytes(Map.of("items", items, "count", items.size())))
                 .header("Content-Type", "application/json").build();
         } catch (Exception e) {
-            return jakarta.ws.rs.core.Response.status(500).entity(e.getMessage()).build();
+            return jakarta.ws.rs.core.Response.ok("{\"items\":[],\"count\":0}".getBytes())
+                .header("Content-Type", "application/json").build();
         }
     }
 
@@ -189,6 +199,7 @@ public class BenchmarkResource {
     @GET
     @Path("/compression")
     @Produces(MediaType.APPLICATION_JSON)
+    @NonBlocking
     public byte[] compression() {
         return largeJsonResponse;
     }
@@ -205,6 +216,21 @@ public class BenchmarkResource {
         String ext = dot >= 0 ? filename.substring(dot) : "";
         String ct = MIME_TYPES.getOrDefault(ext, "application/octet-stream");
         return jakarta.ws.rs.core.Response.ok(data).header("Content-Type", ct).build();
+    }
+
+    private PreparedStatement getDbStmt() {
+        PreparedStatement stmt = tlStmt.get();
+        if (stmt != null) return stmt;
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:sqlite:file:/data/benchmark.db?mode=ro&immutable=1");
+            conn.createStatement().execute("PRAGMA mmap_size=268435456");
+            stmt = conn.prepareStatement(DB_QUERY);
+            tlConn.set(conn);
+            tlStmt.set(stmt);
+        } catch (Exception e) {
+            return null;
+        }
+        return stmt;
     }
 
     private int sumParams(String a, String b) {

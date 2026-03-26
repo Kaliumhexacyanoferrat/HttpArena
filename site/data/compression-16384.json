@@ -648,25 +648,6 @@
     "status_5xx": 0
   },
   {
-    "framework": "quarkus-jvm",
-    "language": "Java",
-    "rps": 4008,
-    "avg_latency": "1.59s",
-    "p99_latency": "3.90s",
-    "cpu": "8053.2%",
-    "memory": "29.1GiB",
-    "connections": 16384,
-    "threads": 64,
-    "duration": "5s",
-    "pipeline": 1,
-    "bandwidth": "898.22MB/s",
-    "reconnects": 0,
-    "status_2xx": 20044,
-    "status_3xx": 0,
-    "status_4xx": 0,
-    "status_5xx": 0
-  },
-  {
     "framework": "rocket",
     "language": "Rust",
     "rps": 9880,
@@ -880,6 +861,26 @@
     "status_2xx": 51551,
     "status_3xx": 0,
     "status_4xx": 670,
+    "status_5xx": 0
+  },
+  {
+    "framework": "quarkus-jvm",
+    "language": "Java",
+    "rps": 9781,
+    "avg_latency": "1.17s",
+    "p99_latency": "3.02s",
+    "cpu": "11359.6%",
+    "memory": "13.1GiB",
+    "connections": 16384,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 1,
+    "bandwidth": "2.14GB/s",
+    "input_bw": "706.83KB/s",
+    "reconnects": 0,
+    "status_2xx": 48905,
+    "status_3xx": 0,
+    "status_4xx": 0,
     "status_5xx": 0
   },
   {

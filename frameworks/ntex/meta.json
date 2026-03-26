@@ -1,5 +1,5 @@
 {
-  "display_name": "ntex",
+  "display_name": "ntex-iouring",
   "language": "Rust",
   "type": "framework",
   "engine": "io_uring",
