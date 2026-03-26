@@ -27,6 +27,10 @@ function largeJson()
 }
 $largeJson = largeJson();
 
+$http_worker->onWorkerStart = static function () {
+    DB::Init();
+};
+
 // Data received
 $http_worker->onMessage = static function ($connection, $request) {
     $path = $request->path();
@@ -84,7 +88,7 @@ $http_worker->onMessage = static function ($connection, $request) {
             $max = (float) $request->get('max', 50);
 
             $connection->headers = ['Content-Type' => 'application/json'];
-            return $connection->send(query($min, $max));
+            return $connection->send(DB::query($min, $max));
     }
 
     // Serve static files
