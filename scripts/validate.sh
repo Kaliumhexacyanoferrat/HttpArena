@@ -44,7 +44,7 @@ echo "[build] Building Docker image..."
 if [ -x "frameworks/$FRAMEWORK/build.sh" ]; then
     "frameworks/$FRAMEWORK/build.sh" || { echo "FAIL: Docker build failed"; exit 1; }
 else
-    docker build -t "$IMAGE_NAME" "../frameworks/$FRAMEWORK" || { echo "FAIL: Docker build failed"; exit 1; }
+    docker build -t "$IMAGE_NAME" "frameworks/$FRAMEWORK" || { echo "FAIL: Docker build failed"; exit 1; }
 fi
 
 # Mount volumes based on subscribed tests
@@ -94,8 +94,14 @@ fi
 # Start Postgres sidecar if async-db is needed
 if has_test "async-db"; then
     echo "[postgres] Starting Postgres sidecar for validation..."
-    docker rm -f "httparena-validate-postgres" 2>/dev/null || true
-    docker run -d --name "httparena-validate-postgres" --network host         -e POSTGRES_USER=bench         -e POSTGRES_PASSWORD=bench         -e POSTGRES_DB=benchmark         -v "C:/Work/Projects/GenHTTP/HttpArena/data/pgdb-seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro"         postgres:17-alpine         -c max_connections=500
+    docker rm -f "$PG_CONTAINER" 2>/dev/null || true
+    docker run -d --name "$PG_CONTAINER" --network host \
+        -e POSTGRES_USER=bench \
+        -e POSTGRES_PASSWORD=bench \
+        -e POSTGRES_DB=benchmark \
+        -v "$DATA_DIR/pgdb-seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro" \
+        postgres:17-alpine \
+        -c max_connections=500
     for i in $(seq 1 30); do
         if docker exec "$PG_CONTAINER" pg_isready -U bench -d benchmark >/dev/null 2>&1; then
             echo "[postgres] Ready"
@@ -170,7 +176,7 @@ check_header() {
     local headers
     headers=$(curl -s -D- -o /dev/null "$@")
     local value
-    value=$(echo "$headers" | grep -i "^${header_name}:" | sed 's/^[^:]*: *//' | tr -d '/r' || true)
+    value=$(echo "$headers" | grep -i "^${header_name}:" | sed 's/^[^:]*: *//' | tr -d '\r' || true)
 
     if [ "$value" = "$expected_value" ] || [[ "$value" == "$expected_value;"* ]]; then
         echo "  PASS [$label] ($header_name: $value)"
@@ -200,32 +206,32 @@ wait_h2() {
 
 if has_test "baseline" || has_test "limited-conn"; then
     echo "[test] baseline endpoints"
-    check "GET /baseline11?a=13&b=42" "55" /
+    check "GET /baseline11?a=13&b=42" "55" \
         "http://localhost:$PORT/baseline11?a=13&b=42"
 
-    check "POST /baseline11?a=13&b=42 body=20" "75" /
-        -X POST -H "Content-Type: text/plain" -d "20" /
+    check "POST /baseline11?a=13&b=42 body=20" "75" \
+        -X POST -H "Content-Type: text/plain" -d "20" \
         "http://localhost:$PORT/baseline11?a=13&b=42"
 
-    check "POST /baseline11?a=13&b=42 chunked body=20" "75" /
-        -X POST -H "Content-Type: text/plain" -H "Transfer-Encoding: chunked" -d "20" /
+    check "POST /baseline11?a=13&b=42 chunked body=20" "75" \
+        -X POST -H "Content-Type: text/plain" -H "Transfer-Encoding: chunked" -d "20" \
         "http://localhost:$PORT/baseline11?a=13&b=42"
 
     # Anti-cheat: randomized inputs to detect hardcoded responses
     echo "[test] baseline anti-cheat (randomized inputs)"
     A1=$((RANDOM % 900 + 100))
     B1=$((RANDOM % 900 + 100))
-    check "GET /baseline11?a=$A1&b=$B1 (random)" "$((A1 + B1))" /
+    check "GET /baseline11?a=$A1&b=$B1 (random)" "$((A1 + B1))" \
         "http://localhost:$PORT/baseline11?a=$A1&b=$B1"
 
     BODY1=$((RANDOM % 900 + 100))
     BODY2=$((RANDOM % 900 + 100))
     while [ "$BODY1" -eq "$BODY2" ]; do BODY2=$((RANDOM % 900 + 100)); done
-    check "POST body=$BODY1 (cache check 1)" "$((13 + 42 + BODY1))" /
-        -X POST -H "Content-Type: text/plain" -d "$BODY1" /
+    check "POST body=$BODY1 (cache check 1)" "$((13 + 42 + BODY1))" \
+        -X POST -H "Content-Type: text/plain" -d "$BODY1" \
         "http://localhost:$PORT/baseline11?a=13&b=42"
-    check "POST body=$BODY2 (cache check 2)" "$((13 + 42 + BODY2))" /
-        -X POST -H "Content-Type: text/plain" -d "$BODY2" /
+    check "POST body=$BODY2 (cache check 2)" "$((13 + 42 + BODY2))" \
+        -X POST -H "Content-Type: text/plain" -d "$BODY2" \
         "http://localhost:$PORT/baseline11?a=13&b=42"
 fi
 
@@ -233,7 +239,7 @@ fi
 
 if has_test "pipelined"; then
     echo "[test] pipelined endpoint"
-    check "GET /pipeline" "ok" /
+    check "GET /pipeline" "ok" \
         "http://localhost:$PORT/pipeline"
 fi
 
@@ -270,7 +276,7 @@ print(f'{count} {has_total} {correct_totals}')
     fi
 
     # Check Content-Type header
-    check_header "GET /json Content-Type" "Content-Type" "application/json" /
+    check_header "GET /json Content-Type" "Content-Type" "application/json" \
         "http://localhost:$PORT/json"
 fi
 
@@ -281,8 +287,8 @@ if has_test "upload"; then
     # Small upload: returns byte count
     UPLOAD_BODY="Hello, HttpArena!"
     EXPECTED_LEN=${#UPLOAD_BODY}
-    check "POST /upload small body" "$EXPECTED_LEN" /
-        -X POST -H "Content-Type: application/octet-stream" --data-binary "$UPLOAD_BODY" /
+    check "POST /upload small body" "$EXPECTED_LEN" \
+        -X POST -H "Content-Type: application/octet-stream" --data-binary "$UPLOAD_BODY" \
         "http://localhost:$PORT/upload"
 
     # Anti-cheat: random body to detect hardcoded responses
@@ -305,7 +311,7 @@ if has_test "compression"; then
 
     # Must return Content-Encoding: gzip when Accept-Encoding: gzip is sent
     comp_headers=$(curl -s -D- -o /dev/null -H "Accept-Encoding: gzip" "http://localhost:$PORT/compression")
-    comp_encoding=$(echo "$comp_headers" | grep -i "^content-encoding:" | tr -d '/r' | awk '{print tolower($2)}' || true)
+    comp_encoding=$(echo "$comp_headers" | grep -i "^content-encoding:" | tr -d '\r' | awk '{print tolower($2)}' || true)
     if [ "$comp_encoding" = "gzip" ]; then
         echo "  PASS [compression Content-Encoding: gzip]"
         PASS=$((PASS + 1))
@@ -352,7 +358,7 @@ if has_test "noisy"; then
     echo "[test] noisy resilience"
 
     # Valid baseline request still works
-    check "GET /baseline11?a=13&b=42 (noisy context)" "55" /
+    check "GET /baseline11?a=13&b=42 (noisy context)" "55" \
         "http://localhost:$PORT/baseline11?a=13&b=42"
 
     # Bad method should return 4xx (400 or 405)
@@ -366,13 +372,13 @@ if has_test "noisy"; then
     fi
 
     # Nonexistent path should return 404
-    check_status "GET /this/path/does/not/exist" "404" /
+    check_status "GET /this/path/does/not/exist" "404" \
         "http://localhost:$PORT/this/path/does/not/exist"
 
     # After noise, valid request still works (server didn't crash)
     A4=$((RANDOM % 900 + 100))
     B4=$((RANDOM % 900 + 100))
-    check "GET /baseline11?a=$A4&b=$B4 (post-noise)" "$((A4 + B4))" /
+    check "GET /baseline11?a=$A4&b=$B4 (post-noise)" "$((A4 + B4))" \
         "http://localhost:$PORT/baseline11?a=$A4&b=$B4"
 fi
 
@@ -404,7 +410,7 @@ print(f'{count} {has_rating} {has_tags} {has_active_bool}')
         FAIL=$((FAIL + 1))
     fi
 
-    check_header "GET /db Content-Type" "Content-Type" "application/json" /
+    check_header "GET /db Content-Type" "Content-Type" "application/json" \
         "http://localhost:$PORT/db?min=10&max=50"
 
     # Anti-cheat: empty range should return 0 items
@@ -434,13 +440,13 @@ if has_test "baseline-h2"; then
             FAIL=$((FAIL + 1))
         fi
 
-        check "GET /baseline2?a=13&b=42 over HTTP/2" "55" /
+        check "GET /baseline2?a=13&b=42 over HTTP/2" "55" \
             -sk --http2 "https://localhost:$H2PORT/baseline2?a=13&b=42"
 
         # Anti-cheat: randomized query params
         A3=$((RANDOM % 900 + 100))
         B3=$((RANDOM % 900 + 100))
-        check "GET /baseline2?a=$A3&b=$B3 over HTTP/2 (random)" "$((A3 + B3))" /
+        check "GET /baseline2?a=$A3&b=$B3 over HTTP/2 (random)" "$((A3 + B3))" \
             -sk --http2 "https://localhost:$H2PORT/baseline2?a=$A3&b=$B3"
     fi
 fi
@@ -451,13 +457,13 @@ if has_test "static-h2"; then
     echo "[test] static-h2 endpoint"
     if wait_h2; then
         # Check a few static files exist and return correct Content-Type
-        check_header "GET /static/reset.css Content-Type" "Content-Type" "text/css" /
+        check_header "GET /static/reset.css Content-Type" "Content-Type" "text/css" \
             -sk --http2 "https://localhost:$H2PORT/static/reset.css"
 
-        check_header "GET /static/app.js Content-Type" "Content-Type" "application/javascript" /
+        check_header "GET /static/app.js Content-Type" "Content-Type" "application/javascript" \
             -sk --http2 "https://localhost:$H2PORT/static/app.js"
 
-        check_header "GET /static/manifest.json Content-Type" "Content-Type" "application/json" /
+        check_header "GET /static/manifest.json Content-Type" "Content-Type" "application/json" \
             -sk --http2 "https://localhost:$H2PORT/static/manifest.json"
 
         # Check response size is non-zero
@@ -471,7 +477,7 @@ if has_test "static-h2"; then
         fi
 
         # 404 for missing files
-        check_status "GET /static/nonexistent.txt" "404" /
+        check_status "GET /static/nonexistent.txt" "404" \
             -sk --http2 "https://localhost:$H2PORT/static/nonexistent.txt"
     fi
 fi
@@ -504,7 +510,7 @@ print(f'{count} {has_rating} {has_tags} {has_active_bool}')
         FAIL=$((FAIL + 1))
     fi
 
-    check_header "GET /async-db Content-Type" "Content-Type" "application/json" /
+    check_header "GET /async-db Content-Type" "Content-Type" "application/json" \
         "http://localhost:$PORT/async-db?min=10&max=50"
 
     # Anti-cheat: empty range should return 0 items
