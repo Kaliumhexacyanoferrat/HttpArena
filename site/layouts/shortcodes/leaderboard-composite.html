@@ -684,6 +684,12 @@ function updateFloatingHeaderComp() {
   }
 }
 window.addEventListener('scroll', updateFloatingHeaderComp, { passive: true });
+floaterComp.addEventListener('click', function(e) {
+  var sortBtn = e.target.closest('[data-sort]');
+  if (!sortBtn || !lastHeaderComp) return;
+  var real = lastHeaderComp.querySelector('[data-sort="' + sortBtn.dataset.sort + '"]');
+  if (real) { real.click(); lastHeaderComp = null; updateFloatingHeaderComp(); }
+});
 new MutationObserver(function() { lastHeaderComp = null; updateFloatingHeaderComp(); })
   .observe(document.getElementById('composite-table'), { childList: true });
 

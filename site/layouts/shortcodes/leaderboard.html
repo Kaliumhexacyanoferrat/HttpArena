@@ -1414,6 +1414,15 @@ applyFilters();
 
   window.addEventListener('scroll', updateFloatingHeader, { passive: true });
 
+  /* Delegate sort clicks from floating header to real header */
+  floater.addEventListener('click', function(e) {
+    var sortBtn = e.target.closest('.lb-sortable');
+    if (!sortBtn || !lastHeader) return;
+    var key = sortBtn.dataset.sort;
+    var real = lastHeader.querySelector('.lb-sortable[data-sort="' + key + '"]');
+    if (real) { real.click(); lastHeader = null; updateFloatingHeader(); }
+  });
+
   /* Reset when switching tabs/connections */
   var observer = new MutationObserver(function() { lastHeader = null; updateFloatingHeader(); });
   document.querySelectorAll('.lb-panel, .lb-conn-panel').forEach(function(el) {

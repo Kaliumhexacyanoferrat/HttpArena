@@ -588,6 +588,12 @@ function updateFloatingHeaderWs() {
   }
 }
 window.addEventListener('scroll', updateFloatingHeaderWs, { passive: true });
+floaterWs.addEventListener('click', function(e) {
+  var sortBtn = e.target.closest('.lb-sortable');
+  if (!sortBtn || !lastHeaderWs) return;
+  var real = lastHeaderWs.querySelector('.lb-sortable[data-sort="' + sortBtn.dataset.sort + '"]');
+  if (real) { real.click(); lastHeaderWs = null; updateFloatingHeaderWs(); }
+});
 var obsWs = new MutationObserver(function() { lastHeaderWs = null; updateFloatingHeaderWs(); });
 w.querySelectorAll('.lb-panel-ws, .lb-conn-panel-ws').forEach(function(el) {
   obsWs.observe(el, { attributes: true, attributeFilter: ['class'] });

@@ -589,6 +589,12 @@ function updateFloatingHeaderH2() {
   }
 }
 window.addEventListener('scroll', updateFloatingHeaderH2, { passive: true });
+floaterH2.addEventListener('click', function(e) {
+  var sortBtn = e.target.closest('.lb-sortable');
+  if (!sortBtn || !lastHeaderH2) return;
+  var real = lastHeaderH2.querySelector('.lb-sortable[data-sort="' + sortBtn.dataset.sort + '"]');
+  if (real) { real.click(); lastHeaderH2 = null; updateFloatingHeaderH2(); }
+});
 var obsH2 = new MutationObserver(function() { lastHeaderH2 = null; updateFloatingHeaderH2(); });
 w.querySelectorAll('.lb-panel-h2, .lb-conn-panel-h2').forEach(function(el) {
   obsH2.observe(el, { attributes: true, attributeFilter: ['class'] });
