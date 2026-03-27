@@ -14,7 +14,8 @@ $http_worker->reusePort = true;
 $http_worker->count = (int) shell_exec('nproc');
 
 // benchmark data
-$jsonData = json_decode(file_get_contents('/data/dataset.json'), true);
+define('JSON_DATA', json_decode(file_get_contents('/data/dataset.json'), true));
+define('LARGE_JSON', largeJson());
 
 function largeJson()
 {
@@ -25,16 +26,14 @@ function largeJson()
 
     return json_encode(['items' => $data, 'count' => count($data)]);
 }
-$largeJson = largeJson();
 
 $http_worker->onWorkerStart = static function () {
     DB::Init();
 };
 
 // Data received
-$http_worker->onMessage = static function ($connection, $request) use ($jsonData, $largeJson) {
-    $path = $request->path();
-    switch ($path) {
+$http_worker->onMessage = static function ($connection, $request) {
+    switch ($request->path()) {
         case '/pipeline':
             $connection->headers = ['Content-Type' => 'text/plain'];
             return $connection->send('ok');
@@ -50,7 +49,7 @@ $http_worker->onMessage = static function ($connection, $request) use ($jsonData
 
         case '/json':
             $total = [];
-            foreach ($jsonData as $item) {
+            foreach (JSON_DATA as $item) {
                 $item['total'] = $item['price'] * $item['quantity'];
                 $total[] = $item;
             }
@@ -68,10 +67,10 @@ $http_worker->onMessage = static function ($connection, $request) use ($jsonData
                     'Content-Type' => 'application/json',
                     'Content-Encoding' => 'gzip'
                 ];
-                return $connection->send(gzencode($largeJson, 1));
+                return $connection->send(gzencode(LARGE_JSON, 1));
             }
 
-            $resp = new Response(200, ['Content-Type' => 'application/json'], $largeJson);
+            $resp = new Response(200, ['Content-Type' => 'application/json'], LARGE_JSON);
             return $connection->send($resp);
 
         case '/db':
@@ -85,8 +84,8 @@ $http_worker->onMessage = static function ($connection, $request) use ($jsonData
     }
 
     // Serve static files
-    if (str_starts_with($path, '/static/')) {
-        $response = (new Response())->withFile('/data' . $path);
+    if (str_starts_with($request->path(), '/static/')) {
+        $response = (new Response())->withFile('/data' . $request->path());
         return $connection->send($response);
     }
 
