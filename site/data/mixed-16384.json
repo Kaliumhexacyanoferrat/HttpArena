@@ -948,5 +948,30 @@
     "tpl_db": 46164,
     "tpl_upload": 56961,
     "tpl_compression": 92287
+  },
+  {
+    "framework": "workerman",
+    "language": "PHP",
+    "rps": 31108,
+    "avg_latency": "423.03ms",
+    "p99_latency": "2.73s",
+    "cpu": "10277.1%",
+    "memory": "3.0GiB",
+    "connections": 16384,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 1,
+    "bandwidth": "1.41GB/s",
+    "input_bw": "3.04GB/s",
+    "reconnects": 113667,
+    "status_2xx": 466942,
+    "status_3xx": 0,
+    "status_4xx": 58531,
+    "status_5xx": 0,
+    "tpl_baseline": 280086,
+    "tpl_json": 47990,
+    "tpl_db": 48586,
+    "tpl_upload": 6,
+    "tpl_compression": 90274
   }
 ]

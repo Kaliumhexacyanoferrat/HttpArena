@@ -640,6 +640,26 @@
     "status_5xx": 0
   },
   {
+    "framework": "ngx-php",
+    "language": "PHP",
+    "rps": 12,
+    "avg_latency": "190.99ms",
+    "p99_latency": "254.00ms",
+    "cpu": "0.2%",
+    "memory": "9.6GiB",
+    "connections": 64,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 1,
+    "bandwidth": "1.85KB/s",
+    "input_bw": "240.00MB/s",
+    "reconnects": 0,
+    "status_2xx": 64,
+    "status_3xx": 0,
+    "status_4xx": 0,
+    "status_5xx": 0
+  },
+  {
     "framework": "ntex-tokio",
     "language": "Rust",
     "rps": 216,

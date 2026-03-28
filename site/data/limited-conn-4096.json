@@ -825,6 +825,26 @@
     "status_5xx": 0
   },
   {
+    "framework": "ngx-php",
+    "language": "PHP",
+    "rps": 627995,
+    "avg_latency": "6.30ms",
+    "p99_latency": "50.20ms",
+    "cpu": "2790.3%",
+    "memory": "4.3GiB",
+    "connections": 4096,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 1,
+    "bandwidth": "85.01MB/s",
+    "input_bw": "48.51MB/s",
+    "reconnects": 948248,
+    "status_2xx": 3139976,
+    "status_3xx": 0,
+    "status_4xx": 0,
+    "status_5xx": 0
+  },
+  {
     "framework": "ntex-iouring",
     "language": "Rust",
     "rps": 1235745,
@@ -962,6 +982,26 @@
     "status_2xx": 2821685,
     "status_3xx": 0,
     "status_4xx": 0,
+    "status_5xx": 0
+  },
+  {
+    "framework": "workerman",
+    "language": "PHP",
+    "rps": 1387195,
+    "avg_latency": "2.44ms",
+    "p99_latency": "16.20ms",
+    "cpu": "5696.4%",
+    "memory": "2.0GiB",
+    "connections": 4096,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 1,
+    "bandwidth": "151.09MB/s",
+    "input_bw": "107.16MB/s",
+    "reconnects": 1241054,
+    "status_2xx": 6935975,
+    "status_3xx": 0,
+    "status_4xx": 552250,
     "status_5xx": 0
   }
 ]

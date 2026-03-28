@@ -41,6 +41,7 @@
   "lithium": {"description": "Lithium C++ HTTP framework with compile-time reflection, boost::context coroutines, and -O3 -march=native -flto.", "repo": "https://github.com/matt-42/lithium", "type": "framework", "engine": "li/http"},
   "nginx": {"description": "Nginx with a custom C handler module, compiled with -O3 -march=native.", "repo": "https://github.com/nginx/nginx", "type": "engine", "engine": "nginx"},
   "nginx-openresty": {"description": "OpenResty (Nginx + LuaJIT) with Lua content handlers for all benchmark endpoints.", "repo": "https://github.com/openresty/openresty", "type": "framework", "engine": "openresty"},
+  "ngx-php": {"description": "Embedded PHP scripting language module for nginx.", "repo": "https://github.com/rryqszq4/ngx-php", "type": "framework", "engine": "nginx"},
   "node": {"description": "Bare Node.js HTTP server using the cluster module for multi-core scaling.", "repo": "https://github.com/nodejs/node", "type": "framework", "engine": "V8"},
   "node-websocket": {"description": "Node.js WebSocket echo server using ws package", "repo": "https://github.com/websockets/ws", "type": "framework", "engine": "V8"},
   "ntex-iouring": {"description": "ntex web framework with neon-uring runtime (io_uring), compiled with -O3 and thin LTO.", "repo": "https://github.com/ntex-rs/ntex", "type": "framework", "engine": "io_uring"},
@@ -61,5 +62,6 @@
   "ulfius": {"description": "Ulfius C REST framework built on GNU Libmicrohttpd with Jansson JSON. Lightweight with small memory footprint, designed for embedded systems.", "repo": "https://github.com/babelouest/ulfius", "type": "framework", "engine": "libmicrohttpd"},
   "ultimate-express": {"description": "ultimate-express (Express API on uWebSockets.js) with single-process threading.", "repo": "https://github.com/dimdenGD/ultimate-express", "type": "framework", "engine": "uWebSockets"},
   "vertx": {"description": "Eclipse Vert.x 4.5 — reactive toolkit on Netty with event-loop threading, JDK 21.", "repo": "https://github.com/eclipse-vertx/vert.x", "type": "engine", "engine": "Netty"},
+  "workerman": {"description": "Workerman with PHP content handlers for all benchmark endpoints.", "repo": "https://github.com/walkor/Workerman", "type": "framework", "engine": "workerman"},
   "workerman-websocket": {"description": "Workerman WebSocket echo server", "repo": "https://github.com/walkor/Workerman", "type": "framework", "engine": "Workerman"}
 }
