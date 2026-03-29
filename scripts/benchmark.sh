@@ -78,7 +78,7 @@ rebuild_site_data() {
         local repo=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('repo',''))" "$meta")
         local ftype=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('type','realistic'))" "$meta")
         local engine=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('engine',''))" "$meta")
-        printf '  "%s": {"description": "%s", "repo": "%s", "type": "%s", "engine": "%s"}' "$dn" "$desc" "$repo" "$ftype" "$engine" >> "$fw_json"
+        printf '  "%s": {"dir": "%s", "description": "%s", "repo": "%s", "type": "%s", "engine": "%s"}' "$dn" "$fw" "$desc" "$repo" "$ftype" "$engine" >> "$fw_json"
         fw_first=false
     done
     echo '' >> "$fw_json"

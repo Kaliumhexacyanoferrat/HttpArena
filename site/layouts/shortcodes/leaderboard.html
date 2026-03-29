@@ -587,6 +587,7 @@ var lbProfiles = {{ $profiles | jsonify | safeJS }};
 <div class="lb-header-floating" id="lb-floating-header"></div>
 
 <script>
+var lbFwMeta = {{ site.Data.frameworks | jsonify | safeJS }};
 var barClasses = ['lb-bar-1', 'lb-bar-2', 'lb-bar-3', 'lb-bar-4', 'lb-bar-5'];
 
 /* Build "Best" panels — pick best RPS per framework across all conn counts */
@@ -911,9 +912,10 @@ document.addEventListener('click', function(e) {
   }
   var baseUrl = '{{ "logs" | relURL }}';
 
+  var dirName = (lbFwMeta[name] && lbFwMeta[name].dir) ? lbFwMeta[name].dir : name;
   var repoHtml = repo ? '<a class="lb-popup-link" href="' + repo + '" target="_blank" rel="noreferrer">View source &rarr;</a>' : '';
-  var benchHtml = '<a class="lb-popup-link" href="https://github.com/MDA2AV/HttpArena/tree/main/frameworks/' + encodeURIComponent(name) + '" target="_blank" rel="noreferrer">Benchmark implementation &rarr;</a>';
-  var logHtml = (profile && connCount) ? '<a class="lb-popup-link" href="' + baseUrl + '/' + profile + '/' + connCount + '/' + encodeURIComponent(name) + '.log" target="_blank" rel="noreferrer">Docker logs &rarr;</a>' : '';
+  var benchHtml = '<a class="lb-popup-link" href="https://github.com/MDA2AV/HttpArena/tree/main/frameworks/' + encodeURIComponent(dirName) + '" target="_blank" rel="noreferrer">Benchmark implementation &rarr;</a>';
+  var logHtml = (profile && connCount) ? '<a class="lb-popup-link" href="' + baseUrl + '/' + profile + '/' + connCount + '/' + encodeURIComponent(dirName) + '.log" target="_blank" rel="noreferrer">Docker logs &rarr;</a>' : '';
 
   var statusHtml = s2xx > 0
     ? '2xx: ' + s2xx.toLocaleString() + ', 3xx: ' + s3xx.toLocaleString() + ', 4xx: ' + s4xx.toLocaleString() + ', 5xx: ' + s5xx.toLocaleString()
