@@ -74,8 +74,6 @@ public static class Project
     {
         var service = ServiceResource.From<Compression>().ExecutionMode(ExecutionMode.Auto);
 
-        service.Add(CompressedContent.Default());
-
         return app.Add("compression", service);
     }
 

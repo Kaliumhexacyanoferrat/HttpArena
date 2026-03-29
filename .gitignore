@@ -11,3 +11,6 @@ bin/
 target/
 frameworks/blitz/zig-linux-*
 frameworks/blitz/.zig-cache
+
+# IDE settings
+*.user
