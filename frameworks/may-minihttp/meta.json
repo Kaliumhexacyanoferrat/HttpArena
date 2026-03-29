@@ -1,0 +1,14 @@
+{
+  "display_name": "may-minihttp",
+  "language": "Rust",
+  "type": "engine",
+  "engine": "may-minihttp",
+  "description": "Mini HTTP server built on May stackful coroutines. Uses cooperative scheduling with coroutine-per-connection model for high concurrency.",
+  "repo": "https://github.com/Xudong-Huang/may_minihttp",
+  "enabled": true,
+  "tests": [
+    "baseline",
+    "pipelined",
+    "limited-conn"
+  ]
+}
