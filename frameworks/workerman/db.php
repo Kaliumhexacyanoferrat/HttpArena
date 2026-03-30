@@ -2,14 +2,13 @@
 
 class DB
 {
-    private static $db;
     private static $prepared;
 
     public static function init()
     {
-        self::$db = new Sqlite3('/data/benchmark.db', SQLITE3_OPEN_READONLY);
+        $db = new Sqlite3('/data/benchmark.db', SQLITE3_OPEN_READONLY);
 
-        self::$prepared = self::$db->prepare('SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count
+        self::$prepared = $db->prepare('SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count
                             FROM items
                             WHERE price BETWEEN ? AND ?
                             LIMIT 50');
