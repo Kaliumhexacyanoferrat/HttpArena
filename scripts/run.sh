@@ -63,7 +63,7 @@ docker_args+=(-e "DATABASE_URL=postgres://bench:bench@localhost:5432/benchmark")
 docker_args+=(-e "DATABASE_MAX_CONN=512")
 
 if [ -d "$CERTS_DIR" ]; then
-    docker_args+=(-p "$H2PORT:8443" -v "$CERTS_DIR:/certs:ro")
+    docker_args+=( -v "$CERTS_DIR:/certs:ro")
 fi
 
 DB_FILE="$DATA_DIR/benchmark.db"
