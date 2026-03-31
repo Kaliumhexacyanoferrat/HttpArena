@@ -84,7 +84,7 @@ docker run -d --name "$PG_CONTAINER" --network host \
     -e POSTGRES_DB=benchmark \
     -v "$DATA_DIR/pgdb-seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro" \
     postgres:17-alpine \
-    -c max_connections=500
+    -c max_connections=512
 for i in $(seq 1 60); do
     if docker exec "$PG_CONTAINER" pg_isready -U bench -d benchmark >/dev/null 2>&1; then
         # Ensure seed data is loaded (pg_isready fires before init scripts finish)
