@@ -113,7 +113,6 @@ if has_test "async-db" || has_test "mixed"; then
             # Ensure seed data is loaded (pg_isready fires before init scripts finish)
             if docker exec "$PG_CONTAINER" psql -U bench -d benchmark -tAc "SELECT 1 FROM items LIMIT 1" 2>/dev/null | grep -q 1; then
                 echo "[postgres] Ready"
-                echo "0"
                 break
             fi
         fi
@@ -124,12 +123,8 @@ if has_test "async-db" || has_test "mixed"; then
     docker_args+=(-e "DATABASE_MAX_CONN=512")
 fi
 
-echo "1"
-
 # Remove any stale container from a previous run
 docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
-
-echo "docker run ${docker_args[@]} $IMAGE_NAME"
 
 docker run "${docker_args[@]}" "$IMAGE_NAME"
 
