@@ -133,7 +133,7 @@ async def db_setup():
         return
     DATABASE_MAX_CONN = os.environ.get("DATABASE_MAX_CONN", None)
     if DATABASE_MAX_CONN:
-        avr_pool_size = DATABASE_MAX_CONN * 0.92 / WRK_COUNT
+        avr_pool_size = int(DATABASE_MAX_CONN) * 0.92 / WRK_COUNT
         PG_POOL_MIN_SIZE = int(avr_pool_size + 0.35)
         PG_POOL_MAX_SIZE = int(avr_pool_size + 0.95)
     try:
