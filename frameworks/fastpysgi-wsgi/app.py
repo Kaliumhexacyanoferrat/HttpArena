@@ -210,8 +210,11 @@ def compression_endpoint(env):
     global LARGE_JSON_BUF
     if not LARGE_JSON_BUF:
         return text_resp("No dataset", 500)
-    compressed = zlib.compress(LARGE_JSON_BUF, level = 1, wbits = 31)
-    return json_resp(compressed, gzip = True)
+    accept_encoding = env.get('HTTP_ACCEPT_ENCODING', '')
+    if accept_encoding and 'gzip' in accept_encoding:
+        compressed = zlib.compress(LARGE_JSON_BUF, level = 1, wbits = 31)
+        return json_resp(compressed, gzip = True)
+    return json_resp(LARGE_JSON_BUF)
 
 def db_endpoint(env):
     global DB_AVAILABLE, DB_QUERY
@@ -244,10 +247,10 @@ def async_db_endpoint(env):
         db_setup()
     if not DATABASE_POOL:
         return json_resp( { "items": [ ], "count": 0 } )
-    query_params = parse_qs(env.get('QUERY_STRING', ''))
-    min_val = float(query_params.get("min", [10])[0])
-    max_val = float(query_params.get("max", [50])[0])
     try:
+        query_params = parse_qs(env.get('QUERY_STRING', ''))
+        min_val = float(query_params.get("min")[0])
+        max_val = float(query_params.get("max")[0])
         with DATABASE_POOL.connection() as conn:
             rows = conn.execute(DATABASE_QUERY, (min_val, max_val)).fetchall()
         items = [

@@ -166,6 +166,13 @@ def json_resp(body: dict | str, status: int = 200, gzip: bool = False):
         body = body.encode('utf-8')
     return status, headers, body
 
+def get_header(scope: dict, name: str, def_value: str):
+    name = name.lower()
+    for hdr_name, value in scope.get("headers", [ ]):
+        if hdr_name.decode('latin-1').lower() == name:
+            return value.decode('latin-1', errors="replace")
+    return def_value
+
 # -- Routes -----------------------------------------------------------
 
 async def pipeline(scope, receive, send):
@@ -221,33 +228,39 @@ async def compression_endpoint(scope, receive, send):
     global LARGE_JSON_BUF
     if not LARGE_JSON_BUF:
         return text_resp("No dataset", 500)
-    compressed = zlib.compress(LARGE_JSON_BUF, level = 1, wbits = 31)
-    return json_resp(compressed, gzip = True)
+    accept_encoding = get_header(scope, 'accept-encoding', '')
+    if accept_encoding and 'gzip' in accept_encoding:
+        compressed = zlib.compress(LARGE_JSON_BUF, level = 1, wbits = 31)
+        return json_resp(compressed, gzip = True)
+    return json_resp(LARGE_JSON_BUF)
 
 async def db_endpoint(scope, receive, send):
     global DB_AVAILABLE, DB_QUERY
     if not DB_AVAILABLE:
         return json_resp( { "items": [ ], "count": 0 } )
-    query_params = parse_qs(scope.get('query_string', b'').decode())
-    min_val = float(query_params.get("min", [10])[0])
-    max_val = float(query_params.get("max", [50])[0])
-    conn = _get_db()
-    rows = conn.execute(DB_QUERY, (min_val, max_val)).fetchall()
-    items = [ ]
-    for row in rows:
-        items.append(
-            {
-                "id"      : row["id"],
-                "name"    : row["name"],
-                "category": row["category"],
-                "price"   : row["price"],
-                "quantity": row["quantity"],
-                "active"  : bool(row["active"]),
-                "tags"    : json.loads(row["tags"]),
-                "rating"  : { "score": row["rating_score"], "count": row["rating_count"] },
-            }
-        )
-    return json_resp( { "items": items, "count": len(items) } )
+    try:
+        query_params = parse_qs(scope.get('query_string', b'').decode())
+        min_val = float(query_params.get("min")[0])
+        max_val = float(query_params.get("max")[0])
+        conn = _get_db()
+        rows = conn.execute(DB_QUERY, (min_val, max_val)).fetchall()
+        items = [ ]
+        for row in rows:
+            items.append(
+                {
+                    "id"      : row["id"],
+                    "name"    : row["name"],
+                    "category": row["category"],
+                    "price"   : row["price"],
+                    "quantity": row["quantity"],
+                    "active"  : bool(row["active"]),
+                    "tags"    : json.loads(row["tags"]),
+                    "rating"  : { "score": row["rating_score"], "count": row["rating_count"] },
+                }
+            )
+        return json_resp( { "items": items, "count": len(items) } )
+    except Exception:
+        return json_resp( { "items": [ ], "count": 0 } )
 
 async def async_db_endpoint(scope, receive, send):
     global DATABASE_POOL, DATABASE_QUERY
