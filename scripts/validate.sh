@@ -594,7 +594,7 @@ fi
 if has_test "echo-ws"; then
     WS_DOCS="$DOCS_BASE/ws/echo/validation"
     echo "[test] echo-ws endpoint"
-    WS_OUTPUT=$(python3 "$SCRIPT_DIR/validate-ws.py" localhost "$PORT" /ws 2>&1)
+    WS_OUTPUT=$(python3 "$SCRIPT_DIR/validate-ws.py" localhost "$PORT" /ws 2>&1) || true
     echo "$WS_OUTPUT"
 
     # Parse pass/fail counts from the script output
