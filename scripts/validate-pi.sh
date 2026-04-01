@@ -126,6 +126,8 @@ fi
 # Remove any stale container from a previous run
 docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
 
+echo "docker run ${docker_args[@]} $IMAGE_NAME"
+
 docker run "${docker_args[@]}" "$IMAGE_NAME"
 
 # Wait for server to start
