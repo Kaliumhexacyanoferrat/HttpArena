@@ -18,6 +18,7 @@
     "mixed",
     "static",
     "tcp-frag",
-    "echo-ws"
+    "echo-ws",
+    "mini"
   ]
 }
