@@ -16,6 +16,7 @@ import asyncpg
 
 CPU_COUNT = int(multiprocessing.cpu_count())
 WRK_COUNT = min(len(os.sched_getaffinity(0)), 128)
+WRK_COUNT = max(WRK_COUNT, 4)
 
 MIME_TYPES = {
     '.css'  : 'text/css',
@@ -107,7 +108,7 @@ def _get_db() -> sqlite3.Connection:
 
 # -- Postgres DB ------------------------------------------------------------
 
-PG_POOL_MIN_SIZE = 2
+PG_POOL_MIN_SIZE = 1
 PG_POOL_MAX_SIZE = 2
 
 class NoResetConnection(asyncpg.Connection):
@@ -126,33 +127,23 @@ async def db_close():
 
 async def db_setup():
     global DATABASE_POOL, DATABASE_URL, WRK_COUNT
+    global PG_POOL_MIN_SIZE, PG_POOL_MAX_SIZE
     await db_close()
-    max_pool_size = 0
     if not DATABASE_URL:
         return
-    '''
-    max_connections = 0
-    try:
-        conn = await asyncpg.connect(DATABASE_URL)
-        try:
-            result = await conn.fetchval("SHOW max_connections;")
-            max_connections = int(result)
-        finally:
-            await conn.close()
-    except Exception:
-        pass
-    if not max_connections:
-        return
-    max_pool_size = int(max_connections * 0.87 / WRK_COUNT) + 1
-    '''
+    DATABASE_MAX_CONN = os.environ.get("DATABASE_MAX_CONN", None)
+    if DATABASE_MAX_CONN:
+        avr_pool_size = int(DATABASE_MAX_CONN) * 0.92 / WRK_COUNT
+        #PG_POOL_MIN_SIZE = int(avr_pool_size + 0.35)
+        PG_POOL_MAX_SIZE = int(avr_pool_size + 0.95)
     try:
         DATABASE_POOL = await asyncpg.create_pool(
             dsn = DATABASE_URL,
-            min_size = PG_POOL_MIN_SIZE,
-            max_size = max(max_pool_size, PG_POOL_MAX_SIZE),
+            min_size = max(PG_POOL_MIN_SIZE, 1),
+            max_size = max(PG_POOL_MAX_SIZE, 2),
             connection_class = NoResetConnection
         )
-    except Exception:
+    except Exception as e:
         DATABASE_POOL = None
 
 # -- Helpers ----------------------------------------------------------
@@ -166,7 +157,7 @@ def text_resp(body: str | bytes, status: int = 200):
 
 def json_resp(body: dict | str, status: int = 200, gzip: bool = False):
     if gzip:
-        headers = [[ b'Content-Type', b'application/json'], [ b'Content-Encoding', b'gzip' ]]
+        headers = [[ b'Content-Type', b'application/json' ], [ b'Content-Encoding', b'gzip' ]]
     else:
         headers = [[ b'Content-Type', b'application/json' ]]
     if isinstance(body, dict):
@@ -174,6 +165,13 @@ def json_resp(body: dict | str, status: int = 200, gzip: bool = False):
     if isinstance(body, str):
         body = body.encode('utf-8')
     return status, headers, body
+
+def get_header(scope: dict, name: str, def_value: str):
+    name = name.lower()
+    for hdr_name, value in scope.get("headers", [ ]):
+        if hdr_name.decode('latin-1').lower() == name:
+            return value.decode('latin-1', errors="replace")
+    return def_value
 
 # -- Routes -----------------------------------------------------------
 
@@ -230,65 +228,72 @@ async def compression_endpoint(scope, receive, send):
     global LARGE_JSON_BUF
     if not LARGE_JSON_BUF:
         return text_resp("No dataset", 500)
-    compressed = zlib.compress(LARGE_JSON_BUF, level = 1, wbits = 31)
-    return json_resp(compressed, gzip = True)
+    accept_encoding = get_header(scope, 'accept-encoding', '')
+    if accept_encoding and 'gzip' in accept_encoding:
+        compressed = zlib.compress(LARGE_JSON_BUF, level = 1, wbits = 31)
+        return json_resp(compressed, gzip = True)
+    return json_resp(LARGE_JSON_BUF)
 
 async def db_endpoint(scope, receive, send):
     global DB_AVAILABLE, DB_QUERY
     if not DB_AVAILABLE:
         return json_resp( { "items": [ ], "count": 0 } )
-    query_params = parse_qs(scope.get('query_string', b'').decode())
-    min_val = float(query_params.get("min", [10])[0])
-    max_val = float(query_params.get("max", [50])[0])
-    conn = _get_db()
-    rows = conn.execute(DB_QUERY, (min_val, max_val)).fetchall()
-    items = [ ]
-    for row in rows:
-        items.append(
-            {
-                "id"      : row["id"],
-                "name"    : row["name"],
-                "category": row["category"],
-                "price"   : row["price"],
-                "quantity": row["quantity"],
-                "active"  : bool(row["active"]),
-                "tags"    : json.loads(row["tags"]),
-                "rating"  : { "score": row["rating_score"], "count": row["rating_count"] },
-            }
-        )
-    return json_resp( { "items": items, "count": len(items) } )
+    try:
+        query_params = parse_qs(scope.get('query_string', b'').decode())
+        min_val = float(query_params.get("min")[0])
+        max_val = float(query_params.get("max")[0])
+        conn = _get_db()
+        rows = conn.execute(DB_QUERY, (min_val, max_val)).fetchall()
+        items = [ ]
+        for row in rows:
+            items.append(
+                {
+                    "id"      : row["id"],
+                    "name"    : row["name"],
+                    "category": row["category"],
+                    "price"   : row["price"],
+                    "quantity": row["quantity"],
+                    "active"  : bool(row["active"]),
+                    "tags"    : json.loads(row["tags"]),
+                    "rating"  : { "score": row["rating_score"], "count": row["rating_count"] },
+                }
+            )
+        return json_resp( { "items": items, "count": len(items) } )
+    except Exception:
+        return json_resp( { "items": [ ], "count": 0 } )
 
 async def async_db_endpoint(scope, receive, send):
     global DATABASE_POOL, DATABASE_QUERY
     if not DATABASE_POOL:
-        await db_setup()
-    if not DATABASE_POOL:
         return json_resp( { "items": [ ], "count": 0 } )
-    query_params = parse_qs(scope.get('query_string', b'').decode())
-    min_val = float(query_params.get('min', ['10'])[0])
-    max_val = float(query_params.get('max', ['50'])[0])
-    db_conn = await DATABASE_POOL.acquire()
     try:
-        rows = await db_conn.fetch(DATABASE_QUERY, min_val, max_val)
-    finally:
-        await DATABASE_POOL.release(db_conn)
-    items = [
-        {
-            'id'      : row['id'],
-            'name'    : row['name'],
-            'category': row['category'],
-            'price'   : row['price'],
-            'quantity': row['quantity'],
-            'active'  : row['active'],
-            'tags'    : json.loads(row['tags']) if isinstance(row['tags'], str) else row['tags'],
-            'rating': {
-                'score': row['rating_score'],
-                'count': row['rating_count'],
+        query_params = parse_qs(scope.get('query_string', b'').decode())
+        min_val = float(query_params.get('min')[0])
+        max_val = float(query_params.get('max')[0])
+        db_conn = await DATABASE_POOL.acquire()
+        try:
+            rows = await db_conn.fetch(DATABASE_QUERY, min_val, max_val)
+        finally:
+            await DATABASE_POOL.release(db_conn)
+        items = [
+            {
+                'id'      : row['id'],
+                'name'    : row['name'],
+                'category': row['category'],
+                'price'   : row['price'],
+                'quantity': row['quantity'],
+                'active'  : row['active'],
+                'tags'    : json.loads(row['tags']) if isinstance(row['tags'], str) else row['tags'],
+                'rating': {
+                    'score': row['rating_score'],
+                    'count': row['rating_count'],
+                }
             }
-        }
-        for row in rows
-    ]
-    return json_resp( { "items": items, "count": len(items) } )
+            for row in rows
+        ]
+        return json_resp( { "items": items, "count": len(items) } )
+    except Exception:
+        return json_resp( { "items": [ ], "count": 0 } )
 
 async def static_file_endpoint(scope, receive, send):
     global STATIC_FILES, STATIC_DIR
@@ -333,7 +338,7 @@ async def asgi_lifespan(receive, send):
     while True:
         message = await receive()
         if message['type'] == 'lifespan.startup':
-            #await db_setup()
+            await db_setup()
             await send({'type': 'lifespan.startup.complete'})
         elif message['type'] == 'lifespan.shutdown':
             await db_close()

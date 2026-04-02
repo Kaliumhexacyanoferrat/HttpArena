@@ -15,6 +15,7 @@
         "upload",
         "compression",
         "mixed",
+        "mini",
         "async-db",
         "static",
         "tcp-frag"

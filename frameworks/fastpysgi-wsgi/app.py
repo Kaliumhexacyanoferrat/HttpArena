@@ -16,6 +16,7 @@ import psycopg.rows
 
 CPU_COUNT = int(multiprocessing.cpu_count())
 WRK_COUNT = min(len(os.sched_getaffinity(0)), 128)
+WRK_COUNT = max(WRK_COUNT, 4)
 
 MIME_TYPES = {
     '.css'  : 'text/css',
@@ -106,8 +107,8 @@ def _get_db() -> sqlite3.Connection:
 
 # -- Postgres DB ------------------------------------------------------------
 
-PG_POOL_MIN_SIZE = 2
-PG_POOL_MAX_SIZE = 3
+PG_POOL_MIN_SIZE = 1
+PG_POOL_MAX_SIZE = 2
 
 def db_close():
     global DATABASE_POOL
@@ -123,12 +124,16 @@ def db_setup():
     db_close()
     if not DATABASE_URL:
         return
-    max_pool_size = 0
+    DATABASE_MAX_CONN = os.environ.get("DATABASE_MAX_CONN", None)
+    if DATABASE_MAX_CONN:
+        avr_pool_size = int(DATABASE_MAX_CONN) * 0.92 / WRK_COUNT
+        #PG_POOL_MIN_SIZE = int(avr_pool_size + 0.35)
+        PG_POOL_MAX_SIZE = int(avr_pool_size + 0.95)
     try:
         DATABASE_POOL = psycopg_pool.ConnectionPool(
             conninfo = DATABASE_URL,
-            min_size = PG_POOL_MIN_SIZE,
-            max_size = max(max_pool_size, PG_POOL_MAX_SIZE),
+            min_size = max(PG_POOL_MIN_SIZE, 1),
+            max_size = max(PG_POOL_MAX_SIZE, 2),
             kwargs = { 'row_factory': psycopg.rows.dict_row },
         )
         #DATABASE_POOL.wait()
@@ -206,33 +211,39 @@ def compression_endpoint(env):
     global LARGE_JSON_BUF
     if not LARGE_JSON_BUF:
         return text_resp("No dataset", 500)
-    compressed = zlib.compress(LARGE_JSON_BUF, level = 1, wbits = 31)
-    return json_resp(compressed, gzip = True)
+    accept_encoding = env.get('HTTP_ACCEPT_ENCODING', '')
+    if accept_encoding and 'gzip' in accept_encoding:
+        compressed = zlib.compress(LARGE_JSON_BUF, level = 1, wbits = 31)
+        return json_resp(compressed, gzip = True)
+    return json_resp(LARGE_JSON_BUF)
 
 def db_endpoint(env):
     global DB_AVAILABLE, DB_QUERY
     if not DB_AVAILABLE:
         return json_resp( { "items": [ ], "count": 0 } )
-    query_params = parse_qs(env.get('QUERY_STRING', ''))
-    min_val = float(query_params.get("min", [10])[0])
-    max_val = float(query_params.get("max", [50])[0])
-    conn = _get_db()
-    rows = conn.execute(DB_QUERY, (min_val, max_val)).fetchall()
-    items = [ ]
-    for row in rows:
-        items.append(
-            {
-                "id"      : row["id"],
-                "name"    : row["name"],
-                "category": row["category"],
-                "price"   : row["price"],
-                "quantity": row["quantity"],
-                "active"  : bool(row["active"]),
-                "tags"    : json.loads(row["tags"]),
-                "rating"  : { "score": row["rating_score"], "count": row["rating_count"] },
-            }
-        )
-    return json_resp( { "items": items, "count": len(items) } )
+    try:
+        query_params = parse_qs(env.get('QUERY_STRING', ''))
+        min_val = float(query_params.get("min")[0])
+        max_val = float(query_params.get("max")[0])
+        conn = _get_db()
+        rows = conn.execute(DB_QUERY, (min_val, max_val)).fetchall()
+        items = [ ]
+        for row in rows:
+            items.append(
+                {
+                    "id"      : row["id"],
+                    "name"    : row["name"],
+                    "category": row["category"],
+                    "price"   : row["price"],
+                    "quantity": row["quantity"],
+                    "active"  : bool(row["active"]),
+                    "tags"    : json.loads(row["tags"]),
+                    "rating"  : { "score": row["rating_score"], "count": row["rating_count"] },
+                }
+            )
+        return json_resp( { "items": items, "count": len(items) } )
+    except Exception:
+        return json_resp( { "items": [ ], "count": 0 } )
 
 def async_db_endpoint(env):
     global DATABASE_POOL, DATABASE_QUERY
@@ -240,10 +251,10 @@ def async_db_endpoint(env):
         db_setup()
     if not DATABASE_POOL:
         return json_resp( { "items": [ ], "count": 0 } )
-    query_params = parse_qs(env.get('QUERY_STRING', ''))
-    min_val = float(query_params.get("min", [10])[0])
-    max_val = float(query_params.get("max", [50])[0])
     try:
+        query_params = parse_qs(env.get('QUERY_STRING', ''))
+        min_val = float(query_params.get("min")[0])
+        max_val = float(query_params.get("max")[0])
         with DATABASE_POOL.connection() as conn:
             rows = conn.execute(DATABASE_QUERY, (min_val, max_val)).fetchall()
         items = [
