@@ -860,6 +860,26 @@
     "status_5xx": 0
   },
   {
+    "framework": "ServiceStack",
+    "language": "C#",
+    "rps": 221,
+    "avg_latency": "1.07s",
+    "p99_latency": "4.84s",
+    "cpu": "6329.3%",
+    "memory": "22.6GiB",
+    "connections": 512,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 1,
+    "bandwidth": "46.98KB/s",
+    "input_bw": "4.32GB/s",
+    "reconnects": 0,
+    "status_2xx": 1109,
+    "status_3xx": 0,
+    "status_4xx": 0,
+    "status_5xx": 0
+  },
+  {
     "framework": "SimpleW",
     "language": "C#",
     "rps": 869,
