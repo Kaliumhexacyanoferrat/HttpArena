@@ -14,11 +14,10 @@
     "upload",
     "compression",
     "noisy",
-    "mixed",
     "api-4",
     "api-16",
     "static",
     "async-db",
-        "sync-db"
+    "sync-db"
   ]
 }

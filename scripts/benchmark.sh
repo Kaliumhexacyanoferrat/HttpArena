@@ -8,6 +8,7 @@ cd "$ROOT_DIR"
 GCANNON="${GCANNON:-gcannon}"
 GCANNON_IMAGE="${GCANNON_IMAGE:-gcannon:latest}"
 GCANNON_CPUS="${GCANNON_CPUS:-32-63,96-127}"
+GCANNON_MODE=native
 H2LOAD="${H2LOAD:-h2load}"
 OHA="${OHA:-$HOME/.cargo/bin/oha}"
 GHZ="${GHZ:-ghz}"
@@ -29,46 +30,35 @@ CERTS_DIR="$ROOT_DIR/certs"
 #           "grpc" = gRPC unary (h2load h2c), "grpc-tls" = gRPC unary (h2load TLS),
 #           "static" = multi-URI static files (gcannon --raw), "ws-echo" = WebSocket echo (gcannon --ws)
 declare -A PROFILES=(
-    [baseline]="1|0|0-31,64-95|512,4096,16384|"
-    [pipelined]="16|0|0-31,64-95|512,4096,16384|pipeline"
+    [baseline]="1|0|0-31,64-95|512,4096|"
+    [pipelined]="16|0|0-31,64-95|512,4096|pipeline"
     [limited-conn]="1|10|0-31,64-95|512,4096|"
-    [json]="1|0|0-31,64-95|4096,16384|json"
-    [upload]="1|0|0-31,64-95|64,256,512|upload"
-    [compression]="1|0|0-31,64-95|4096,16384|compression"
+    [json]="1|0|0-31,64-95|4096|json"
+    [upload]="1|0|0-31,64-95|32,256|upload"
+    [compression]="1|0|0-31,64-95|512,4096|compression"
     [noisy]="1|0|0-31,64-95|512,4096,16384|noisy"
-    [mixed]="1|5|0-31,64-95|4096|mixed"
     [api-4]="1|5|0-3|256|api-4"
     [api-16]="1|5|0-7,64-71|1024|api-16"
-    [static]="1|10|0-31,64-95|4096,16384|static"
-    [tcp-frag]="1|2|0-31,64-95|512,4096,16384|tcp-frag"
+    [static]="1|10|0-31,64-95|1024,4096,6800|static"
     [baseline-h2]="1|0|0-31,64-95|256,1024|h2"
     [static-h2]="1|0|0-31,64-95|256,1024|static-h2"
-    [baseline-h3]="32|0|0-31,64-95|256,512|h3"
-    [static-h3]="32|0|0-31,64-95|256,512|static-h3"
     [unary-grpc]="1|0|0-31,64-95|256,1024|grpc"
     [unary-grpc-tls]="1|0|0-31,64-95|256,1024|grpc-tls"
     [echo-ws]="1|0|0-31,64-95|512,4096,16384|ws-echo"
     [sync-db]="1|0|0-31,64-95|1024|sync-db"
     [async-db]="1|0|0-31,64-95|1024|async-db"
 )
-PROFILE_ORDER=(baseline pipelined limited-conn json upload compression noisy mixed api-4 api-16 static sync-db async-db baseline-h2 static-h2 baseline-h3 static-h3 unary-grpc unary-grpc-tls echo-ws)
+PROFILE_ORDER=(baseline pipelined limited-conn json upload compression noisy api-4 api-16 static sync-db async-db baseline-h2 static-h2 unary-grpc unary-grpc-tls echo-ws)
 
 # Parse flags
 SAVE_RESULTS=false
-ENABLE_FRAG=false
 POSITIONAL=()
 for arg in "$@"; do
     case "$arg" in
         --save) SAVE_RESULTS=true ;;
-        --frag) ENABLE_FRAG=true ;;
         *) POSITIONAL+=("$arg") ;;
     esac
 done
-
-# Only include tcp-frag in profile order when --frag is passed
-if [ "$ENABLE_FRAG" = "true" ]; then
-    PROFILE_ORDER+=(tcp-frag)
-fi
 FRAMEWORK="${POSITIONAL[0]:-}"
 PROFILE_FILTER="${POSITIONAL[1]:-}"
 
@@ -309,9 +299,6 @@ restore_settings() {
             done
         fi
     fi
-    # Restore loopback MTU in case tcp-frag test was interrupted
-    sudo ip link set lo mtu 65536 2>/dev/null || true
-    sudo ip route flush cache 2>/dev/null || true
 }
 trap restore_settings EXIT
 
@@ -343,9 +330,6 @@ echo "[tune] Setting UDP buffer sizes for QUIC..."
 sudo sysctl -w net.core.rmem_max=7500000 > /dev/null 2>&1 || true
 sudo sysctl -w net.core.wmem_max=7500000 > /dev/null 2>&1 || true
 
-echo "[tune] Ensuring loopback MTU is 65536..."
-sudo ip link set lo mtu 65536 2>/dev/null || true
-sudo ip route flush cache 2>/dev/null || true
 
 echo "[clean] Restarting Docker daemon..."
 if sudo systemctl restart docker 2>/dev/null; then
@@ -367,7 +351,7 @@ fi
 
 # Start Postgres sidecar if async-db is needed
 if echo ",$FRAMEWORK_TESTS," | grep -qF ",async-db,"; then
-    if [ -z "$PROFILE_FILTER" ] || [ "$PROFILE_FILTER" = "async-db" ] || [ "$PROFILE_FILTER" = "mixed" ] || [ "$PROFILE_FILTER" = "api-4" ] || [ "$PROFILE_FILTER" = "api-16" ]; then
+    if [ -z "$PROFILE_FILTER" ] || [ "$PROFILE_FILTER" = "async-db" ] || [ "$PROFILE_FILTER" = "api-4" ] || [ "$PROFILE_FILTER" = "api-16" ]; then
         echo "[postgres] Starting Postgres sidecar..."
         docker rm -f "$PG_CONTAINER" 2>/dev/null || true
         docker run -d --name "$PG_CONTAINER" --network host \
@@ -406,7 +390,14 @@ for profile in "${profiles_to_run[@]}"; do
         fi
     fi
 
-    IFS='|' read -r pipeline req_per_conn cpu_limit conn_list endpoint <<< "${PROFILES[$profile]}"
+    if [ -n "${PROFILES[$profile]+x}" ]; then
+        IFS='|' read -r pipeline req_per_conn cpu_limit conn_list endpoint <<< "${PROFILES[$profile]}"
+    elif [ -n "${CUSTOM_PROFILE:-}" ]; then
+        IFS='|' read -r pipeline req_per_conn cpu_limit conn_list endpoint <<< "$CUSTOM_PROFILE"
+    else
+        echo "[skip] Unknown profile: $profile"
+        continue
+    fi
 
     # Parse connection counts
     IFS=',' read -ra CONN_COUNTS <<< "$conn_list"
@@ -431,7 +422,7 @@ for profile in "${profiles_to_run[@]}"; do
         -v "$ROOT_DIR/data/benchmark.db:/data/benchmark.db:ro"
         -v "$ROOT_DIR/data/static:/data/static:ro"
         -v "$CERTS_DIR:/certs:ro")
-    if [ "$endpoint" = "async-db" ] || [ "$endpoint" = "mixed" ] || [ "$endpoint" = "api-4" ] || [ "$endpoint" = "api-16" ]; then
+    if [ "$endpoint" = "async-db" ] || [ "$endpoint" = "api-4" ] || [ "$endpoint" = "api-16" ]; then
         docker_args+=(-e "DATABASE_URL=postgres://bench:bench@localhost:5432/benchmark")
         docker_args+=(-e "DATABASE_MAX_CONN=256")
     fi
@@ -574,10 +565,6 @@ for profile in "${profiles_to_run[@]}"; do
         gc_args=("http://localhost:$PORT"
             --raw "$REQUESTS_DIR/json-gzip.raw"
             -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline")
-    elif [ "$endpoint" = "mixed" ]; then
-        gc_args=("http://localhost:$PORT"
-            --raw "$REQUESTS_DIR/get.raw,$REQUESTS_DIR/get.raw,$REQUESTS_DIR/get.raw,$REQUESTS_DIR/post_cl.raw,$REQUESTS_DIR/post_cl.raw,$REQUESTS_DIR/json-get.raw,$REQUESTS_DIR/db-get.raw,$REQUESTS_DIR/upload-small.raw,$REQUESTS_DIR/json-gzip.raw,$REQUESTS_DIR/json-gzip.raw,$REQUESTS_DIR/static-reset.css.raw,$REQUESTS_DIR/static-app.js.raw,$REQUESTS_DIR/async-db-get.raw,$REQUESTS_DIR/async-db-get.raw"
-            -c "$CONNS" -t "$THREADS" -d 15s -p "$pipeline")
     elif [ "$endpoint" = "api-4" ] || [ "$endpoint" = "api-16" ]; then
         gc_args=("http://localhost:$PORT"
             --raw "$REQUESTS_DIR/get.raw,$REQUESTS_DIR/get.raw,$REQUESTS_DIR/get.raw,$REQUESTS_DIR/json-get.raw,$REQUESTS_DIR/json-get.raw,$REQUESTS_DIR/json-get.raw,$REQUESTS_DIR/async-db-get.raw,$REQUESTS_DIR/async-db-get.raw"
@@ -588,13 +575,6 @@ for profile in "${profiles_to_run[@]}"; do
     elif [ "$endpoint" = "async-db" ]; then
         gc_args=("http://localhost:$PORT/async-db?min=10&max=50"
             -c "$CONNS" -t "$THREADS" -d 10s -p "$pipeline")
-    elif [ "$endpoint" = "tcp-frag" ]; then
-        # Set loopback MTU to 69 to force heavy TCP fragmentation
-        echo "[tune] Setting loopback MTU to 69 for TCP fragmentation test..."
-        sudo ip link set lo mtu 69
-        gc_args=("http://localhost:$PORT"
-            --raw "$REQUESTS_DIR/get-frag.raw,$REQUESTS_DIR/get-frag.raw,$REQUESTS_DIR/post-frag.raw,$REQUESTS_DIR/post-chunked-frag.raw,$REQUESTS_DIR/noise-frag.raw,$REQUESTS_DIR/cookie-frag.raw,$REQUESTS_DIR/manyheaders-frag.raw,$REQUESTS_DIR/body29-frag.raw"
-            -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline")
     elif [ "$endpoint" = "noisy" ]; then
         gc_args=("http://localhost:$PORT"
             --raw "$REQUESTS_DIR/get.raw,$REQUESTS_DIR/post_cl.raw,$REQUESTS_DIR/noise-badpath.raw,$REQUESTS_DIR/noise-badcl.raw,$REQUESTS_DIR/noise-binary.raw"
@@ -605,6 +585,10 @@ for profile in "${profiles_to_run[@]}"; do
             -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline")
     elif [ "$endpoint" = "json" ]; then
         gc_args=("http://localhost:$PORT/json"
+            -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline")
+    elif [ -n "${CUSTOM_RAW:-}" ]; then
+        gc_args=("http://localhost:$PORT"
+            --raw "$CUSTOM_RAW"
             -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline")
     else
         gc_args=("http://localhost:$PORT"
@@ -637,11 +621,15 @@ for profile in "${profiles_to_run[@]}"; do
             rm -f "$oha_out"
         elif [ "$USE_H2LOAD" = "true" ]; then
             output=$(timeout 45 "${gc_args[@]}" 2>&1) || true
+        elif [ "$GCANNON_MODE" = "native" ]; then
+            output=$(timeout 45 taskset -c "$GCANNON_CPUS" \
+                env LD_LIBRARY_PATH=/usr/lib "$GCANNON" "${gc_args[@]}" 2>&1) || true
         else
             output=$(timeout 45 docker run --rm --network host \
                 --cpuset-cpus="$GCANNON_CPUS" \
                 --security-opt seccomp=unconfined \
                 --ulimit memlock=-1:-1 \
+                --ulimit nofile=1048576:1048576 \
                 -v "$REQUESTS_DIR:$REQUESTS_DIR:ro" \
                 "$GCANNON_IMAGE" "${gc_args[@]}" 2>&1) || true
         fi
@@ -758,25 +746,6 @@ else: print(f'{bps}B/s')
     tpl_json=""
     if [ "$USE_H2LOAD" = "false" ] && [ "$USE_OHA" = "false" ]; then
         tpl_line=$(echo "$best_output" | grep -oP 'Per-template-ok: \K.*' || echo "")
-        if [ -n "$tpl_line" ] && [ "$endpoint" = "mixed" ]; then
-            # Mixed templates: get×3, post_cl×2, json-get×1, db-get×1, upload-small×1, json-gzip×2, static×2, async-db×2
-            IFS=',' read -ra tpl_counts <<< "$tpl_line"
-            t_baseline=$(( ${tpl_counts[0]:-0} + ${tpl_counts[1]:-0} + ${tpl_counts[2]:-0} + ${tpl_counts[3]:-0} + ${tpl_counts[4]:-0} ))
-            t_json=${tpl_counts[5]:-0}
-            t_db=${tpl_counts[6]:-0}
-            t_upload=${tpl_counts[7]:-0}
-            t_compression=$(( ${tpl_counts[8]:-0} + ${tpl_counts[9]:-0} ))
-            t_static=$(( ${tpl_counts[10]:-0} + ${tpl_counts[11]:-0} ))
-            t_async_db=$(( ${tpl_counts[12]:-0} + ${tpl_counts[13]:-0} ))
-            tpl_json=",
-  \"tpl_baseline\": $t_baseline,
-  \"tpl_json\": $t_json,
-  \"tpl_db\": $t_db,
-  \"tpl_upload\": $t_upload,
-  \"tpl_compression\": $t_compression,
-  \"tpl_static\": $t_static,
-  \"tpl_async_db\": $t_async_db"
-        fi
         if [ -n "$tpl_line" ] && ([ "$endpoint" = "api-4" ] || [ "$endpoint" = "api-16" ]); then
             # API-4 templates: get×3, json-get×3, async-db×2
             IFS=',' read -ra tpl_counts <<< "$tpl_line"
@@ -792,34 +761,8 @@ else: print(f'{bps}B/s')
   \"tpl_static\": 0,
   \"tpl_async_db\": $t_async_db"
         fi
-        if [ -n "$tpl_line" ] && [ "$endpoint" = "tcp-frag" ]; then
-            # TCP frag templates: get-frag×2, post-frag×1, post-chunked-frag×1, noise-frag×1, cookie-frag×1, manyheaders-frag×1, body29-frag×1
-            tpl_all_line=$(echo "$best_output" | grep -oP 'Per-template: \K.*' || echo "")
-            IFS=',' read -ra tpl_ok <<< "$tpl_line"
-            IFS=',' read -ra tpl_all <<< "$tpl_all_line"
-            tf_get=$(( ${tpl_ok[0]:-0} + ${tpl_ok[1]:-0} ))
-            tf_post=${tpl_ok[2]:-0}
-            tf_chunked=${tpl_ok[3]:-0}
-            tf_noise=${tpl_ok[4]:-0}
-            tf_cookie=${tpl_ok[5]:-0}
-            tf_headers=${tpl_ok[6]:-0}
-            tf_body29=${tpl_ok[7]:-0}
-            # Errors = total - ok
-            tf_get_err=$(( ${tpl_all[0]:-0} + ${tpl_all[1]:-0} - tf_get ))
-            tf_post_err=$(( ${tpl_all[2]:-0} - tf_post ))
-            tf_chunked_err=$(( ${tpl_all[3]:-0} - tf_chunked ))
-            tf_noise_err=$(( ${tpl_all[4]:-0} - tf_noise ))
-            tf_cookie_err=$(( ${tpl_all[5]:-0} - tf_cookie ))
-            tf_headers_err=$(( ${tpl_all[6]:-0} - tf_headers ))
-            tf_body29_err=$(( ${tpl_all[7]:-0} - tf_body29 ))
-            tpl_json=",
-  \"tf_get\": $tf_get, \"tf_get_err\": $tf_get_err,
-  \"tf_post\": $tf_post, \"tf_post_err\": $tf_post_err,
-  \"tf_chunked\": $tf_chunked, \"tf_chunked_err\": $tf_chunked_err,
-  \"tf_noise\": $tf_noise, \"tf_noise_err\": $tf_noise_err,
-  \"tf_cookie\": $tf_cookie, \"tf_cookie_err\": $tf_cookie_err,
-  \"tf_headers\": $tf_headers, \"tf_headers_err\": $tf_headers_err,
-  \"tf_body29\": $tf_body29, \"tf_body29_err\": $tf_body29_err"
+        if [ -n "$tpl_line" ] && [ -n "${CUSTOM_TPL_PARSER:-}" ]; then
+            tpl_json=$(echo "$best_output" | bash -c "$CUSTOM_TPL_PARSER")
         fi
     fi
 
@@ -869,14 +812,6 @@ EOF
 
     done # CONNS loop
 
-    # Restore loopback MTU if tcp-frag test changed it
-    if [ "$endpoint" = "tcp-frag" ]; then
-        echo "[tune] Restoring loopback MTU to 65536..."
-        sudo ip link set lo mtu 65536
-        # Flush route cache to clear stale MSS from fragmented connections
-        sudo ip route flush cache 2>/dev/null || true
-        sleep 1
-    fi
 done
 
 # Rebuild site data only with --save

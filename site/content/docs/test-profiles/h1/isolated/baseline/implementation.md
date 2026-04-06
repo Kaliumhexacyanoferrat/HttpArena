@@ -6,7 +6,7 @@ title: Implementation Guidelines
 
 The primary throughput benchmark. Each connection sends one request at a time over persistent keep-alive connections.
 
-**Connections:** 512, 4,096, 16,384
+**Connections:** 512, 4,096
 **CPU limit:** 64 threads (container limited to 64 CPU threads via `--cpus=64`)
 
 ## Workload

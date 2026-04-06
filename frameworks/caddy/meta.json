@@ -11,8 +11,6 @@
     "pipelined",
     "limited-conn",
     "baseline-h2",
-    "static-h2",
-    "baseline-h3",
-    "static-h3"
+    "static-h2"
   ]
 }

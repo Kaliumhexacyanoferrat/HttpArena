@@ -6,7 +6,7 @@ title: Implementation Guidelines
 
 The Compression profile measures the throughput cost of real-time gzip compression. Only frameworks with built-in compression support and a configurable compression level are eligible.
 
-**Connections:** 4,096, 16,384
+**Connections:** 512, 4,096
 
 ## How it works
 
@@ -63,24 +63,22 @@ To account for this, the compression score adjusts RPS by the **bandwidth per re
 
 ```
 bw_per_req   = bandwidth / rps
-penalty      = (min(bw_per_req) / bw_per_req)²
+penalty      = min(bw_per_req) / bw_per_req
 adjusted_rps = rps × penalty
 score        = (adjusted_rps / max(adjusted_rps)) × 100
 ```
 
 - `bw_per_req` - average bytes transferred per request (higher = worse compression)
 - `min(bw_per_req)` - the smallest value across all frameworks (best compressor)
-- `penalty` - squared ratio ≤ 1.0; frameworks with the best compression get no penalty, others are reduced quadratically
+- `penalty` - linear ratio ≤ 1.0; frameworks with the best compression get no penalty, others are reduced proportionally
 - The framework with the highest adjusted RPS scores **100**, others scale down
-
-The squared penalty amplifies the cost of worse compression. A framework that compresses 30% less efficiently (30% larger responses) has its RPS multiplied by ~0.59 instead of ~0.77 with a linear penalty.
 
 ## Parameters
 
 | Parameter | Value |
 |-----------|-------|
 | Endpoint | `GET /compression` |
-| Connections | 4,096, 16,384 |
+| Connections | 512, 4,096 |
 | Pipeline | 1 |
 | Duration | 5s |
 | Runs | 3 (best taken) |

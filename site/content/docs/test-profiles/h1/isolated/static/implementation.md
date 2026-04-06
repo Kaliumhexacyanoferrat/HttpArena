@@ -6,7 +6,7 @@ title: Implementation Guidelines
 
 Serves 20 static files of various types and sizes over HTTP/1.1, simulating a realistic page load with diverse file types and sizes.
 
-**Connections:** 4,096, 16,384
+**Connections:** 1,024, 4,096, 6,800
 
 ## Workload
 
@@ -60,7 +60,7 @@ Content-Type: application/javascript
 | Parameter | Value |
 |-----------|-------|
 | Endpoint | 20 URIs under `/static/*` |
-| Connections | 4,096, 16,384 |
+| Connections | 1,024, 4,096, 6,800 |
 | Pipeline | 1 |
 | Duration | 5s |
 | Runs | 3 (best taken) |

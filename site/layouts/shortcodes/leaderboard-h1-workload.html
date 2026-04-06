@@ -366,7 +366,6 @@ html.dark .lb-card-title { color: #ffffff; }
 </style>
 
 {{ $profiles := slice
-  (dict "id" "mixed"        "label" "Mixed Workload"        "conns" (slice 4096) "desc" "A realistic mix of request types: 3 baseline GETs, 2 baseline POSTs, 1 JSON processing, 1 SQLite DB lookup, 1 file upload (1 MB), 2 compression requests, 2 static file serves, and 2 async Postgres queries. Connections limited to 5 requests each. Measures overall framework performance under a diverse, real-world-like workload that exercises multiple code paths simultaneously.")
   (dict "id" "api-4"         "label" "API-4"                  "conns" (slice 256) "desc" "Lighter workload (baseline, JSON, async-db) with the server constrained to 4 CPUs. 4 threads, 256 connections. Measures framework efficiency under limited resources — closer to a typical production deployment.")
   (dict "id" "api-16"        "label" "API-16"                 "conns" (slice 1024) "desc" "Same API workload (baseline, JSON, async-db) with the server constrained to 16 CPUs and 32 GB memory. 64 threads, 256 connections. Tests performance scaling with more resources.")
 }}
@@ -557,9 +556,9 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaa42</pre>
   <div class="lb-filters" style="margin:0 0 0 0;">
     <span class="lb-filters-label">Conn</span>
     <div class="lb-conn-tabs" data-for="{{ $p.id }}">
-      {{ if not (or (eq $p.id "mixed") (eq $p.id "api-4") (eq $p.id "api-16") (eq $p.id "compression")) }}<div class="lb-conn-tab active" data-conns="best">Best</div>{{ end }}
+      {{ if not (or (eq $p.id "api-4") (eq $p.id "api-16") (eq $p.id "compression")) }}<div class="lb-conn-tab active" data-conns="best">Best</div>{{ end }}
     {{ range $ci, $c := $p.conns }}
-      <div class="lb-conn-tab{{ if or (eq $p.id "mixed") (eq $p.id "api-4") (eq $p.id "api-16") (eq $p.id "compression") }}{{ if eq $ci 0 }} active{{ end }}{{ end }}" data-conns="{{ $c }}">{{ $c }}</div>
+      <div class="lb-conn-tab{{ if or (eq $p.id "api-4") (eq $p.id "api-16") (eq $p.id "compression") }}{{ if eq $ci 0 }} active{{ end }}{{ end }}" data-conns="{{ $c }}">{{ $c }}</div>
     {{ end }}
     </div>
   </div>
@@ -581,7 +580,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaa42</pre>
 
   {{ $isReconn := or (eq $p.id "limited-conn") (eq $p.id "noisy") (eq $p.id "static") }}
   {{ $isNoisy := eq $p.id "noisy" }}
-  <div class="lb-conn-panel{{ if not (or (eq $p.id "mixed") (eq $p.id "api-4") (eq $p.id "api-16") (eq $p.id "compression")) }} active{{ end }}" data-profile="{{ $p.id }}" data-conns="best">
+  <div class="lb-conn-panel{{ if not (or (eq $p.id "api-4") (eq $p.id "api-16") (eq $p.id "compression")) }} active{{ end }}" data-profile="{{ $p.id }}" data-conns="best">
     <div class="lb">
       <div class="lb-row lb-header{{ if $isReconn }} lb-row-reconn{{ end }}{{ if $isNoisy }} lb-row-noisy{{ end }}">
         <div title="Rank by requests per second">#</div>
@@ -605,7 +604,7 @@ aaaaaaaaaaaaaaaaaaaaaaaaaaa42</pre>
   {{ range $ci, $c := $p.conns }}
   {{ $key := printf "%s-%d" $p.id $c }}
   {{ $data := index site.Data $key }}
-  <div class="lb-conn-panel{{ if and (or (eq $p.id "mixed") (eq $p.id "api-4") (eq $p.id "api-16") (eq $p.id "compression")) (eq $ci 0) }} active{{ end }}" data-profile="{{ $p.id }}" data-conns="{{ $c }}">
+  <div class="lb-conn-panel{{ if and (or (eq $p.id "api-4") (eq $p.id "api-16") (eq $p.id "compression")) (eq $ci 0) }} active{{ end }}" data-profile="{{ $p.id }}" data-conns="{{ $c }}">
   <div class="lb">
     <div class="lb-row lb-header{{ if $isReconn }} lb-row-reconn{{ end }}{{ if $isNoisy }} lb-row-noisy{{ end }}">
       <div title="Rank by requests per second">#</div>
@@ -671,9 +670,8 @@ var barH1WkClasses = ['lb-bar-1', 'lb-bar-2', 'lb-bar-3', 'lb-bar-4', 'lb-bar-5'
 /* Build "Best" panels — pick best RPS per framework across all conn counts */
 function buildH1WkBestPanels() {
   lbH1WkRoot.querySelectorAll('.lb-conn-panel[data-conns="best"]').forEach(function(bestPanel) {
-    /* Skip compression and mixed — handled by their own score functions */
+    /* Skip compression and api — handled by their own score functions */
     if (bestPanel.dataset.profile === 'compression') return;
-    if (bestPanel.dataset.profile === 'mixed') return;
     if (bestPanel.dataset.profile === 'api-4') return;
     if (bestPanel.dataset.profile === 'api-16') return;
 
@@ -790,7 +788,7 @@ function applyH1WkFilters() {
       }
     });
 
-    var isMixed = connPanel.dataset.profile === 'mixed' || connPanel.dataset.profile === 'api-4' || connPanel.dataset.profile === 'api-16';
+    var isMixed = connPanel.dataset.profile === 'api-4' || connPanel.dataset.profile === 'api-16';
     if (!isCompression && !isMixed) {
       rows.forEach(function(row) {
         if (row.classList.contains('lb-hidden')) return;
@@ -1267,7 +1265,7 @@ function applyH1WkCompressionPanel(panel) {
 
   var maxAdj = 0;
   rowData.forEach(function(d) {
-    d.adj = (d.bpr > 0) ? d.rps * Math.pow(minBpr / d.bpr, 2) : 0;
+    d.adj = (d.bpr > 0) ? d.rps * (minBpr / d.bpr) : 0;
     if (d.adj > maxAdj) maxAdj = d.adj;
   });
 
@@ -1383,19 +1381,15 @@ function h1Wk_fmtK(n) {
   return String(n);
 }
 
-var h1Wk_mixedColors = {baseline:'#3b82f6', json:'#8b5cf6', db:'#f59e0b', upload:'#10b981', compression:'#ef4444', static:'#06b6d4', async_db:'#d946ef'};
-var h1Wk_mixedLabels = {baseline:'Baseline', json:'JSON', db:'DB', upload:'Upload', compression:'Gzip', static:'Static', async_db:'Async DB'};
-var h1Wk_mixedKeys = ['baseline','json','db','upload','compression','static','async_db'];
-var h1Wk_mixedWeights = {baseline:0.15, json:1, db:10, upload:10, compression:7, static:2, async_db:10};
-var h1Wk_mixedGrid = '2.5rem 10rem 5.5rem 4.95rem 4.5rem 3.5rem 6rem 5rem 3.5rem 5rem 4.5rem 5.5rem 5rem 5rem 4rem';
+var h1Wk_mixedColors = {baseline:'#3b82f6', json:'#8b5cf6', async_db:'#d946ef'};
+var h1Wk_mixedLabels = {baseline:'Baseline', json:'JSON', async_db:'Async DB'};
 
 var h1Wk_api4Keys = ['baseline','json','async_db'];
 var h1Wk_api4Weights = {baseline:0.15, json:1, async_db:10};
 var h1Wk_api4Grid = '2.5rem 10rem 5.5rem 4.95rem 4.5rem 3.5rem 6rem 5rem 3.5rem 5rem 4.5rem 5.5rem 5rem 5rem 4rem';
 
 function h1Wk_getProfileConfig(profile) {
-  if (profile === 'api-4' || profile === 'api-16') return { keys: h1Wk_api4Keys, weights: h1Wk_api4Weights, grid: h1Wk_api4Grid, colors: h1Wk_mixedColors, labels: h1Wk_mixedLabels };
-  return { keys: h1Wk_mixedKeys, weights: h1Wk_mixedWeights, grid: h1Wk_mixedGrid, colors: h1Wk_mixedColors, labels: h1Wk_mixedLabels };
+  return { keys: h1Wk_api4Keys, weights: h1Wk_api4Weights, grid: h1Wk_api4Grid, colors: h1Wk_mixedColors, labels: h1Wk_mixedLabels };
 }
 
 function h1Wk_buildMixBar(d, cfg) {
@@ -1538,10 +1532,10 @@ function applyH1WkMixedPanel(panel) {
 
 function applyH1WkMixedScores() {
   /* Process connection panels */
-  document.querySelectorAll('.lb-conn-panel[data-profile="mixed"]:not([data-conns="best"]), .lb-conn-panel[data-profile="api-4"]:not([data-conns="best"]), .lb-conn-panel[data-profile="api-16"]:not([data-conns="best"])').forEach(applyH1WkMixedPanel);
+  document.querySelectorAll('.lb-conn-panel[data-profile="api-4"]:not([data-conns="best"]), .lb-conn-panel[data-profile="api-16"]:not([data-conns="best"])').forEach(applyH1WkMixedPanel);
 
-  /* Build best panel using mixed scores */
-  document.querySelectorAll('.lb-conn-panel[data-profile="mixed"][data-conns="best"], .lb-conn-panel[data-profile="api-4"][data-conns="best"], .lb-conn-panel[data-profile="api-16"][data-conns="best"]').forEach(function(bestPanel) {
+  /* Build best panel using api scores */
+  document.querySelectorAll('.lb-conn-panel[data-profile="api-4"][data-conns="best"], .lb-conn-panel[data-profile="api-16"][data-conns="best"]').forEach(function(bestPanel) {
     var profile = bestPanel.dataset.profile;
     var cfg = h1Wk_getProfileConfig(profile);
     var parentPanel = bestPanel.closest('.lb-panel');

@@ -1,14 +1,553 @@
-[0.001s][warning][os] NUMA support disabled: Failed to initialize libnuma
-Apr 04, 2026 3:03:11 PM io.helidon.common.features.HelidonFeatures features
-INFO: Helidon SE 4.4.0 features: [Config, Encoding, Media, Registry, WebServer]
-Apr 04, 2026 3:03:11 PM io.helidon.webserver.ServerListener startIt
-INFO: [0x3a0fa953] http://0.0.0.0:8080 bound for socket '@default'
-There is no Helidon logging implementation on classpath, skipping log configuration.
-Apr 04, 2026 3:03:11 PM io.helidon.webserver.LoomServer startIt
-INFO: Started all channels in 18 milliseconds. 1436 milliseconds since JVM startup. Java 25.0.2+10-LTS
-Helidon HttpArena server started on port 8080
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x3cf83d18] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x4e08e7b0] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x23693f05] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x167fe799] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x1f498751] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x088b819d] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x303af38d] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x657957c7] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x317787af] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x65befb22] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x38221c99] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x5cb42a62] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x08beb1ea] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x77373815] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
+	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
+	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
+	at io.helidon.webserver.http.ErrorHandlers.lambda$handleError$1(ErrorHandlers.java:180)
+	at java.base/java.util.Optional.ifPresentOrElse(Unknown Source)
+	at io.helidon.webserver.http.ErrorHandlers.handleError(ErrorHandlers.java:179)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
+	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
+	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
+	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
+	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
+	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
+	at io.helidon.webserver.ThreadPerTaskExecutor$ThreadBoundFuture.run(ThreadPerTaskExecutor.java:241)
+	at java.base/java.lang.VirtualThread.run(Unknown Source)
+Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset by peer
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:150)
+	at io.helidon.common.socket.SocketWriter.writeNow(SocketWriter.java:81)
+	at io.helidon.common.socket.SocketWriterDirect.write(SocketWriterDirect.java:43)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:217)
+	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
+	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
+	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
+	at com.httparena.Main.baselinePost(Main.java:101)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
+	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
+	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:76)
+	... 8 more
+Caused by: java.io.IOException: Connection reset by peer
+	at java.base/sun.nio.ch.SocketDispatcher.write0(Native Method)
+	at java.base/sun.nio.ch.SocketDispatcher.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.writeFromNativeBuffer(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.IOUtil.write(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.implWrite(Unknown Source)
+	at java.base/sun.nio.ch.SocketChannelImpl.write(Unknown Source)
+	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
+	... 19 more
+
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x5ae85b56] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -18,7 +557,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -32,7 +571,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -49,8 +588,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x6ba0bcad] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x0e94c666] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -60,7 +599,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -74,7 +613,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -91,8 +630,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x2630d0b0] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x29b6275d] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -102,7 +641,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -116,7 +655,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -133,8 +672,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x590e1f38] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x51ea33e1] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -175,8 +714,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x1dd6d0f0] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x0b5ee3e5] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -217,8 +756,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x7e1cc396] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x45cf9662] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -259,8 +798,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x57623b45] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x7056701d] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -270,7 +809,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -284,7 +823,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -301,8 +840,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x09f637b8] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x5e902af2] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -343,8 +882,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x426ac7ef] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x30326cd9] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -385,8 +924,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x69596884] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x4a806e74] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -396,7 +935,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -410,7 +949,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -427,8 +966,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x23202c68] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x07fc0821] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -469,8 +1008,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x54aea4fb] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x113a0227] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -511,8 +1050,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x4e163e8a] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x3f0861ff] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -553,8 +1092,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x36579f88] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x5f2b0a18] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -564,7 +1103,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -578,7 +1117,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -595,8 +1134,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x3e2dc226] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x64e1828a] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -637,8 +1176,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x04ef1b37] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x270459f8] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -679,8 +1218,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x492f022c] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x16773f63] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -721,8 +1260,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x7f1b9817] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x369dacdd] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -732,7 +1271,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -746,7 +1285,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -763,8 +1302,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x2ac87aaa] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x7eaae565] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -774,7 +1313,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -788,7 +1327,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -805,8 +1344,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x2d7ccf8c] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x30088705] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -847,8 +1386,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x2881bf2e] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x56f9c624] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -889,8 +1428,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x325d527b] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x1fc2830f] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -900,7 +1439,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -914,7 +1453,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -931,8 +1470,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x0fd8cb04] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x07159ce6] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -942,7 +1481,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -956,7 +1495,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -973,8 +1512,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x6cd27870] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x2212f1e4] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1015,8 +1554,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x71717efd] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x418254f5] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1057,8 +1596,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x75847320] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x335a0b6d] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1068,7 +1607,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -1082,7 +1621,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -1099,8 +1638,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x570f8ce1] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x78c9f68e] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1110,7 +1649,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -1124,7 +1663,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -1141,8 +1680,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x5dcda904] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x0bec85ca] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1152,7 +1691,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -1166,7 +1705,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -1183,8 +1722,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x430e3465] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x5ad789fc] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1194,7 +1733,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -1208,7 +1747,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -1225,8 +1764,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x182c0682] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x5159e45e] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1236,7 +1775,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -1250,7 +1789,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -1267,8 +1806,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x11b642a6] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x115022b0] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1309,8 +1848,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x24719473] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x617c6e40] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1320,7 +1859,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -1334,7 +1873,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -1351,8 +1890,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x391c7c2c] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x75ff5ecc] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1393,8 +1932,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x3abd4627] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x26207689] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1435,8 +1974,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x109f20b0] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x645483f7] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1477,8 +2016,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x6bc4d41e] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x6c4510a9] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1519,8 +2058,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x21ad030c] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x6579cbde] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1561,8 +2100,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x5e82117a] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x3e3c7b7f] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1603,8 +2142,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x5edfd7eb] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x1654477f] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1645,8 +2184,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x0e09801c] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x69537caa] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1687,8 +2226,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x33f1496b] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x6ec93414] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1729,8 +2268,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x00f80da9] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x68496096] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1771,8 +2310,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x02a13327] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x1736961b] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1813,8 +2352,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x288ebc86] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x2ae684a1] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1855,8 +2394,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x7f65faa0] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x68e94183] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1897,8 +2436,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x4f46f790] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x29edff33] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1939,8 +2478,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x10fda719] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x0911074a] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -1981,8 +2520,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x2385386f] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x4024a9cc] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2023,8 +2562,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x590c9606] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x0a9a5f86] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2065,8 +2604,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x64eb822a] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x035806bf] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2107,8 +2646,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x138c89be] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x66b61e0d] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2149,8 +2688,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x28f205ad] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x2ef65d7e] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2191,8 +2730,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:17 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x43df588c] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x1b125381] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2233,8 +2772,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x61a2cdb4] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x37ab50d0] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2275,8 +2814,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x443cfdce] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x2bf77ab4] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2286,7 +2825,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -2300,7 +2839,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -2317,8 +2856,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x6fb36c84] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x0ebcfdb9] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2359,8 +2898,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x0a886ad9] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x393e00f0] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2370,7 +2909,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -2384,7 +2923,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -2401,8 +2940,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x4f699d2b] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x79579972] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2443,8 +2982,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x19a1ed37] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x76240fcb] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2485,8 +3024,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x58cdbecc] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x52654283] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2527,8 +3066,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x1694e1de] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x2e38e6ad] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2538,7 +3077,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -2552,7 +3091,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -2569,8 +3108,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x746239a6] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x2cd2b21a] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2580,7 +3119,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -2594,7 +3133,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -2611,8 +3150,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x78057e51] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x1f166245] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2653,8 +3192,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x323f14a2] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x27efebfa] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2664,7 +3203,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -2678,7 +3217,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -2695,8 +3234,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x18b5445d] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x3f915c92] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2737,8 +3276,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x2b7783d4] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x62b9eeb6] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2779,8 +3318,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x5335a1fe] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x3e18811a] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2821,8 +3360,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x53fb8545] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x6df9326f] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2832,7 +3371,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -2846,7 +3385,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -2863,8 +3402,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x7d3b0229] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x0b79f145] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2905,8 +3444,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x2cadb31d] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x6dfc8216] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2947,8 +3486,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x66416a71] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x22efc58d] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -2958,7 +3497,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -2972,7 +3511,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -2989,8 +3528,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x0323c95c] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x54ff869d] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3000,7 +3539,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -3014,7 +3553,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -3031,8 +3570,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x19283ece] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x0a3e89ce] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3042,7 +3581,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -3056,7 +3595,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -3073,8 +3612,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x1bce2159] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x03cbda0c] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3115,8 +3654,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x29711588] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x6c1c3ce9] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3126,7 +3665,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -3140,7 +3679,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -3157,8 +3696,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x4350b4d1] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=GET, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x018f6acc] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3168,7 +3707,7 @@ io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.webserver.http.ErrorHandlers.runWithErrorHandling(ErrorHandlers.java:113)
 	at io.helidon.webserver.http.Filters.filter(Filters.java:83)
 	at io.helidon.webserver.http.HttpRoutingImpl.route(HttpRoutingImpl.java:74)
-	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:548)
+	at io.helidon.webserver.http1.Http1Connection.route(Http1Connection.java:617)
 	at io.helidon.webserver.http1.Http1Connection.handle(Http1Connection.java:216)
 	at io.helidon.webserver.ConnectionHandler.run(ConnectionHandler.java:185)
 	at io.helidon.common.task.InterruptableTask.call(InterruptableTask.java:47)
@@ -3182,7 +3721,7 @@ Caused by: java.io.UncheckedIOException: java.io.IOException: Connection reset b
 	at io.helidon.webserver.http1.Http1ServerResponse.send(Http1ServerResponse.java:196)
 	at io.helidon.webserver.http.ServerResponseBase.doSend(ServerResponseBase.java:314)
 	at io.helidon.webserver.http.ServerResponseBase.send(ServerResponseBase.java:128)
-	at com.httparena.Main.baselineGet(Main.java:89)
+	at com.httparena.Main.baselinePost(Main.java:101)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.doRoute(HttpRoutingImpl.java:174)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:132)
 	at io.helidon.webserver.http.HttpRoutingImpl$RoutingExecutor.call(HttpRoutingImpl.java:110)
@@ -3199,8 +3738,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x6b3b78c4] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x16a643fb] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3241,8 +3780,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x28f02d13] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x00365023] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3283,8 +3822,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x1b999412] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x7cf5e7a1] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3325,8 +3864,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x00ca7dae] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x5b72e84b] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3367,8 +3906,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x369c076e] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x545f4192] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3409,8 +3948,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x221ac443] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x2d538607] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3451,8 +3990,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x408ea77a] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x1f0617c8] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3493,8 +4032,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x7a64bad7] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x405d25a3] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3535,8 +4074,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x321c19de] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x02d428cf] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3577,8 +4116,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x3eaae12c] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x46c3bb01] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3619,8 +4158,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x42c7f91a] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x22de1a36] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3661,8 +4200,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x1002a0a3] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x50a91833] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3703,8 +4242,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x4e25ef6c] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x28503f86] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3745,8 +4284,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x3019fad8] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x395dde3c] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3787,8 +4326,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x03b8f477] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x5716d4e3] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3829,8 +4368,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x1accc762] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x7d05fd0f] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3871,8 +4410,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x4cad61cd] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x37db8aa9] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3913,8 +4452,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x2e5f8c98] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x6c306bce] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3955,8 +4494,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x090a583d] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x4b7188a8] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -3997,8 +4536,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x14349419] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x53e2fe34] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -4039,8 +4578,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x6ea22f59] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x03fe4488] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -4081,8 +4620,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x67a5be6f] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x0817aaae] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -4123,8 +4662,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x4846e954] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x0e58293b] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -4165,8 +4704,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x536db867] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x30b59a99] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -4207,8 +4746,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x20d8ba49] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x530790bc] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -4249,8 +4788,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x2e74528b] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x33f36fba] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -4291,8 +4830,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x2f49505c] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x7d47e44d] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -4333,8 +4872,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x4f36fee3] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x79e7f7ac] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -4375,8 +4914,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:24 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x125aae25] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x18cc762f] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=13&b=42, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)
@@ -4417,8 +4956,8 @@ Caused by: java.io.IOException: Connection reset by peer
 	at io.helidon.common.socket.NioSocket.write(NioSocket.java:147)
 	... 19 more
 
-Apr 04, 2026 3:03:25 PM io.helidon.common.socket.SocketContext log
-WARNING: [0x3a0fa953 0x2018a231] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
+Apr 06, 2026 1:47:00 PM io.helidon.common.socket.SocketContext log
+WARNING: [0x4980ab09 0x6777ebf0] Request failed: HttpPrologue[protocol=HTTP, protocolVersion=1.1, method=POST, uriPath=/baseline11, query=?a=0&b=0, fragment=], cannot send error response, as response already sent
 io.helidon.http.RequestException: java.io.IOException: Connection reset by peer
 	at io.helidon.http.RequestException$Builder.build(RequestException.java:157)
 	at io.helidon.webserver.http.ErrorHandlers.unhandledError(ErrorHandlers.java:205)

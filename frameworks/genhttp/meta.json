@@ -16,7 +16,6 @@
     "async-db",
     "sync-db",
     "noisy",
-    "mixed",
     "static",
     "tcp-frag",
     "echo-ws",

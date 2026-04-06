@@ -16,7 +16,6 @@
     "async-db",
     "sync-db",
     "noisy",
-    "mixed",
     "api-4",
     "api-16",
     "static",

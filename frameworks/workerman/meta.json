@@ -16,10 +16,9 @@
     "noisy",
     "static",
     "tcp-frag",
-    "mixed",
     "api-4",
     "api-16",
     "async-db",
-        "sync-db"
+    "sync-db"
   ]
 }

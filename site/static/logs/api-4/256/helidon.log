@@ -1,12 +1,12 @@
-[0.013s][warning][os] NUMA support disabled: Failed to initialize libnuma
+[0.014s][warning][os] NUMA support disabled: Failed to initialize libnuma
 SLF4J(W): No SLF4J providers were found.
 SLF4J(W): Defaulting to no-operation (NOP) logger implementation
 SLF4J(W): See https://www.slf4j.org/codes.html#noProviders for further details.
-Apr 04, 2026 11:19:20 AM io.helidon.common.features.HelidonFeatures features
+Apr 06, 2026 4:47:52 AM io.helidon.webserver.ServerListener startIt
+INFO: [0x746f261b] http://0.0.0.0:8080 bound for socket '@default'
+Apr 06, 2026 4:47:52 AM io.helidon.common.features.HelidonFeatures features
 INFO: Helidon SE 4.4.0 features: [Config, Encoding, Media, Registry, WebServer]
-Apr 04, 2026 11:19:20 AM io.helidon.webserver.ServerListener startIt
-INFO: [0x1f68b747] http://0.0.0.0:8080 bound for socket '@default'
 There is no Helidon logging implementation on classpath, skipping log configuration.
-Apr 04, 2026 11:19:20 AM io.helidon.webserver.LoomServer startIt
-INFO: Started all channels in 21 milliseconds. 1158 milliseconds since JVM startup. Java 25.0.2+10-LTS
+Apr 06, 2026 4:47:52 AM io.helidon.webserver.LoomServer startIt
+INFO: Started all channels in 17 milliseconds. 1025 milliseconds since JVM startup. Java 25.0.2+10-LTS
 Helidon HttpArena server started on port 8080

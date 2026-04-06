@@ -6,7 +6,7 @@ title: Implementation Guidelines
 
 16 HTTP requests are sent back-to-back on each connection before waiting for responses. Uses a lightweight `GET /pipeline` endpoint that returns a fixed `ok` response, isolating raw I/O throughput from application logic.
 
-**Connections:** 512, 4,096, 16,384
+**Connections:** 512, 4,096
 
 ## Expected request/response
 

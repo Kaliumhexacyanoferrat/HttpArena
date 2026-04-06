@@ -25,17 +25,17 @@ INFO: 25 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 30 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 35 is running.
+INFO: 34 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 40 is running.
+INFO: 39 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 45 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 49 is running.
+INFO: 50 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 54 is running.
+INFO: 55 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 59 is running.
+INFO: 60 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 69 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
@@ -51,65 +51,65 @@ INFO: 90 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 95 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 101 is running.
+INFO: 100 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 106 is running.
+INFO: 105 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 111 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 116 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 121 is running.
+INFO: 120 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 126 is running.
+INFO: 125 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 130 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 136 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 141 is running.
+INFO: 140 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 146 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 151 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 156 is running.
+INFO: 155 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 161 is running.
+INFO: 160 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 166 is running.
+INFO: 165 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 171 is running.
+INFO: 170 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 176 is running.
+INFO: 175 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 181 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 186 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 190 is running.
+INFO: 191 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 195 is running.
+INFO: 196 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 200 is running.
+INFO: 201 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 205 is running.
+INFO: 206 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 210 is running.
+INFO: 211 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 215 is running.
+INFO: 216 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 220 is running.
+INFO: 221 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 225 is running.
+INFO: 226 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 230 is running.
+INFO: 231 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 235 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 240 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 245 is running.
+INFO: 246 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 251 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
@@ -137,11 +137,11 @@ INFO: 307 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 311 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 316 is running.
+INFO: 317 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 321 is running.
+INFO: 322 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 326 is running.
+INFO: 327 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 331 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
@@ -157,7 +157,7 @@ INFO: 357 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 362 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 366 is running.
+INFO: 367 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 372 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
@@ -170,28 +170,107 @@ INFO: 387 is running.
 INFO: 392 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 397 is running.
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 402 is running.
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 407 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 412 is running.
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 417 is running.
+INFO: 416 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 422 is running.
+INFO: 420 is running.
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
+INFO: 436 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 427 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 432 is running.
+INFO: 431 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 437 is running.
+INFO: 441 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 442 is running.
+INFO: 445 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 447 is running.
-/usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 452 is running.
+INFO: 451 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 457 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
@@ -235,151 +314,72 @@ INFO: 552 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 557 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
+INFO: 562 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 567 is running.
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 572 is running.
-INFO: 562 is running.
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 578 is running.
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+INFO: 577 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 583 is running.
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 591 is running.
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 596 is running.
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+INFO: 582 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 587 is running.
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
-/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 601 is running.
+INFO: 592 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 606 is running.
+INFO: 597 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 612 is running.
+INFO: 602 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 619 is running.
+INFO: 607 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
-INFO: 623 is running.
+INFO: 614 is running.
+/usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
+INFO: 618 is running.
+/usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
+INFO: 622 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 627 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 632 is running.
 /usr/local/bundle/gems/rage-rb-1.22.1/lib/rage/middleware/fiber_wrapper.rb:11: warning: Scheduler should implement #fiber_interrupt
 INFO: 637 is running.
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
+/usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
 /usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
 /usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!
 /usr/local/lib/ruby/4.0.0/resolv.rb:207: warning: IO::Buffer is experimental and both the Ruby and C interface may change in the future!

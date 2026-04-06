@@ -8,7 +8,7 @@ The Async Database profile measures how efficiently a framework handles concurre
 
 **This test is for framework-type entries only** - engines (nginx, h2o, etc.) are excluded.
 
-**Connections:** 512, 1,024
+**Connections:** 1,024
 
 ## How it works
 
@@ -138,7 +138,7 @@ on_request /async-db:
 | Parameter | Value |
 |-----------|-------|
 | Endpoint | `GET /async-db` |
-| Connections | 512, 1,024 |
+| Connections | 1,024 |
 | Pipeline | 1 |
 | Duration | 5s |
 | Runs | 3 (best taken) |

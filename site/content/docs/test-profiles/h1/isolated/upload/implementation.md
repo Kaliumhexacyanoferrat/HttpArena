@@ -6,7 +6,7 @@ title: Implementation Guidelines
 
 The Upload profile measures how efficiently a framework handles large request body ingestion. Each request sends a 20 MB binary payload and the server returns the byte count.
 
-**Connections:** 64, 256, 512
+**Connections:** 32, 256
 
 ## How it works
 
@@ -48,7 +48,7 @@ Content-Type: text/plain
 | Parameter | Value |
 |-----------|-------|
 | Endpoint | `POST /upload` |
-| Connections | 64, 256, 512 |
+| Connections | 32, 256 |
 | Pipeline | 1 |
 | Duration | 5s |
 | Runs | 3 (best taken) |

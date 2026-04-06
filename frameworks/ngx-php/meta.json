@@ -14,7 +14,6 @@
     "upload",
     "compression",
     "noisy",
-    "mixed",
     "api-4",
     "api-16",
     "db",
@@ -23,8 +22,6 @@
     "static",
     "tcp-frag",
     "baseline-h2",
-    "static-h2",
-    "baseline-h3",
-    "static-h3"
+    "static-h2"
   ]
 }

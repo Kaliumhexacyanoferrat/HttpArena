@@ -14,7 +14,6 @@
     "json",
     "compression",
     "upload",
-    "mixed",
     "api-4",
     "api-16",
     "async-db",

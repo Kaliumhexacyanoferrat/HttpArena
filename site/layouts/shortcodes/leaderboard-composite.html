@@ -1,15 +1,14 @@
 {{ $profiles := slice
-  (dict "id" "mixed" "label" "Mixed" "sublabel" "H/1.1 Workload" "proto" "h1wk" "conns" (slice 4096) "scored" true "engineScored" false)
   (dict "id" "api-4" "label" "API-4" "sublabel" "H/1.1 Workload" "proto" "h1wk" "conns" (slice 256) "scored" true "engineScored" true)
   (dict "id" "api-16" "label" "API-16" "sublabel" "H/1.1 Workload" "proto" "h1wk" "conns" (slice 1024) "scored" true "engineScored" false)
-  (dict "id" "baseline" "label" "Baseline" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096 16384) "scored" true "engineScored" true)
-  (dict "id" "pipelined" "label" "Pipelined" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096 16384) "scored" false "engineScored" true)
+  (dict "id" "baseline" "label" "Baseline" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096) "scored" true "engineScored" true)
+  (dict "id" "pipelined" "label" "Pipelined" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096) "scored" true "engineScored" true)
   (dict "id" "limited-conn" "label" "Short-lived" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096) "scored" true "engineScored" true)
-  (dict "id" "json" "label" "JSON" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 4096 16384) "scored" true "engineScored" false)
-  (dict "id" "upload" "label" "Upload" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 64 256 512) "scored" true "engineScored" false)
-  (dict "id" "compression" "label" "Compression" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 4096 16384) "scored" true "engineScored" false)
-  (dict "id" "static" "label" "Static" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 4096 16384) "scored" true "engineScored" false)
-  (dict "id" "tcp-frag" "label" "TCP Frag" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096 16384) "scored" true "engineScored" false)
+  (dict "id" "json" "label" "JSON" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 4096) "scored" true "engineScored" false)
+  (dict "id" "upload" "label" "Upload" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 32 256) "scored" true "engineScored" false)
+  (dict "id" "compression" "label" "Compression" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096) "scored" true "engineScored" false)
+  (dict "id" "static" "label" "Static" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 1024 4096 6800) "scored" true "engineScored" false)
+  (dict "id" "tcp-frag" "label" "TCP Frag" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096 16384) "scored" false "engineScored" false)
   (dict "id" "noisy" "label" "Noisy" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096 16384) "scored" false "engineScored" false)
   (dict "id" "sync-db" "label" "Sync DB" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 1024) "scored" true "engineScored" false)
   (dict "id" "async-db" "label" "Async DB" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 1024) "scored" true "engineScored" false)
@@ -17,8 +16,6 @@
   (dict "id" "static-h2" "label" "Static" "sublabel" "H/2" "proto" "h2" "conns" (slice 256 1024) "scored" true "engineScored" true)
   (dict "id" "unary-grpc" "label" "Unary" "sublabel" "gRPC" "proto" "grpc" "conns" (slice 256 1024) "scored" true "engineScored" true)
   (dict "id" "unary-grpc-tls" "label" "Unary TLS" "sublabel" "gRPC" "proto" "grpc" "conns" (slice 256 1024) "scored" true "engineScored" true)
-  (dict "id" "baseline-h3" "label" "Baseline" "sublabel" "H/3" "proto" "h3" "conns" (slice 256 512) "scored" true "engineScored" true)
-  (dict "id" "static-h3" "label" "Static" "sublabel" "H/3" "proto" "h3" "conns" (slice 256 512) "scored" true "engineScored" true)
   (dict "id" "echo-ws" "label" "Echo" "sublabel" "WebSocket" "proto" "ws" "conns" (slice 512 4096 16384) "scored" true "engineScored" true)
 }}
 
@@ -286,7 +283,7 @@ function loadData(newEntries, newMeta) {
     memSums[key] = (memSums[key] || 0) + parseMem(e.memory);
     bwSums[key] = (bwSums[key] || 0) + parseBandwidth(e.bandwidth);
     counts[key] = (counts[key] || 0) + 1;
-    if (e.profile === 'mixed' || e.profile === 'api-4' || e.profile === 'api-16') {
+    if (e.profile === 'api-4' || e.profile === 'api-16') {
       if (!tplSumsByProfile[e.profile]) tplSumsByProfile[e.profile] = {};
       var fw = e.framework;
       if (!tplSumsByProfile[e.profile][fw]) tplSumsByProfile[e.profile][fw] = {baseline:0, json:0, db:0, upload:0, compression:0, static:0, async_db:0, count:0};
@@ -556,9 +553,9 @@ function renderComposite() {
     });
   });
 
-  // For mixed: compute weighted scores and re-normalize
+  // For api workloads: compute weighted scores and re-normalize
   var mixedWeights = {baseline:0.15, json:1, db:10, upload:10, compression:7, static:2, async_db:10};
-  ['mixed', 'api-4', 'api-16'].forEach(function(mpid) {
+  ['api-4', 'api-16'].forEach(function(mpid) {
     if (activeIds.indexOf(mpid) >= 0) {
       var maxWeighted = 0;
       Object.keys(avgTplByProfile[mpid] || {}).forEach(function(fw) {
@@ -593,7 +590,7 @@ function renderComposite() {
         var rps = avgByProfile[pid][fw] || 0;
         var bw = avgBwByProfile[pid][fw] || 0;
         if (rps > 0 && bw > 0) {
-          var adj = rps * Math.pow(minVal / (bw / rps), 2);
+          var adj = rps * (minVal / (bw / rps));
           if (adj > maxAdj) maxAdj = adj;
         }
       });
@@ -615,8 +612,8 @@ function renderComposite() {
       if (avgByProfile[pid] && avgByProfile[pid][fw] && maxRpsByProfile[pid] > 0) {
         var rps = avgByProfile[pid][fw];
         var effectiveRps = rps;
-        // For mixed: use weighted template score
-        if ((pid === 'mixed' || pid === 'api-4' || pid === 'api-16') && avgTplByProfile[pid] && avgTplByProfile[pid][fw]) {
+        // For api workloads: use weighted template score
+        if ((pid === 'api-4' || pid === 'api-16') && avgTplByProfile[pid] && avgTplByProfile[pid][fw]) {
           var t = avgTplByProfile[pid][fw];
           effectiveRps = t.baseline * mixedWeights.baseline + t.json * mixedWeights.json + t.db * mixedWeights.db + t.upload * mixedWeights.upload + t.compression * mixedWeights.compression + (t.static || 0) * mixedWeights.static + (t.async_db || 0) * mixedWeights.async_db;
         }
@@ -624,7 +621,7 @@ function renderComposite() {
         if (pid === 'compression' && minBwPerReq[pid]) {
           var bw = avgBwByProfile[pid][fw] || 0;
           if (bw > 0 && rps > 0) {
-            effectiveRps = rps * Math.pow(minBwPerReq[pid] / (bw / rps), 2);
+            effectiveRps = rps * (minBwPerReq[pid] / (bw / rps));
           }
         }
         var rpsScore = (effectiveRps / maxRpsByProfile[pid]) * 100;
@@ -763,11 +760,9 @@ function renderComposite() {
       } else {
         var color = scored ? (s >= 85 ? '#16a34a' : s >= 70 ? '#65a30d' : s >= 50 ? '#ca8a04' : s >= 30 ? '#ea580c' : '#dc2626') : '#94a3b8';
         var suffix = '';
-        if (pid !== 'mixed') {
-          var rps = avgByProfile[pid][r.framework];
-          var rpsStr = rps >= 1000000 ? (rps / 1000000).toFixed(1) + 'M' : rps >= 10000 ? (rps / 1000).toFixed(0) + 'K' : rps >= 1000 ? (rps / 1000).toFixed(1) + 'K' : Math.round(rps);
-          suffix = ' <span style="font-size:0.6rem; color:#94a3b8; font-weight:400;">(' + rpsStr + ')</span>';
-        }
+        var rps = avgByProfile[pid][r.framework];
+        var rpsStr = rps >= 1000000 ? (rps / 1000000).toFixed(1) + 'M' : rps >= 10000 ? (rps / 1000).toFixed(0) + 'K' : rps >= 1000 ? (rps / 1000).toFixed(1) + 'K' : Math.round(rps);
+        suffix = ' <span style="font-size:0.6rem; color:#94a3b8; font-weight:400;">(' + rpsStr + ')</span>';
         profileCells += '<div class="lb-stat" style="text-align:right; color:' + color + '; font-weight:500;' + bgStyle + '">' + s.toFixed(1) + suffix + '</div>';
       }
     });
@@ -793,7 +788,7 @@ function renderComposite() {
             '</div>';
         } else {
           var protoTag = ' (' + (profileSublabels[pid] || profileProtos[pid]) + ')';
-          var popupSuffix = pid !== 'mixed' ? ' <span style="font-size:0.7rem; color:#94a3b8;">(' + Number(rps).toLocaleString() + ' req/s)</span>' : '';
+          var popupSuffix = ' <span style="font-size:0.7rem; color:#94a3b8;">(' + Number(rps).toLocaleString() + ' req/s)</span>';
           profileDetails +=
             '<div>' +
               '<div class="lb-popup-stat-label">' + profileLabels[pid] + protoTag + '</div>' +
