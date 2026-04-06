@@ -1,0 +1,28 @@
+{
+  "display_name": "spring-boot",
+  "language": "Java",
+  "type": "production",
+  "engine": "tomcat",
+  "description": "Spring Boot with embedded Tomcat on JDK 25 with virtual threads.",
+  "repo": "https://github.com/spring-projects/spring-boot",
+  "enabled": true,
+  "tests": [
+    "baseline",
+    "tcp-frag",
+    "limited-conn",
+    "noisy",
+    "pipelined",
+    "json",
+    "upload",
+    "static",
+    "compression",
+    "sync-db",
+    "async-db",
+    "mixed",
+    "api-4",
+    "api-16",
+    "baseline-h2",
+    "static-h2",
+    "echo-ws"
+  ]
+}
