@@ -5,7 +5,7 @@ title: Implementation Guidelines
 
 The API-16 profile runs a lighter workload than [Mixed](../../mixed/implementation) with the server container constrained to **16 CPUs and 32 GB memory**. Only baseline, JSON, static files, and async database endpoints are tested — heavy endpoints (upload, compression, SQLite DB) are excluded. The load generator uses 4 threads and 1024 connections.
 
-**Connections:** 128
+**Connections:** 1,024
 
 ## How it differs from Mixed
 
@@ -13,8 +13,8 @@ The API-16 profile runs a lighter workload than [Mixed](../../mixed/implementati
 |-----------|-------|--------|
 | Server CPUs | Unlimited | 16 |
 | Server memory | Unlimited | 32 GB |
-| Connections | 4,096 | 128 |
-| gcannon threads | 64 | 4 |
+| Connections | 4,096 | 1,024 |
+| gcannon threads | 64 | 64 |
 | Duration | 15s | 15s |
 | Request templates | 14 | 8 |
 | Requests per connection | 5 | 5 |
@@ -40,10 +40,10 @@ The API-16 profile runs a lighter workload than [Mixed](../../mixed/implementati
 The server container is started with:
 
 ```
---cpus=16 --memory=32g --memory-swap=32g
+--cpuset-cpus=0-7,64-71 --memory=32g --memory-swap=32g
 ```
 
-If a framework exceeds the 16 GB memory limit, the container will be OOM-killed by Docker.
+If a framework exceeds the 32 GB memory limit, the container will be OOM-killed by Docker.
 
 ## Parameters
 
@@ -58,4 +58,4 @@ If a framework exceeds the 16 GB memory limit, the container will be OOM-killed 
 | Templates | 8 (3 baseline GET, 3 JSON, 2 async-db) |
 | Server CPU limit | 16 |
 | Server memory limit | 32 GB |
-| gcannon threads | 4 |
+| gcannon threads | 64 |

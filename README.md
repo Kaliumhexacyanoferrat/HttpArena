@@ -30,7 +30,7 @@ Always specify `-f <framework>`. Results are automatically compared against the 
 
 | Category | Profiles | Description |
 |----------|----------|-------------|
-| Connection | Baseline (512-16K), Pipelined, Limited | Performance scaling with connection count |
+| Connection | Baseline (512-4K), Pipelined, Limited | Performance scaling with connection count |
 | Workload | JSON, Compression, Upload, Sync DB (SQLite), Async DB (Postgres) | Serialization, gzip, streaming I/O, database queries |
 | Multi-endpoint | Mixed, API-4, API-16, Assets-4, Assets-16 | Concurrent endpoints, resource-constrained, asset serving with conditional compression |
 | Resilience | Noisy, TCP Fragmentation | Malformed requests, MTU 69 fragmentation stress |
