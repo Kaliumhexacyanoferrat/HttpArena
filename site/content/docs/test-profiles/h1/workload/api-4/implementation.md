@@ -5,7 +5,7 @@ title: Implementation Guidelines
 
 The API-4 profile runs a lighter workload than [Mixed](../../mixed/implementation) with the server container constrained to **4 CPUs and 16 GB memory**. Only baseline, JSON, static files, and async database endpoints are tested — heavy endpoints (upload, compression, SQLite DB) are excluded. The load generator uses 4 threads and 256 connections.
 
-**Connections:** 128
+**Connections:** 256
 
 ## How it differs from Mixed
 
@@ -13,8 +13,8 @@ The API-4 profile runs a lighter workload than [Mixed](../../mixed/implementatio
 |-----------|-------|--------|
 | Server CPUs | Unlimited | 4 |
 | Server memory | Unlimited | 16 GB |
-| Connections | 4,096 | 128 |
-| gcannon threads | 64 | 4 |
+| Connections | 4,096 | 256 |
+| gcannon threads | 64 | 64 |
 | Duration | 15s | 15s |
 | Request templates | 14 | 8 |
 | Requests per connection | 5 | 5 |
@@ -40,7 +40,7 @@ The API-4 profile runs a lighter workload than [Mixed](../../mixed/implementatio
 The server container is started with:
 
 ```
---cpus=4 --memory=16g --memory-swap=16g
+--cpuset-cpus=0-3 --memory=16g --memory-swap=16g
 ```
 
 If a framework exceeds the 16 GB memory limit, the container will be OOM-killed by Docker.
@@ -58,4 +58,4 @@ If a framework exceeds the 16 GB memory limit, the container will be OOM-killed 
 | Templates | 8 (3 baseline GET, 3 JSON, 2 async-db) |
 | Server CPU limit | 4 |
 | Server memory limit | 16 GB |
-| gcannon threads | 4 |
+| gcannon threads | 64 |

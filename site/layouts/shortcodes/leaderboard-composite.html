@@ -753,9 +753,10 @@ function renderComposite() {
     var pids = sectionGroups[section];
     if (pids.length === 0) return;
     var bestFw = null, bestAvg = 0;
+    var totalPids = pids.length;
     Object.keys(allFw).forEach(function(fw) {
       if (isExcluded(fw)) return;
-      var sum = 0, count = 0;
+      var sum = 0;
       pids.forEach(function(pid) {
         if (pid === 'api-4' || pid === 'api-16') {
           var t = avgTplByProfile[pid] && avgTplByProfile[pid][fw];
@@ -763,18 +764,16 @@ function renderComposite() {
           if (t && maxW > 0) {
             var w = t.baseline * mixedWeights.baseline + t.json * mixedWeights.json + t.db * mixedWeights.db + t.upload * mixedWeights.upload + t.compression * mixedWeights.compression + (t.static || 0) * mixedWeights.static + (t.async_db || 0) * mixedWeights.async_db;
             sum += (w / maxW) * 100;
-            count++;
           }
         } else {
           var rps = (avgByProfile[pid] && avgByProfile[pid][fw]) || 0;
           var maxRps = allMaxRps[pid] || 0;
           if (rps > 0 && maxRps > 0) {
             sum += (rps / maxRps) * 100;
-            count++;
           }
         }
       });
-      var avg = count > 0 ? sum / count : 0;
+      var avg = totalPids > 0 ? sum / totalPids : 0;
       if (avg > bestAvg) { bestAvg = avg; bestFw = fw; }
     });
     if (bestFw) {
