@@ -1,10 +1,12 @@
-﻿using GenHTTP.Api.Content;
+﻿using System.IO.Compression;
+using GenHTTP.Api.Content;
 using GenHTTP.Api.Protocol;
-
+using GenHTTP.Modules.Compression;
 using GenHTTP.Modules.IO;
 using GenHTTP.Modules.Layouting;
 using GenHTTP.Modules.Layouting.Provider;
 using GenHTTP.Modules.Reflection;
+using GenHTTP.Modules.ServerCaching;
 using GenHTTP.Modules.Webservices;
 using GenHTTP.Modules.Websockets;
 
@@ -41,7 +43,17 @@ public static class Project
         {
             var files = ResourceTree.FromDirectory("/data/static");
 
-            app.Add("static", Resources.From(files));
+            var compression = CompressedContent.Default()
+                                               .Level(CompressionLevel.Optimal);
+
+            var cache = ServerCache.TemporaryFiles() // memory is not allowed for production
+                                   .Invalidate(false);
+
+            var handler = Resources.From(files)
+                                   .Add(compression)
+                                   .Add(cache);
+
+            app.Add("static", handler);
         }
 
         return app;
