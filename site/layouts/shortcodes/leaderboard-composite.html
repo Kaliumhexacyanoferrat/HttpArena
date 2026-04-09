@@ -81,6 +81,8 @@ html.dark #composite-type-note { color: #e2e8f0 !important; background: linear-g
   .composite-badge { display:inline-flex; align-items:center; justify-content:center; font-size:1.05rem; line-height:1; cursor:default; margin-left:-0.15rem; }
   .composite-banana { display:inline-flex; align-items:center; margin-left:0.25rem; cursor:default; line-height:1; vertical-align:middle; }
   .composite-banana-emoji { font-size:0.95rem; line-height:1; }
+  .composite-eggplant { display:inline-flex; align-items:center; margin-left:0.25rem; cursor:default; line-height:1; vertical-align:middle; }
+  .composite-eggplant-emoji { font-size:0.95rem; line-height:1; }
   html.dark .composite-badge { opacity:0.9; }
   </style>
 
@@ -501,11 +503,18 @@ function getActiveTypes() {
 }
 
 var bananaTiers = {
-  bronze:   { label:'Bronze',   color:'#B45309', filter:'brightness(0.7) sepia(1) saturate(3) hue-rotate(-10deg)' },
-  silver:   { label:'Silver',   color:'#9CA3AF', filter:'brightness(0.9) saturate(0) contrast(1.1)' },
-  gold:     { label:'Gold',     color:'#EAB308', filter:'brightness(1.05) saturate(1.5) hue-rotate(-10deg) drop-shadow(0 0 2px rgba(234,179,8,0.5))' },
-  platinum: { label:'Platinum', color:'#A78BFA', filter:'brightness(0.95) sepia(1) saturate(2) hue-rotate(210deg) drop-shadow(0 0 2px rgba(167,139,250,0.5))' },
-  diamond:  { label:'Diamond',  color:'#22D3EE', filter:'brightness(1) sepia(1) saturate(3) hue-rotate(140deg) drop-shadow(0 0 3px rgba(34,211,238,0.6))' }
+  bronze:   { label:'Bronze',   color:'#B45309', filter:'brightness(0.7) sepia(1) saturate(3) hue-rotate(-10deg)', msg:'Welcome to the banana club' },
+  silver:   { label:'Silver',   color:'#9CA3AF', filter:'brightness(0.9) saturate(0) contrast(1.1)', msg:'He is starting to believe!' },
+  gold:     { label:'Gold',     color:'#EAB308', filter:'brightness(1.05) saturate(1.5) hue-rotate(-10deg) drop-shadow(0 0 2px rgba(234,179,8,0.5))', msg:'Chimp' },
+  platinum: { label:'Platinum', color:'#A78BFA', filter:'brightness(0.95) sepia(1) saturate(2) hue-rotate(210deg) drop-shadow(0 0 2px rgba(167,139,250,0.5))', msg:'Monkey King' },
+  diamond:  { label:'Diamond',  color:'#22D3EE', filter:'brightness(1) sepia(1) saturate(3) hue-rotate(140deg) drop-shadow(0 0 3px rgba(34,211,238,0.6))', msg:'It\\\'s lonely at the top.' }
+};
+var eggplantTiers = {
+  bronze:   { label:'Bronze',   color:'#B45309', filter:'brightness(1.2) sepia(1) saturate(5) hue-rotate(350deg)' },
+  silver:   { label:'Silver',   color:'#9CA3AF', filter:'grayscale(1) brightness(1.2)' },
+  gold:     { label:'Golden',   color:'#EAB308', filter:'brightness(1.3) sepia(1) saturate(5) hue-rotate(10deg) drop-shadow(0 0 2px rgba(234,179,8,0.5))' },
+  platinum: { label:'Platinum', color:'#A78BFA', filter:'none' },
+  diamond:  { label:'Diamond',  color:'#22D3EE', filter:'brightness(1.3) sepia(1) saturate(5) hue-rotate(120deg) drop-shadow(0 0 3px rgba(34,211,238,0.6))' }
 };
 
 function renderComposite() {
@@ -853,6 +862,21 @@ function renderComposite() {
     }
   });
 
+  // Compute eggplant points per framework using actual computed scores
+  // Each scored test below 15 = 1 point
+  var eggplantByFw = {};
+  results.forEach(function(r) {
+    var points = 0;
+    r.scores.forEach(function(s, i) {
+      var pid = activeIds[i];
+      if (s > 0 && s < 15 && isScoredForFw(pid, r.framework)) points++;
+    });
+    if (points >= 3) {
+      var tier = points >= 11 ? 'diamond' : points >= 9 ? 'platinum' : points >= 7 ? 'gold' : points >= 5 ? 'silver' : 'bronze';
+      eggplantByFw[r.framework] = { points: points, tier: tier };
+    }
+  });
+
   // Render
   var table = document.getElementById('composite-table');
   table.innerHTML = '';
@@ -954,7 +978,15 @@ function renderComposite() {
     var fwBanana = bananaByFw[r.framework];
     if (fwBanana) {
       var bt = bananaTiers[fwBanana.tier];
-      badgeHtml = '<span class="composite-banana" title="' + bt.label + ' Banana (' + fwBanana.points + ' pts)"><span class="composite-banana-emoji" style="filter:' + bt.filter + ';">\uD83C\uDF4C</span></span>';
+      badgeHtml += '<span class="composite-banana" title="' + bt.label + ' Banana (' + fwBanana.points + ' pts) — ' + bt.msg + '"><span class="composite-banana-emoji" style="filter:' + bt.filter + ';">\uD83C\uDF4C</span></span>';
+    }
+    var fwEggplant = eggplantByFw[r.framework];
+    if (fwEggplant) {
+      var et = eggplantTiers[fwEggplant.tier];
+      badgeHtml += '<span class="composite-eggplant" title="' + et.label + ' Eggplant (' + fwEggplant.points + ' tests below 15) — This is not a dildo"><span class="composite-eggplant-emoji" style="filter:' + et.filter + ';">\uD83C\uDF46</span></span>';
+    }
+    if (r.framework === 'genhttp') {
+      badgeHtml += '<span style="display:inline-flex; align-items:center; margin-left:0.25rem; cursor:default; line-height:1; vertical-align:middle; filter:brightness(0.7) sepia(1) saturate(3) hue-rotate(-10deg);" title="Participation Award — He\'s happy to be here">\uD83C\uDFC5</span>';
     }
     row.innerHTML =
       '<div class="lb-rank">' + rank + '</div>' +
@@ -993,7 +1025,7 @@ function renderComposite() {
       var protoColorsPopup = { h1iso: '#3b82f6', h1wk: '#2563eb', h2: '#eab308', h3: '#22c55e', grpc: '#7c3aed', ws: '#0891b2' };
       if (popupBanana) {
         var pbt = bananaTiers[popupBanana.tier];
-        popupBadges += '<div style="margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.5rem;">\uD83C\uDF4C</span><span style="font-weight:700; font-size:0.95rem; color:' + pbt.color + ';">' + pbt.label + ' Banana</span><span style="font-size:0.8rem; color:#64748b;">(' + popupBanana.points + ' pts)</span></div>';
+        popupBadges += '<div style="margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.5rem;">\uD83C\uDF4C</span><span style="font-weight:700; font-size:0.95rem; color:' + pbt.color + ';">' + pbt.label + ' Banana</span><span style="font-size:0.8rem; color:#64748b;">(' + popupBanana.points + ' pts)</span></div><div style="margin-bottom:0.5rem; font-size:0.8rem; font-style:italic; color:' + pbt.color + ';">' + pbt.msg + '</div>';
       }
       if (popupCrowns && popupCrowns.length > 0) {
         popupBadges += '<div style="margin-bottom:0.4rem;"><span style="font-weight:600; font-size:0.78rem; color:#64748b;">Section Podium (x3 pts)</span><div style="margin-top:0.2rem;">';
@@ -1012,6 +1044,14 @@ function renderComposite() {
           popupBadges += '<span style="display:inline-flex; align-items:center; gap:0.3rem; margin:0.15rem 0.3rem 0.15rem 0; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.78rem; font-weight:500; color:' + color + '; background:rgba(0,0,0,0.04); border:1px solid ' + color + ';">' + placeLabel + ' ' + b.label + ' (' + sublabel + ')</span>';
         });
         popupBadges += '</div></div>';
+      }
+      var popupEggplant = eggplantByFw[r.framework];
+      if (popupEggplant) {
+        var pet = eggplantTiers[popupEggplant.tier];
+        popupBadges += '<div style="margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.5rem; filter:' + pet.filter + ';">\uD83C\uDF46</span><span style="font-weight:700; font-size:0.95rem; color:' + pet.color + ';">' + pet.label + ' Eggplant</span><span style="font-size:0.8rem; color:#64748b;">(' + popupEggplant.points + ' tests below 15)</span></div><div style="margin-bottom:0.5rem; font-size:0.8rem; font-style:italic; color:' + pet.color + ';">This is not a dildo</div>';
+      }
+      if (r.framework === 'genhttp') {
+        popupBadges += '<div style="margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.5rem; filter:brightness(0.7) sepia(1) saturate(3) hue-rotate(-10deg);">\uD83C\uDFC5</span><span style="font-weight:700; font-size:0.95rem; color:#B45309;">Participation Award</span></div><div style="margin-bottom:0.5rem; font-size:0.8rem; font-style:italic; color:#B45309;">He\'s happy to be here</div>';
       }
       var popupBadgeSection = popupBadges ? '<div style="margin:0.75rem 0; padding:0.75rem; background:rgba(0,0,0,0.02); border-radius:8px; border:1px solid rgba(0,0,0,0.06);">' + popupBadges + '</div>' : '';
 
