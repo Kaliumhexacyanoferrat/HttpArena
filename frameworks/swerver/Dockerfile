@@ -24,7 +24,7 @@ RUN set -eux; \
 # Clone swerver source — pinned to specific commit to bust Docker cache
 WORKDIR /src
 RUN git clone https://github.com/justinGrosvenor/swerver.git . && \
-    git checkout 880817d
+    git checkout 4bc5d15
 
 # Symlink OpenSSL libs to /usr/lib/ for Zig's linker
 RUN MULTIARCH=$(dpkg-architecture -qDEB_HOST_MULTIARCH); \
