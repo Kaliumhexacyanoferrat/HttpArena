@@ -23,18 +23,6 @@ TcpConnection::$defaultMaxPackageSize = 30 * 1024 * 1024;
 define('JSON_DATA', json_decode(file_get_contents('/data/dataset.json'), true));
 define('LARGE_JSON', largeJson());
 
-const MIME = [
-    'css'   => "text/css",
-    'js'    => "application/javascript",
-    'html'  => "text/html",
-    'woff2' => "font/woff2",
-    'svg'   => "image/svg+xml",
-    'webp'  => "image/webp",
-    'json'  => "application/json"
-    ];
-
-define('STATIC_FILES', loadStaticFiles());
-
 function largeJson()
 {
     $data = json_decode(file_get_contents('/data/dataset-large.json'), true);
@@ -43,21 +31,6 @@ function largeJson()
     }
 
     return json_encode(['items' => $data, 'count' => count($data)], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-}
-
-function loadStaticFiles() 
-{
-    $files = [];
-    $dir = new DirectoryIterator('/data/static');
-    foreach ($dir as $fileinfo) {
-        if (!$fileinfo->isDot()) {
-            $files['/static/' . $fileinfo->getFilename()] = [
-                file_get_contents($fileinfo->getPathname()),
-                MIME[pathinfo($fileinfo->getFilename(), PATHINFO_EXTENSION)] ?? 'application/octet-stream'
-            ];
-        }
-    }
-    return $files;
 }
 
 $http_worker->onWorkerStart = static function () {
@@ -129,10 +102,8 @@ $http_worker->onMessage = static function ($connection, $request) {
 
     //Serve static files
     if (str_starts_with($path, '/static/')) {
-        if (isset(STATIC_FILES[$path])) {
-            $connection->headers = ['Content-Type' => STATIC_FILES[$path][1]];
-            return $connection->send(STATIC_FILES[$path][0]);
-        }
+        $response = (new Response())->withFile('/data' . $path);
+        return $connection->send($response);
     }
 
     return $connection->send(new Response(
