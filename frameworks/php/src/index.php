@@ -1,6 +1,6 @@
 <?php
 
-require 'Pgsql.php';
+//require 'Pgsql.php';
 
 return match ($_SERVER['PATH_INFO']) {
     '/baseline11' => baseline(),
@@ -8,7 +8,7 @@ return match ($_SERVER['PATH_INFO']) {
     //'/json'     => json(),
     //'/upload'     => upload(),
     '/pipeline'   => pipeline(),
-    '/async-db'   => asyncDb(),
+    //'/async-db'   => asyncDb(),
 
     default => notFound()
 };
@@ -40,11 +40,11 @@ function baseline()
 //                     JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 // }
 
-function upload()
-{
-    header('Content-Type: text/plain');
-    echo strlen($_POST);
-}
+// function upload()
+// {
+//     header('Content-Type: text/plain');
+//     echo strlen($_POST);
+// }
 
 function pipeline()
 {
@@ -52,15 +52,15 @@ function pipeline()
     echo 'ok';
 }
 
-function asyncDb()
-{
-    header('Content-Type: application/json');
-    echo Pgsql::query(
-        $_GET['min'] ?? 10,
-        $_GET['max'] ?? 50,
-        $_GET['limit'] ?? 50
-    );
-}
+// function asyncDb()
+// {
+//     header('Content-Type: application/json');
+//     echo Pgsql::query(
+//         $_GET['min'] ?? 10,
+//         $_GET['max'] ?? 50,
+//         $_GET['limit'] ?? 50
+//     );
+// }
 
 function notFound()
 {
