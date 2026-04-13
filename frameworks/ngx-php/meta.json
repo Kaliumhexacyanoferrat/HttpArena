@@ -21,8 +21,7 @@
     "baseline-h2",
     "static-h2",
     "baseline-h3",
-    "static-h3",
-    "upload"
+    "static-h3"
   ],
   "maintainers": [
     "joanhey"
