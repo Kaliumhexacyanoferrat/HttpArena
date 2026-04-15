@@ -20,6 +20,8 @@ rpsScore = (framework_avg_rps / best_avg_rps) × 100
 
 This produces a 0–100 value where the top framework scores 100.
 
+**Exception: JSON Compressed.** The `json-comp` profile applies a compression-ratio gain before normalization so frameworks that ship smaller response bodies are rewarded directly. Instead of averaging raw rps, `avgRps` is first scaled by `(minBpr / myBpr)²` where `myBpr = avgBw / avgRps` and `minBpr` is the smallest bytes-per-response across the field. Doubling the response size quarters the score. See the [JSON Compressed implementation](/docs/test-profiles/h1/isolated/json-compressed/implementation/#scoring) for the full formula and rationale.
+
 ### Step 3: Arithmetic mean
 
 The final composite score is the arithmetic mean of per-profile scores across all **scored** profiles:
