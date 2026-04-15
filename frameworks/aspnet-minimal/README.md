@@ -4,10 +4,10 @@ Minimal ASP.NET Core HTTP server using .NET 10 with Kestrel and minimal API rout
 
 ## Stack
 
-- **Language:** C# / .NET 10 (Alpine)
+- **Language:** C# / .NET 10
 - **Framework:** ASP.NET Core Minimal APIs
 - **Engine:** Kestrel
-- **Build:** Self-contained publish, `aspnet:10.0-alpine` runtime
+- **Build:** Framework-dependent publish, `mcr.microsoft.com/dotnet/aspnet:10.0` runtime (Debian 12) with `libmsquic` installed for HTTP/3
 
 ## Endpoints
 
@@ -24,9 +24,13 @@ Minimal ASP.NET Core HTTP server using .NET 10 with Kestrel and minimal API rout
 
 ## Notes
 
-- HTTP/1.1 on port 8080, HTTP/1+2+3 on port 8443, h1+TLS on port 8081 (`json-tls` profile)
-- Logging disabled (`ClearProviders()`) for throughput
-- Response compression middleware (gzip, fastest level) drives `/json` encoding
-- HTTP/2 tuned: 256 max streams, 2 MB connection window
-- Postgres pooled via `Npgsql.NpgsqlDataSource` built from `DATABASE_URL`
-- Source split: `Program.cs` (startup), `Handlers.cs` (routes), `AppData.cs` (dataset cache), `Models.cs` (DTOs)
+- HTTP/1.1 on port 8080, HTTP/1+2+3 on port 8443 (TCP **and** UDP for QUIC), h1+TLS on port 8081 (`json-tls` profile)
+- HTTP/3 via MsQuic (`libmsquic` installed in the runtime image); Kestrel advertises h3 through the default Alt-Svc header so clients upgrade from h2
+- TLS certs loaded from `$TLS_CERT` / `$TLS_KEY` (default `/certs/server.crt` + `/certs/server.key`)
+- Logging disabled (`ClearProviders()`) for throughput; `Server: aspnet-minimal` header set via a lightweight middleware
+- `AddResponseCompression()` + `UseResponseCompression()` drives `/json/{count}` gzip encoding for the `json-comp` profile
+- HTTP/2 tuned: 256 max streams per connection, 2 MB initial connection window, 1 MB stream window
+- `/upload` reads the request body into a 64 KB pooled buffer (`ArrayPool<byte>.Shared`) and returns the byte count — no full-body allocation
+- JSON responses use source-generated `JsonSerializerContext` (`AppJsonContext`) so the hot path avoids reflection
+- Postgres pooled via `Npgsql.NpgsqlDataSource` built once at startup from `DATABASE_URL`
+- Source split: `Program.cs` (startup + Kestrel), `Handlers.cs` (routes + JSON ctx), `AppData.cs` (dataset + pg pool), `Models.cs` (DTOs)
