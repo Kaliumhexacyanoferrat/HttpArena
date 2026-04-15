@@ -193,12 +193,6 @@ run_one() {
         output=$("${tool//-/_}_run" "${gc_args[@]}")
         stats_stop
 
-        # Persist raw load-generator output next to the container logs so
-        # broken parsers / weird tool outputs can be investigated later.
-        local _raw_log_dir="$ROOT_DIR/site/static/logs/$profile/$CONNS"
-        mkdir -p "$_raw_log_dir"
-        printf '%s\n' "$output" > "$_raw_log_dir/${FRAMEWORK}.${tool}.run${run}.txt"
-
         # Print trimmed output (drop ghz/h2load-h3 warm-up noise).
         echo "$output" | grep -Ev '^(Warm-up|Main benchmark duration|Stopped all clients|progress: [0-9]+% of clients started)' || true
         info "CPU $STATS_AVG_CPU | Mem $STATS_PEAK_MEM"
