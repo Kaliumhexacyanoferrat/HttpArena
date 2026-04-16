@@ -31,11 +31,10 @@
     "duration": "5s",
     "pipeline": 1,
     "bandwidth": "0",
-    "input_bw": "",
     "reconnects": 0,
     "status_2xx": 513,
     "status_3xx": 0,
     "status_4xx": 0,
-    "status_5xx": 2
+    "status_5xx": 8
   }
 ]
