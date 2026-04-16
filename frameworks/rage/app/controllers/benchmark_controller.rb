@@ -10,35 +10,11 @@ class BenchmarkController < RageController::API
   if File.exist?(dataset_path)
     @dataset_items = JSON.parse(File.read(dataset_path))
   end
+  def self.dataset_items = @dataset_items
 
-  # Load static files into memory
-  MIME_TYPES = {
-    '.css'   => 'text/css',
-    '.js'    => 'application/javascript',
-    '.html'  => 'text/html',
-    '.woff2' => 'font/woff2',
-    '.svg'   => 'image/svg+xml',
-    '.webp'  => 'image/webp',
-    '.json'  => 'application/json'
-  }.freeze
-
-  static_dir = File.join DATA_DIR, 'static'
-  @static_files_cache = {}
-  if Dir.exist?(static_dir)
-    Dir.foreach(static_dir) do |name|
-      next if name == '.' || name == '..'
-      path = File.join(static_dir, name)
-      next unless File.file?(path)
-      ext = File.extname(name)
-      ct = MIME_TYPES.fetch(ext, 'application/octet-stream')
-      @static_files_cache[name] = { data: File.binread(path), content_type: ct }
-    end
-  end
+  FileUtils.cp_r(File.join(DATA_DIR, 'static'), File.join(Rage.root, 'public', 'static'))
 
   PG_QUERY = 'SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN $1 AND $2 LIMIT $3'
-
-  def self.dataset_items = @dataset_items
-  def self.static_files_cache = @static_files_cache
 
   before_action do
     headers["server"] = "rage"
@@ -124,15 +100,6 @@ class BenchmarkController < RageController::API
       }
     end
     render json: { items: items, count: items.length }
-  end
-
-  def static_file
-    if entry = self.class.static_files_cache[params[:filename]]
-      headers['content-type'] = entry[:content_type]
-      render plain: entry[:data]
-    else
-      head 404
-    end
   end
 
   def upload
