@@ -3,65 +3,103 @@ title: Configuration
 weight: 5
 ---
 
-## Global parameters
+Everything the benchmark driver can be told to do via environment variables, plus the shape of a profile definition. For the full flag-by-flag walkthrough see [benchmark.sh](scripts/benchmark) and [benchmark-lite.sh](scripts/benchmark-lite).
 
-These are set at the top of `scripts/benchmark.sh` and apply to all profiles:
+## Run settings
 
-| Parameter | Default | Env override | Description |
-|-----------|---------|--------------|-------------|
-| `THREADS` | 64 | `THREADS=12` | Threads for gcannon and gcannon-based load tests |
-| `H2THREADS` | 128 | `H2THREADS=64` | Threads for h2load (HTTP/2, gRPC) |
-| `DURATION` | 5s | — | Duration per benchmark run |
-| `RUNS` | 3 | — | Runs per configuration (best kept) |
-| `PORT` | 8080 | — | HTTP/1.1 port |
-| `H2PORT` | 8443 | — | HTTPS / HTTP/2 / HTTP/3 / gRPC-TLS port |
-
-## Load generator paths
+Defined in `scripts/lib/common.sh`. Override by exporting before you run the script, or inline: `THREADS=8 ./scripts/benchmark.sh actix baseline`.
 
 | Variable | Default | Description |
-|----------|---------|-------------|
-| `GCANNON` | `gcannon` | Path to gcannon binary |
-| `H2LOAD` | `h2load` | Path to h2load binary |
-| `OHA` | `$HOME/.cargo/bin/oha` | Path to oha binary |
-| `GHZ` | `ghz` | Path to ghz binary |
+|---|---|---|
+| `DURATION` | `5s` | Load-test duration per run (`-d`/`-D` passed through to the tool). |
+| `RUNS` | `3` | Measurement iterations per (profile, connection count). Best wins. |
+| `THREADS` | `64` | gcannon / wrk worker threads. |
+| `H2THREADS` | `128` | h2load worker threads (HTTP/2, h2c gRPC). |
+| `H3THREADS` | `64` | h2load-h3 worker threads (HTTP/3 over QUIC). |
 
-Override with environment variables if your binaries are in a non-standard location:
+In `benchmark-lite.sh`, `THREADS` / `H2THREADS` / `H3THREADS` all default to `nproc / 2` instead.
 
-```bash
-GCANNON=/usr/local/bin/gcannon H2LOAD=/usr/local/bin/h2load ./scripts/benchmark.sh express
-```
+## Ports
+
+| Variable | Default | Description |
+|---|---|---|
+| `PORT` | `8080` | HTTP/1.1 — also h2c for gRPC. |
+| `H2PORT` | `8443` | HTTPS, HTTP/2 TLS, HTTP/3 QUIC, gRPC-TLS. |
+| `H1TLS_PORT` | `8081` | HTTP/1.1 + TLS, used only by the `json-tls` profile. |
+
+Every framework `Dockerfile` reads the same defaults from its env, so you rarely need to change these.
+
+## Load-generator mode
+
+| Variable | Default | Description |
+|---|---|---|
+| `LOADGEN_DOCKER` | `false` | When `true`, every load generator runs from its Docker image instead of the host binary. Builds missing images automatically from `docker/*.Dockerfile`. Forced `true` by `benchmark-lite.sh`. |
+| `GCANNON_MODE` | `native` | `native` or `docker`. Implied by `LOADGEN_DOCKER`. |
+| `GCANNON_CPUS` | `32-63,96-127` | CPU list the load generators run on. Native mode wraps calls in `taskset -c $GCANNON_CPUS`; docker mode passes it via `--cpuset-cpus`. `benchmark-lite.sh` sets this to `0-$((nproc-1))`. |
+
+## Tool binaries and images
+
+Each load generator has a pair of variables — native binary name and docker image tag:
+
+| Native (`$TOOL`) | Docker (`$TOOL_IMAGE`) | Used for | Source |
+|---|---|---|---|
+| `GCANNON=gcannon` | `GCANNON_IMAGE=gcannon:latest` | h1, pipelined, limited-conn, json, json-comp, upload, api-4/16, async-db, echo-ws | `docker/gcannon.Dockerfile` |
+| `H2LOAD=h2load` | `H2LOAD_IMAGE=h2load:latest` | baseline-h2, static-h2, unary-grpc, unary-grpc-tls, gateway-64 | `docker/h2load.Dockerfile` (Ubuntu + glibc, **not** alpine) |
+| `H2LOAD_H3=h2load-h3` | `H2LOAD_H3_IMAGE=h2load-h3:local` | baseline-h3, static-h3 | `docker/h2load-h3.Dockerfile` (quictls + ngtcp2 + nghttp3) |
+| `WRK=wrk` | `WRK_IMAGE=wrk:local` | static, json-tls | `docker/wrk.Dockerfile` |
+| `GHZ=ghz` | `GHZ_IMAGE=ghz:local` | stream-grpc, stream-grpc-tls, gRPC readiness probe | `docker/ghz.Dockerfile` |
+
+## Postgres sidecar
+
+Started automatically when the framework subscribes to `async-db`, `api-4`, `api-16`, or `gateway-64`.
+
+| Variable | Default | Description |
+|---|---|---|
+| `PG_CONTAINER` | `httparena-postgres` | Container name. |
+| `DATABASE_URL` | `postgres://bench:bench@localhost:5432/benchmark` | Exported into the framework container so the app can connect. |
+
+The sidecar uses `postgres:17-alpine` with `-c max_connections=256` and is seeded from `data/pgdb-seed.sql`.
 
 ## Profile definitions
 
-Each profile defines: pipeline depth, requests per connection, CPU limit, connection counts, and endpoint type.
+Profiles live in `scripts/lib/profiles.sh`. Format:
 
-| Profile | Pipeline | Req/conn | CPU pinning | Connections | Endpoint |
-|---------|----------|----------|-------------|-------------|----------|
-| baseline | 1 | 0 | 0-31,64-95 | 512, 4096 | `/baseline11` |
-| pipelined | 16 | 0 | 0-31,64-95 | 512, 4096 | `/pipeline` |
-| limited-conn | 1 | 10 | 0-31,64-95 | 512, 4096 | `/baseline11` |
-| json | 1 | 0 | 0-31,64-95 | 4096 | `/json/{count}` (7 counts) |
-| json-comp | 1 | 0 | 0-31,64-95 | 512, 4096, 16384 | `/json/{count}?m=N` + `Accept-Encoding: gzip, br` |
-| json-tls | 1 | 0 | 0-31,64-95 | 4096 | `/json/{count}?m=N` over HTTP/1.1 + TLS on port 8081 (wrk) |
-| upload | 1 | 0 | 0-31,64-95 | 32, 256 | `/upload` |
-| api-4 | 1 | 5 | 0-3 | 256 | mixed (baseline, json, async-db) |
-| api-16 | 1 | 5 | 0-7,64-71 | 1024 | mixed (baseline, json, async-db) |
-| static | 1 | 200 | 0-31,64-95 | 1024, 4096, 6800 | `/static/*` (20 files, wrk) |
-| async-db | 1 | 0 | 0-31,64-95 | 1024 | `/async-db?limit=N` (5 limits) |
-| baseline-h2 | 1 | 0 | 0-31,64-95 | 256, 1024 | `/baseline2` (h2load) |
-| static-h2 | 1 | 0 | 0-31,64-95 | 256, 1024 | `/static/*` (h2load) |
-| unary-grpc | 1 | 0 | 0-31,64-95 | 256, 1024 | gRPC `GetSum` (h2load h2c) |
-| unary-grpc-tls | 1 | 0 | 0-31,64-95 | 256, 1024 | gRPC `GetSum` (h2load TLS) |
-| echo-ws | 1 | 0 | 0-31,64-95 | 512, 4096, 16384 | `/ws` (gcannon `--ws`) |
+```
+pipeline | req_per_conn | cpu_limit | connections | endpoint
+```
 
-- **Pipeline** — requests sent back-to-back per connection before waiting for responses
-- **Req/conn** — requests per connection before disconnect and reconnect (0 = keep-alive, no limit)
-- **CPU pinning** — container `--cpuset-cpus` value (pins to specific CPU cores)
+- **pipeline** — gcannon `-p` value. `1` = sequential, `16` = pipelined.
+- **req_per_conn** — gcannon `-r` value. `0` = keep-alive forever; a positive number forces reconnect every N requests (exercises the accept path).
+- **cpu_limit** — cpuset written to the framework container's `--cpuset-cpus`. Blank = no pinning.
+- **connections** — comma-separated list; each value becomes a separate iteration.
+- **endpoint** — dispatch key. Tells `endpoint_tool()` which load generator to use and `gcannon_build_args()` (etc.) how to shape the request.
 
-## Overriding for local testing
+`benchmark-lite.sh` overrides `PROFILES` and `PROFILE_ORDER` with a smaller subset and blanks the `cpu_limit` column; everything else parses identically.
 
-The thread count defaults (64 / 128) are tuned for the dedicated 64-core benchmark server. On a local machine with fewer cores, override them:
+## Profile → tool dispatch
+
+From `endpoint_tool()` in `scripts/lib/profiles.sh`:
+
+| Endpoint | Tool |
+|---|---|
+| `static`, `json-tls` | wrk |
+| `h2`, `static-h2`, `gateway-64`, `grpc`, `grpc-tls` | h2load |
+| `h3`, `static-h3` | h2load-h3 |
+| `grpc-stream`, `grpc-stream-tls` | ghz |
+| everything else (`""`, `pipeline`, `upload`, `api-4`, `api-16`, `async-db`, `json`, `json-compressed`, `ws-echo`, …) | gcannon |
+
+## Small-machine overrides
+
+The defaults in `benchmark.sh` assume the reference 64-core benchmark host. On a laptop, three variables usually get you to something reasonable:
 
 ```bash
-THREADS=8 H2THREADS=16 ./scripts/benchmark.sh express baseline
+THREADS=8 H2THREADS=16 H3THREADS=4 ./scripts/benchmark.sh actix baseline
 ```
+
+If native gcannon / h2load / h2load-h3 aren't installed, flip the whole thing to docker mode instead of installing each tool:
+
+```bash
+LOADGEN_DOCKER=true ./scripts/benchmark.sh actix --save
+```
+
+Or just use `benchmark-lite.sh`, which is this combination pre-baked.

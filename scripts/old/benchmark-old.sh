@@ -7,98 +7,121 @@ cd "$ROOT_DIR"
 
 GCANNON="${GCANNON:-gcannon}"
 GCANNON_IMAGE="${GCANNON_IMAGE:-gcannon:latest}"
-GCANNON_MODE=docker
+GCANNON_CPUS="${GCANNON_CPUS:-32-63,96-127}"
+GCANNON_MODE="${GCANNON_MODE:-native}"
+LOADGEN_DOCKER="${LOADGEN_DOCKER:-false}"
+H2LOAD="${H2LOAD:-h2load}"
 H2LOAD_IMAGE="${H2LOAD_IMAGE:-h2load:latest}"
+H2LOAD_H3="${H2LOAD_H3:-h2load-h3}"
 H2LOAD_H3_IMAGE="${H2LOAD_H3_IMAGE:-h2load-h3:local}"
+WRK="${WRK:-wrk}"
+WRK_IMAGE="${WRK_IMAGE:-wrk:local}"
 OHA="${OHA:-$HOME/.cargo/bin/oha}"
 GHZ="${GHZ:-ghz}"
-HARD_NOFILE=$(ulimit -Hn 2>/dev/null || echo 65536)
-[[ "$HARD_NOFILE" =~ ^[0-9]+$ ]] || HARD_NOFILE=65536
+HARD_NOFILE=$(ulimit -Hn 2>/dev/null || echo 1048576)
+[[ "$HARD_NOFILE" =~ ^[0-9]+$ ]] || HARD_NOFILE=1048576
 ulimit -n "$HARD_NOFILE" 2>/dev/null || true
-DOCKER_NETWORK="httparena-bench-net"
-AVAILABLE_CORES=$(nproc 2>/dev/null || echo 4)
-THREADS="${THREADS:-$(( AVAILABLE_CORES / 2 > 0 ? AVAILABLE_CORES / 2 : 1 ))}"
-H2THREADS="${H2THREADS:-$THREADS}"
+THREADS="${THREADS:-64}"
+H2THREADS="${H2THREADS:-128}"
 H3THREADS="${H3THREADS:-64}"
 DURATION=5s
 RUNS=3
 PORT=8080
 H2PORT=8443
+H1TLS_PORT=8081
 REQUESTS_DIR="$ROOT_DIR/requests"
 RESULTS_DIR="$ROOT_DIR/results"
 CERTS_DIR="$ROOT_DIR/certs"
 
 # Profile definitions: pipeline|req_per_conn|cpu_limit|connections|endpoint
 # endpoint: empty = /baseline11 (raw), "json" = /json (GET), "pipeline" = /pipeline, "upload" = POST /upload (raw),
+#           "json-tls" = /json/{count}?m=N over HTTP/1.1 + TLS on :8081 (wrk+lua),
 #           "h2" = /baseline2 (h2load), "static-h2" = multi-URI h2load, "h3" = /baseline2 (h2load-h3), "static-h3" = multi-URI h2load-h3,
 #           "grpc" = gRPC unary (h2load h2c), "grpc-tls" = gRPC unary (h2load TLS),
-#           "static" = multi-URI static files (gcannon --raw), "ws-echo" = WebSocket echo (gcannon --ws)
-# Lite profiles: no CPU pinning, fixed 512 connections (upload: 128)
+#           "static" = multi-URI static files (gcannon --raw), "ws-echo" = WebSocket echo (gcannon --ws),
+#           "gateway-64" = multi-URI h2load through reverse proxy (TLS)
 declare -A PROFILES=(
-    [baseline]="1|0||512|"
-    [pipelined]="16|0||512|pipeline"
-    [limited-conn]="1|10||512|"
-    [json]="1|0||512|json"
-    [json-comp]="1|0||512|json-compressed"
-    [upload]="1|0||128|upload"
-    [static]="1|10||256,512|static"
-    [baseline-h2]="1|0||512|h2"
-    [static-h2]="1|0||512|static-h2"
-    [baseline-h3]="1|0||64|h3"
-    [static-h3]="1|0||64|static-h3"
-    [unary-grpc]="1|0||512|grpc"
-    [unary-grpc-tls]="1|0||512|grpc-tls"
-    [echo-ws]="1|0||512|ws-echo"
-    [async-db]="1|0||512|async-db"
+    [baseline]="1|0|0-31,64-95|512,4096|"
+    [pipelined]="16|0|0-31,64-95|512,4096|pipeline"
+    [limited-conn]="1|10|0-31,64-95|512,4096|"
+    [json]="1|0|0-31,64-95|4096|json"
+    [json-comp]="1|0|0-31,64-95|512,4096,16384|json-compressed"
+    [json-tls]="1|0|0-31,64-95|4096|json-tls"
+    [upload]="1|0|0-31,64-95|32,256|upload"
+    [api-4]="1|5|0-3|256|api-4"
+    [api-16]="1|5|0-7,64-71|1024|api-16"
+    [static]="1|200|0-31,64-95|1024,4096,6800|static"
+    [baseline-h2]="1|0|0-31,64-95|256,1024|h2"
+    [static-h2]="1|0|0-31,64-95|256,1024|static-h2"
+    [baseline-h3]="1|0|0-31,64-95|64|h3"
+    [static-h3]="1|0|0-31,64-95|64|static-h3"
+    [unary-grpc]="1|0|0-31,64-95|256,1024|grpc"
+    [unary-grpc-tls]="1|0|0-31,64-95|256,1024|grpc-tls"
+    [stream-grpc]="1|0|0-31,64-95|64|grpc-stream"
+    [stream-grpc-tls]="1|0|0-31,64-95|64|grpc-stream-tls"
+    [gateway-64]="1|0|0-31,64-95|256,1024|gateway-64"
+    [echo-ws]="1|0|0-31,64-95|512,4096,16384|ws-echo"
+    [async-db]="1|0|0-31,64-95|1024|async-db"
 )
-PROFILE_ORDER=(baseline pipelined limited-conn json json-comp upload static async-db baseline-h2 static-h2 baseline-h3 static-h3 unary-grpc unary-grpc-tls echo-ws)
+PROFILE_ORDER=(baseline pipelined limited-conn json json-comp json-tls upload api-4 api-16 static async-db baseline-h2 static-h2 baseline-h3 static-h3 gateway-64 unary-grpc unary-grpc-tls stream-grpc stream-grpc-tls echo-ws)
 
 # Parse flags
 SAVE_RESULTS=false
-LOAD_THREADS=""
 POSITIONAL=()
-while [ $# -gt 0 ]; do
-    case "$1" in
+for arg in "$@"; do
+    case "$arg" in
         --save) SAVE_RESULTS=true ;;
-        --load-threads) LOAD_THREADS="$2"; shift ;;
-        --load-threads=*) LOAD_THREADS="${1#*=}" ;;
-        *) POSITIONAL+=("$1") ;;
+        *) POSITIONAL+=("$arg") ;;
     esac
-    shift
 done
 FRAMEWORK="${POSITIONAL[0]:-}"
 PROFILE_FILTER="${POSITIONAL[1]:-}"
-
-if [ -n "$LOAD_THREADS" ]; then
-    THREADS="$LOAD_THREADS"
-    H2THREADS="$LOAD_THREADS"
-    H3THREADS="$LOAD_THREADS"
-fi
 
 rebuild_site_data() {
     local site_data="$ROOT_DIR/site/data"
     mkdir -p "$site_data"
 
-    # Rebuild frameworks.json from individual meta.json files
+    # Rebuild frameworks.json from individual meta.json files.
+    # Hybrid shape: the "primary" entry fields (dir/description/repo/type/engine)
+    # stay at top level for backwards compatibility with all leaderboards.
+    # Additional entries that share the same display_name go in `variants`
+    # (read only by the composite popup to show every aggregated variant).
+    # Primary is chosen as the entry whose dir matches the display_name, or
+    # the first alphabetically.
     local fw_json="$site_data/frameworks.json"
-    echo '{' > "$fw_json"
-    local fw_first=true
-    for fw_dir in "$ROOT_DIR"/frameworks/*/; do
-        [ -d "$fw_dir" ] || continue
-        local fw=$(basename "$fw_dir")
-        local meta="$fw_dir/meta.json"
-        [ -f "$meta" ] || continue
-        $fw_first || echo ',' >> "$fw_json"
-        local dn=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1])); print(d.get('display_name',sys.argv[2]))" "$meta" "$fw")
-        local desc=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('description',''))" "$meta")
-        local repo=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('repo',''))" "$meta")
-        local ftype=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('type','realistic'))" "$meta")
-        local engine=$(python3 -c "import json,sys; print(json.load(open(sys.argv[1])).get('engine',''))" "$meta")
-        printf '  "%s": {"dir": "%s", "description": "%s", "repo": "%s", "type": "%s", "engine": "%s"}' "$dn" "$fw" "$desc" "$repo" "$ftype" "$engine" >> "$fw_json"
-        fw_first=false
-    done
-    echo '' >> "$fw_json"
-    echo '}' >> "$fw_json"
+    python3 - "$ROOT_DIR" > "$fw_json" <<'PYEOF'
+import json, sys, os, glob
+root = sys.argv[1]
+groups = {}
+for meta_path in sorted(glob.glob(os.path.join(root, "frameworks", "*", "meta.json"))):
+    fw_dir = os.path.basename(os.path.dirname(meta_path))
+    try:
+        with open(meta_path) as f:
+            m = json.load(f)
+    except Exception:
+        continue
+    display = m.get("display_name", fw_dir)
+    entry = {
+        "dir": fw_dir,
+        "description": m.get("description", ""),
+        "repo": m.get("repo", ""),
+        "type": m.get("type", "realistic"),
+        "engine": m.get("engine", ""),
+    }
+    groups.setdefault(display, []).append(entry)
+
+out = {}
+for display, entries in groups.items():
+    # Primary = the one whose dir == display_name, else first alphabetical
+    entries_sorted = sorted(entries, key=lambda e: e["dir"])
+    primary = next((e for e in entries_sorted if e["dir"] == display), entries_sorted[0])
+    variants = [e for e in entries_sorted if e["dir"] != primary["dir"]]
+    obj = dict(primary)
+    if variants:
+        obj["variants"] = variants
+    out[display] = obj
+print(json.dumps(out, indent=2))
+PYEOF
     echo "[updated] site/data/frameworks.json"
 
     for profile_dir in "$RESULTS_DIR"/*/; do
@@ -253,9 +276,9 @@ if [ -z "$FRAMEWORK" ]; then
         fi
 
         if [ "$SAVE_RESULTS" = "true" ]; then
-            "$SCRIPT_DIR/benchmark-lite-windows.sh" "$fw" "$PROFILE_FILTER" --save || true
+            "$SCRIPT_DIR/benchmark.sh" "$fw" "$PROFILE_FILTER" --save || true
         else
-            "$SCRIPT_DIR/benchmark-lite-windows.sh" "$fw" "$PROFILE_FILTER" || true
+            "$SCRIPT_DIR/benchmark.sh" "$fw" "$PROFILE_FILTER" || true
         fi
     done
     if [ "$SAVE_RESULTS" = "true" ]; then
@@ -300,10 +323,13 @@ PG_CONTAINER="httparena-postgres"
 restore_settings() {
     docker stop -t 5 "$CONTAINER_NAME" 2>/dev/null || true
     docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+    # Stop gateway compose stack if running
+    if [ -f "$ROOT_DIR/frameworks/$FRAMEWORK/compose.gateway.yml" ]; then
+        CERTS_DIR="$CERTS_DIR" DATA_DIR="$ROOT_DIR/data" DATABASE_URL="postgres://bench:bench@localhost:5432/benchmark" \
+            docker compose -f "$ROOT_DIR/frameworks/$FRAMEWORK/compose.gateway.yml" -p "httparena-${FRAMEWORK}" down --remove-orphans 2>/dev/null || true
+    fi
     docker stop -t 5 "$PG_CONTAINER" 2>/dev/null || true
     docker rm -f "$PG_CONTAINER" 2>/dev/null || true
-    docker volume rm httparena-pgdata 2>/dev/null || true
-    docker network rm "$DOCKER_NETWORK" 2>/dev/null || true
     echo "[restore] Restoring loopback MTU to 65536..."
     sudo ip link set lo mtu 65536 2>/dev/null || true
     if [ -n "$ORIG_GOVERNOR" ]; then
@@ -323,7 +349,35 @@ trap restore_settings EXIT
 docker ps -q --filter "name=httparena-" | xargs -r docker stop -t 5 2>/dev/null || true
 docker ps -aq --filter "name=httparena-" | xargs -r docker rm -f -v 2>/dev/null || true
 
-echo "[info] Available cores: $AVAILABLE_CORES, gcannon threads: $THREADS"
+AVAILABLE_CPUS=$(nproc 2>/dev/null || echo "64")
+echo "[info] Available CPUs: $AVAILABLE_CPUS"
+
+# Build load-generator command prefixes (native vs docker)
+if [ "$LOADGEN_DOCKER" = "true" ]; then
+    echo "[info] Load generators: docker mode (gcannon=$GCANNON_IMAGE, h2load=$H2LOAD_IMAGE, h2load-h3=$H2LOAD_H3_IMAGE, wrk=$WRK_IMAGE)"
+    GCANNON_MODE=docker
+    DOCKER_LOADGEN_FLAGS=(--rm --network host
+        --cpuset-cpus="$GCANNON_CPUS"
+        --security-opt seccomp=unconfined
+        --ulimit memlock=-1:-1
+        --ulimit nofile=1048576:1048576
+        -v "$REQUESTS_DIR:$REQUESTS_DIR:ro")
+    H2LOAD_CMD=(docker run "${DOCKER_LOADGEN_FLAGS[@]}" "$H2LOAD_IMAGE")
+    H2LOAD_H3_CMD=(docker run "${DOCKER_LOADGEN_FLAGS[@]}" "$H2LOAD_H3_IMAGE")
+    WRK_CMD=(docker run "${DOCKER_LOADGEN_FLAGS[@]}" "$WRK_IMAGE")
+    # Build images on first use
+    for entry in "$GCANNON_IMAGE:gcannon.Dockerfile" "$H2LOAD_IMAGE:h2load.Dockerfile" "$H2LOAD_H3_IMAGE:h2load-h3.Dockerfile" "$WRK_IMAGE:wrk.Dockerfile"; do
+        img="${entry%%:*}"; df="${entry##*:}"
+        if ! docker image inspect "$img" >/dev/null 2>&1; then
+            echo "[build] $img from docker/$df ..."
+            docker build -t "$img" -f "$ROOT_DIR/docker/$df" "$ROOT_DIR/docker"
+        fi
+    done
+else
+    H2LOAD_CMD=("$H2LOAD")
+    H2LOAD_H3_CMD=("$H2LOAD_H3")
+    WRK_CMD=("$WRK")
+fi
 
 echo "[tune] Setting CPU governor to performance..."
 if command -v cpupower &>/dev/null; then
@@ -359,54 +413,51 @@ echo "[clean] Dropping kernel caches..."
 sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' 2>/dev/null || true
 sync
 
-# Create Docker bridge network
-docker network rm "$DOCKER_NETWORK" 2>/dev/null || true
-docker network create "$DOCKER_NETWORK" 2>/dev/null || true
-
-# Ensure load generator images exist
-if ! docker image inspect "$GCANNON_IMAGE" >/dev/null 2>&1; then
-    echo "[build] Building gcannon Docker image (clones source from github)..."
-    docker build -t "$GCANNON_IMAGE" -f "$ROOT_DIR/docker/gcannon.Dockerfile" "$ROOT_DIR/docker"
-fi
-if ! docker image inspect "$H2LOAD_IMAGE" >/dev/null 2>&1; then
-    echo "[build] Building h2load Docker image..."
-    docker build -t "$H2LOAD_IMAGE" -f "$ROOT_DIR/docker/h2load.Dockerfile" "$ROOT_DIR/docker"
-fi
-if ! docker image inspect "$H2LOAD_H3_IMAGE" >/dev/null 2>&1; then
-    echo "[build] Building h2load-h3 Docker image (first time takes ~7 min)..."
-    docker build -t "$H2LOAD_H3_IMAGE" -f "$ROOT_DIR/docker/h2load-h3.Dockerfile" "$ROOT_DIR/docker"
+# Build once — skip if framework only subscribes to gateway-64 (compose handles it)
+GATEWAY_COMPOSE="$ROOT_DIR/frameworks/$FRAMEWORK/compose.gateway.yml"
+GATEWAY_ONLY=false
+if [ "$FRAMEWORK_TESTS" = "gateway-64" ]; then
+    GATEWAY_ONLY=true
 fi
 
-# Build once
-echo "=== Building: $FRAMEWORK ==="
-if [ -x "frameworks/$FRAMEWORK/build.sh" ]; then
-    "frameworks/$FRAMEWORK/build.sh" || { echo "FAIL: build"; exit 1; }
-else
-    docker build -t "$IMAGE_NAME" "frameworks/$FRAMEWORK" || { echo "FAIL: build"; exit 1; }
+if [ "$GATEWAY_ONLY" = "false" ]; then
+    echo "=== Building: $FRAMEWORK ==="
+    if [ -x "frameworks/$FRAMEWORK/build.sh" ]; then
+        "frameworks/$FRAMEWORK/build.sh" || { echo "FAIL: build"; exit 1; }
+    else
+        docker build -t "$IMAGE_NAME" "frameworks/$FRAMEWORK" || { echo "FAIL: build"; exit 1; }
+    fi
+fi
+
+# Build gateway compose stack if gateway-64 is subscribed
+if echo ",$FRAMEWORK_TESTS," | grep -qF ",gateway-64,"; then
+    if [ -f "$GATEWAY_COMPOSE" ]; then
+        echo "=== Building gateway stack: $FRAMEWORK ==="
+        CERTS_DIR="$CERTS_DIR" DATA_DIR="$ROOT_DIR/data" DATABASE_URL="" \
+            docker compose -f "$GATEWAY_COMPOSE" -p "httparena-${FRAMEWORK}" build || { echo "FAIL: gateway compose build"; exit 1; }
+    fi
 fi
 
 # Start Postgres sidecar if async-db is needed
-if echo ",$FRAMEWORK_TESTS," | grep -qF ",async-db,"; then
-    if [ -z "$PROFILE_FILTER" ] || [ "$PROFILE_FILTER" = "async-db" ] || [ "$PROFILE_FILTER" = "api-4" ] || [ "$PROFILE_FILTER" = "api-16" ]; then
+if echo ",$FRAMEWORK_TESTS," | grep -qF ",async-db," || echo ",$FRAMEWORK_TESTS," | grep -qF ",gateway-64,"; then
+    if [ -z "$PROFILE_FILTER" ] || [ "$PROFILE_FILTER" = "async-db" ] || [ "$PROFILE_FILTER" = "api-4" ] || [ "$PROFILE_FILTER" = "api-16" ] || [ "$PROFILE_FILTER" = "gateway-64" ]; then
         echo "[postgres] Starting Postgres sidecar..."
         docker rm -f "$PG_CONTAINER" 2>/dev/null || true
-        docker volume rm httparena-pgdata 2>/dev/null || true
-        docker run -d --name "$PG_CONTAINER" --network "$DOCKER_NETWORK" \
+        docker run -d --name "$PG_CONTAINER" --network host \
             -e POSTGRES_USER=bench \
             -e POSTGRES_PASSWORD=bench \
             -e POSTGRES_DB=benchmark \
-            -v httparena-pgdata:/var/lib/postgresql/data \
             -v "$ROOT_DIR/data/pgdb-seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro" \
             postgres:17-alpine \
             -c max_connections=256
-        for i in $(seq 1 90); do
+        for i in $(seq 1 60); do
             if docker exec "$PG_CONTAINER" pg_isready -U bench -d benchmark >/dev/null 2>&1; then
                 if docker exec "$PG_CONTAINER" psql -U bench -d benchmark -tAc "SELECT 1 FROM items LIMIT 1" 2>/dev/null | grep -q 1; then
                     echo "[postgres] Ready (seeded)"
                     break
                 fi
             fi
-            [ "$i" -eq 90 ] && { echo "FAIL: Postgres did not start"; exit 1; }
+            [ "$i" -eq 60 ] && { echo "FAIL: Postgres did not start"; exit 1; }
             sleep 1
         done
     fi
@@ -451,48 +502,83 @@ for profile in "${profiles_to_run[@]}"; do
     docker stop -t 5 "$CONTAINER_NAME" 2>/dev/null || true
     docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
 
-    docker_args=(-d --name "$CONTAINER_NAME" --network "$DOCKER_NETWORK" -p "$PORT:8080" -p "$H2PORT:8443"
-        --security-opt seccomp=unconfined
-        --ulimit memlock=-1:-1
-        --ulimit nofile="$HARD_NOFILE:$HARD_NOFILE"
-        -v "$ROOT_DIR/data/dataset.json:/data/dataset.json:ro"
-        -v "$ROOT_DIR/data/static:/data/static:ro"
-        -v "$CERTS_DIR:/certs:ro")
-    if [ "$endpoint" = "async-db" ] || [ "$endpoint" = "api-4" ] || [ "$endpoint" = "api-16" ]; then
-        docker_args+=(-e "DATABASE_URL=postgres://bench:bench@$PG_CONTAINER:5432/benchmark")
-        docker_args+=(-e "DATABASE_MAX_CONN=256")
-    fi
-    if [ "$endpoint" = "api-4" ]; then
-        docker_args+=(--memory=16g --memory-swap=16g)
-    fi
-    if [ "$endpoint" = "api-16" ]; then
-        docker_args+=(--memory=32g --memory-swap=32g)
-    fi
-    if [ -n "$cpu_limit" ]; then
-        if [[ "$cpu_limit" == *-* ]]; then
-            docker_args+=(--cpuset-cpus="$cpu_limit")
-        else
-            # Cap CPU limit to available cores
-            if [ "$cpu_limit" -gt "$AVAILABLE_CORES" ] 2>/dev/null; then
-                echo "[warn] Profile requests ${cpu_limit} CPUs but only ${AVAILABLE_CORES} available — capping to ${AVAILABLE_CORES}"
-                cpu_limit="$AVAILABLE_CORES"
-            fi
-            docker_args+=(--cpus="$cpu_limit")
+    GATEWAY_MODE=false
+    GATEWAY_PROJECT="httparena-${FRAMEWORK}"
+    if [ "$endpoint" = "gateway-64" ]; then
+        GATEWAY_MODE=true
+        GATEWAY_COMPOSE="$ROOT_DIR/frameworks/$FRAMEWORK/compose.gateway.yml"
+
+        if [ ! -f "$GATEWAY_COMPOSE" ]; then
+            echo "FAIL: compose.gateway.yml not found in frameworks/$FRAMEWORK"
+            continue
         fi
+
+        # Stop any previous compose stack
+        CERTS_DIR="$CERTS_DIR" DATA_DIR="$ROOT_DIR/data" DATABASE_URL="postgres://bench:bench@localhost:5432/benchmark" \
+            docker compose -f "$GATEWAY_COMPOSE" -p "$GATEWAY_PROJECT" down --remove-orphans 2>/dev/null || true
+
+        # Start the compose stack
+        echo "[gateway] Starting compose stack..."
+        CERTS_DIR="$CERTS_DIR" DATA_DIR="$ROOT_DIR/data" DATABASE_URL="postgres://bench:bench@localhost:5432/benchmark" \
+            docker compose -f "$GATEWAY_COMPOSE" -p "$GATEWAY_PROJECT" up -d || { echo "FAIL: gateway compose up"; continue; }
+
+        # Discover container IDs for stats collection — wait briefly then list all running containers in the project
+        sleep 2
+        GATEWAY_CONTAINERS=$(docker ps -q --filter "label=com.docker.compose.project=$GATEWAY_PROJECT" 2>/dev/null | tr '\n' ' ')
+        GATEWAY_CONTAINER_COUNT=$(echo "$GATEWAY_CONTAINERS" | wc -w)
+        echo "[gateway] containers ($GATEWAY_CONTAINER_COUNT): $GATEWAY_CONTAINERS"
+        if [ "$GATEWAY_CONTAINER_COUNT" -lt 2 ]; then
+            echo "[gateway] WARNING: expected at least 2 containers, found $GATEWAY_CONTAINER_COUNT — stats may not sum correctly"
+        fi
+    else
+        # Standard single-container mode
+        docker_args=(-d --name "$CONTAINER_NAME" --network host
+            --security-opt seccomp=unconfined
+            --ulimit memlock=-1:-1
+            --ulimit nofile="$HARD_NOFILE:$HARD_NOFILE"
+            -v "$ROOT_DIR/data/dataset.json:/data/dataset.json:ro"
+            -v "$ROOT_DIR/data/static:/data/static:ro"
+            -v "$CERTS_DIR:/certs:ro")
+        if [ "$endpoint" = "async-db" ] || [ "$endpoint" = "api-4" ] || [ "$endpoint" = "api-16" ]; then
+            docker_args+=(-e "DATABASE_URL=postgres://bench:bench@localhost:5432/benchmark")
+            docker_args+=(-e "DATABASE_MAX_CONN=256")
+        fi
+        if [ "$endpoint" = "api-4" ]; then
+            docker_args+=(--memory=16g --memory-swap=16g)
+        fi
+        if [ "$endpoint" = "api-16" ]; then
+            docker_args+=(--memory=32g --memory-swap=32g)
+        fi
+        if [ -n "$cpu_limit" ]; then
+            if [[ "$cpu_limit" == *-* ]]; then
+                docker_args+=(--cpuset-cpus="$cpu_limit")
+            else
+                # Cap CPU limit to available cores
+                if [ "$cpu_limit" -gt "$AVAILABLE_CPUS" ] 2>/dev/null; then
+                    echo "[warn] Profile requests ${cpu_limit} CPUs but only ${AVAILABLE_CPUS} available — capping to ${AVAILABLE_CPUS}"
+                    cpu_limit="$AVAILABLE_CPUS"
+                fi
+                docker_args+=(--cpus="$cpu_limit")
+            fi
+        fi
+        docker run "${docker_args[@]}" "$IMAGE_NAME"
     fi
-    docker run "${docker_args[@]}" "$IMAGE_NAME"
 
     # Wait for server
     echo "[wait] Waiting for server..."
-    if [ "$endpoint" = "grpc" ] || [ "$endpoint" = "grpc-tls" ]; then
-        PROTO_FILE=$(find "$ROOT_DIR/frameworks/$FRAMEWORK" -name 'benchmark.proto' -type f | head -1)
-        if [ "$endpoint" = "grpc-tls" ]; then
+    if [ "$endpoint" = "grpc" ] || [ "$endpoint" = "grpc-tls" ] || \
+       [ "$endpoint" = "grpc-stream" ] || [ "$endpoint" = "grpc-stream-tls" ]; then
+        PROTO_FILE="$REQUESTS_DIR/benchmark.proto"
+        [ -f "$PROTO_FILE" ] || PROTO_FILE=$(find "$ROOT_DIR/frameworks/$FRAMEWORK" -name 'benchmark.proto' -type f | head -1)
+        if [[ "$endpoint" == *-tls ]]; then
             local_grpc_check="localhost:$H2PORT"
+            local_grpc_flag="--skipTLS"
         else
             local_grpc_check="localhost:$PORT"
+            local_grpc_flag="--insecure"
         fi
         for i in $(seq 1 30); do
-            if $GHZ --insecure --proto "$PROTO_FILE" \
+            if $GHZ $local_grpc_flag --proto "$PROTO_FILE" \
                 --call benchmark.BenchmarkService/GetSum \
                 -d '{"a":1,"b":2}' -c 1 -n 1 \
                 "$local_grpc_check" >/dev/null 2>&1; then
@@ -509,6 +595,8 @@ for profile in "${profiles_to_run[@]}"; do
     else
         if [ "$endpoint" = "h3" ] || [ "$endpoint" = "static-h3" ]; then
             local_check_url="https://localhost:$H2PORT/baseline2?a=1&b=1"
+        elif [ "$endpoint" = "gateway-64" ]; then
+            local_check_url="https://localhost:$H2PORT/static/reset.css"
         elif [ "$endpoint" = "h2" ] || [ "$endpoint" = "static-h2" ]; then
             local_check_url="https://localhost:$H2PORT/static/reset.css"
             [ "$endpoint" = "h2" ] && local_check_url="https://localhost:$H2PORT/baseline2?a=1&b=1"
@@ -518,6 +606,8 @@ for profile in "${profiles_to_run[@]}"; do
             local_check_url="http://localhost:$PORT/static/reset.css"
         elif [ "$endpoint" = "json" ]; then
             local_check_url="http://localhost:$PORT/json/1"
+        elif [ "$endpoint" = "json-tls" ]; then
+            local_check_url="https://localhost:$H1TLS_PORT/json/1?m=1"
         elif [ "$endpoint" = "ws-echo" ]; then
             local_check_url="http://localhost:$PORT/ws"
         else
@@ -541,95 +631,137 @@ for profile in "${profiles_to_run[@]}"; do
     # Build load generator args based on profile endpoint
     USE_H2LOAD=false
     USE_OHA=false
+    USE_WRK=false
+    USE_GHZ=false
     if [ "$endpoint" = "ws-echo" ]; then
-        gc_args=("http://$CONTAINER_NAME:8080/ws"
+        gc_args=("http://localhost:$PORT/ws"
             --ws
             -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline")
     elif [ "$endpoint" = "grpc" ]; then
         USE_H2LOAD=true
-        gc_args=(docker run --rm --network "$DOCKER_NETWORK"
-            -v "$REQUESTS_DIR:$REQUESTS_DIR:ro"
-            "$H2LOAD_IMAGE"
-            "http://$CONTAINER_NAME:8080/benchmark.BenchmarkService/GetSum"
+        gc_args=("${H2LOAD_CMD[@]}"
+            "http://localhost:$PORT/benchmark.BenchmarkService/GetSum"
             -d "$REQUESTS_DIR/grpc-sum.bin"
             -H 'content-type: application/grpc'
             -H 'te: trailers'
             -c "$CONNS" -m 100 -t "$H2THREADS" -D "$DURATION")
     elif [ "$endpoint" = "grpc-tls" ]; then
         USE_H2LOAD=true
-        gc_args=(docker run --rm --network "$DOCKER_NETWORK"
-            -v "$REQUESTS_DIR:$REQUESTS_DIR:ro"
-            "$H2LOAD_IMAGE"
-            "https://$CONTAINER_NAME:8443/benchmark.BenchmarkService/GetSum"
+        gc_args=("${H2LOAD_CMD[@]}"
+            "https://localhost:$H2PORT/benchmark.BenchmarkService/GetSum"
             -d "$REQUESTS_DIR/grpc-sum.bin"
             -H 'content-type: application/grpc'
             -H 'te: trailers'
             -c "$CONNS" -m 100 -t "$H2THREADS" -D "$DURATION")
+    elif [ "$endpoint" = "grpc-stream" ] || [ "$endpoint" = "grpc-stream-tls" ]; then
+        USE_GHZ=true
+        # 4 streams multiplexed per TCP connection with count=5000. Empirically
+        # the optimal clean shape under TLS: ~8.6M msgs/sec with <2% error rate
+        # and ~145ms average latency. Denser ratios (8:1) push the error rate
+        # to 10% under TLS without meaningfully raising throughput.
+        ghz_workers=$((CONNS * 4))
+        ghz_msgs_per_call=5000
+        if [ "$endpoint" = "grpc-stream-tls" ]; then
+            ghz_target="localhost:$H2PORT"
+            ghz_tls_flag=--skipTLS
+        else
+            ghz_target="localhost:$PORT"
+            ghz_tls_flag=--insecure
+        fi
+        gc_args=("$GHZ" "$ghz_tls_flag"
+            --proto "$REQUESTS_DIR/benchmark.proto"
+            --call benchmark.BenchmarkService/StreamSum
+            -d "{\"a\":1,\"b\":2,\"count\":$ghz_msgs_per_call}"
+            --connections "$CONNS" -c "$ghz_workers"
+            -z "$DURATION"
+            "$ghz_target")
     elif [ "$endpoint" = "static-h3" ]; then
         USE_H2LOAD=true
-        gc_args=(docker run --rm --network "$DOCKER_NETWORK"
-            -v "$REQUESTS_DIR:$REQUESTS_DIR:ro"
-            "$H2LOAD_H3_IMAGE" --alpn-list=h3
+        gc_args=("${H2LOAD_H3_CMD[@]}" --alpn-list=h3
             -i "$REQUESTS_DIR/static-h2-uris.txt"
+            -H "Accept-Encoding: br;q=1, gzip;q=0.8"
             -c "$CONNS" -m 64 -t "$H3THREADS" -D "$DURATION")
     elif [ "$endpoint" = "h3" ]; then
         USE_H2LOAD=true
-        gc_args=(docker run --rm --network "$DOCKER_NETWORK"
-            "$H2LOAD_H3_IMAGE" --alpn-list=h3
-            "https://$CONTAINER_NAME:8443/baseline2?a=1&b=1"
+        gc_args=("${H2LOAD_H3_CMD[@]}" --alpn-list=h3
+            "https://localhost:$H2PORT/baseline2?a=1&b=1"
             -c "$CONNS" -m 64 -t "$H3THREADS" -D "$DURATION")
+    elif [ "$endpoint" = "gateway-64" ]; then
+        USE_H2LOAD=true
+        gc_args=("${H2LOAD_CMD[@]}"
+            -i "$REQUESTS_DIR/gateway-64-uris.txt"
+            -H "Accept-Encoding: br;q=1, gzip;q=0.8"
+            -c "$CONNS" -m 100 -t "$H2THREADS" -D "$DURATION")
     elif [ "$endpoint" = "static-h2" ]; then
         USE_H2LOAD=true
-        gc_args=(docker run --rm --network "$DOCKER_NETWORK"
-            -v "$REQUESTS_DIR:$REQUESTS_DIR:ro"
-            "$H2LOAD_IMAGE"
+        gc_args=("${H2LOAD_CMD[@]}"
             -i "$REQUESTS_DIR/static-h2-uris.txt"
+            -H "Accept-Encoding: br;q=1, gzip;q=0.8"
             -c "$CONNS" -m 100 -t "$H2THREADS" -D "$DURATION")
     elif [ "$endpoint" = "h2" ]; then
         USE_H2LOAD=true
-        gc_args=(docker run --rm --network "$DOCKER_NETWORK"
-            "$H2LOAD_IMAGE"
-            "https://$CONTAINER_NAME:8443/baseline2?a=1&b=1"
+        gc_args=("${H2LOAD_CMD[@]}"
+            "https://localhost:$H2PORT/baseline2?a=1&b=1"
             -c "$CONNS" -m 100 -t "$H2THREADS" -D "$DURATION")
     elif [ "$endpoint" = "pipeline" ]; then
-        gc_args=("http://$CONTAINER_NAME:8080/pipeline"
+        gc_args=("http://localhost:$PORT/pipeline"
             -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline")
     elif [ "$endpoint" = "upload" ]; then
-        gc_args=("http://$CONTAINER_NAME:8080"
+        gc_args=("http://localhost:$PORT"
             --raw "$REQUESTS_DIR/upload-500k.raw,$REQUESTS_DIR/upload-2m.raw,$REQUESTS_DIR/upload-10m.raw,$REQUESTS_DIR/upload-20m.raw"
             -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline" -r 5)
     elif [ "$endpoint" = "api-4" ] || [ "$endpoint" = "api-16" ]; then
-        gc_args=("http://$CONTAINER_NAME:8080"
+        gc_args=("http://localhost:$PORT"
             --raw "$REQUESTS_DIR/get.raw,$REQUESTS_DIR/get.raw,$REQUESTS_DIR/get.raw,$REQUESTS_DIR/json-get.raw,$REQUESTS_DIR/json-get.raw,$REQUESTS_DIR/json-get.raw,$REQUESTS_DIR/async-db-get.raw,$REQUESTS_DIR/async-db-get.raw"
             -c "$CONNS" -t 64 -d 15s -p "$pipeline")
     elif [ "$endpoint" = "async-db" ]; then
-        gc_args=("http://$CONTAINER_NAME:8080"
+        gc_args=("http://localhost:$PORT"
             --raw "$REQUESTS_DIR/async-db-5.raw,$REQUESTS_DIR/async-db-10.raw,$REQUESTS_DIR/async-db-20.raw,$REQUESTS_DIR/async-db-35.raw,$REQUESTS_DIR/async-db-50.raw"
             -c "$CONNS" -t "$THREADS" -d 10s -p "$pipeline" -r 25)
     elif [ "$endpoint" = "static" ]; then
-        gc_args=("http://$CONTAINER_NAME:8080"
-            --raw "$REQUESTS_DIR/static-reset.css.raw,$REQUESTS_DIR/static-layout.css.raw,$REQUESTS_DIR/static-theme.css.raw,$REQUESTS_DIR/static-components.css.raw,$REQUESTS_DIR/static-utilities.css.raw,$REQUESTS_DIR/static-analytics.js.raw,$REQUESTS_DIR/static-helpers.js.raw,$REQUESTS_DIR/static-app.js.raw,$REQUESTS_DIR/static-vendor.js.raw,$REQUESTS_DIR/static-router.js.raw,$REQUESTS_DIR/static-header.html.raw,$REQUESTS_DIR/static-footer.html.raw,$REQUESTS_DIR/static-regular.woff2.raw,$REQUESTS_DIR/static-bold.woff2.raw,$REQUESTS_DIR/static-logo.svg.raw,$REQUESTS_DIR/static-icon-sprite.svg.raw,$REQUESTS_DIR/static-hero.webp.raw,$REQUESTS_DIR/static-thumb1.webp.raw,$REQUESTS_DIR/static-thumb2.webp.raw,$REQUESTS_DIR/static-manifest.json.raw"
-            --recv-buf 16384
-            -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline")
+        USE_WRK=true
+        gc_args=("${WRK_CMD[@]}" -t "$THREADS" -c "$CONNS" -d "$DURATION"
+            -s "$REQUESTS_DIR/static-rotate.lua"
+            "http://localhost:$PORT")
+    elif [ "$endpoint" = "json-tls" ]; then
+        USE_WRK=true
+        gc_args=("${WRK_CMD[@]}" -t "$THREADS" -c "$CONNS" -d "$DURATION"
+            -s "$REQUESTS_DIR/json-tls-rotate.lua"
+            "https://localhost:$H1TLS_PORT")
     elif [ "$endpoint" = "json" ]; then
-        gc_args=("http://$CONTAINER_NAME:8080"
+        gc_args=("http://localhost:$PORT"
             --raw "$REQUESTS_DIR/json-1.raw,$REQUESTS_DIR/json-5.raw,$REQUESTS_DIR/json-10.raw,$REQUESTS_DIR/json-15.raw,$REQUESTS_DIR/json-25.raw,$REQUESTS_DIR/json-40.raw,$REQUESTS_DIR/json-50.raw"
             -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline" -r 25)
     elif [ "$endpoint" = "json-compressed" ]; then
-        gc_args=("http://$CONTAINER_NAME:8080"
+        gc_args=("http://localhost:$PORT"
             --raw "$REQUESTS_DIR/json-gzip-1.raw,$REQUESTS_DIR/json-gzip-5.raw,$REQUESTS_DIR/json-gzip-10.raw,$REQUESTS_DIR/json-gzip-15.raw,$REQUESTS_DIR/json-gzip-25.raw,$REQUESTS_DIR/json-gzip-40.raw,$REQUESTS_DIR/json-gzip-50.raw"
             -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline" -r 25)
     elif [ -n "${CUSTOM_RAW:-}" ]; then
-        gc_args=("http://$CONTAINER_NAME:8080"
+        gc_args=("http://localhost:$PORT"
             --raw "$CUSTOM_RAW"
             -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline")
     else
-        gc_args=("http://$CONTAINER_NAME:8080"
+        gc_args=("http://localhost:$PORT"
             --raw "$REQUESTS_DIR/get.raw,$REQUESTS_DIR/post_cl.raw,$REQUESTS_DIR/post_chunked.raw"
+            --recv-buf 512
             -c "$CONNS" -t "$THREADS" -d "$DURATION" -p "$pipeline")
     fi
-    if [ "$USE_H2LOAD" = "false" ] && [ "$req_per_conn" -gt 0 ] 2>/dev/null; then
+    if [ "$USE_H2LOAD" = "false" ] && [ "$USE_WRK" = "false" ] && [ "$USE_GHZ" = "false" ] && [ "$req_per_conn" -gt 0 ] 2>/dev/null; then
         gc_args+=(-r "$req_per_conn")
+    fi
+
+    # Warm-up for ghz: Kestrel (and most gRPC servers) need a few seconds of
+    # traffic before their thread pool and accept loop are fully hot. Without
+    # this, the first measured run can burst 128 connections into a cold
+    # accept backlog and see "connection refused" errors on most of them.
+    if [ "$USE_GHZ" = "true" ]; then
+        echo "[warmup] ghz 2s"
+        taskset -c "$GCANNON_CPUS" "$GHZ" "$ghz_tls_flag" \
+            --proto "$REQUESTS_DIR/benchmark.proto" \
+            --call benchmark.BenchmarkService/StreamSum \
+            -d "{\"a\":1,\"b\":2,\"count\":$ghz_msgs_per_call}" \
+            --connections "$CONNS" -c "$ghz_workers" \
+            -z 2s "$ghz_target" >/dev/null 2>&1 || true
     fi
 
     # Best-of-N runs
@@ -643,19 +775,41 @@ for profile in "${profiles_to_run[@]}"; do
         echo "[run $run/$RUNS]"
 
         stats_log=$(mktemp)
-        while true; do
-            docker stats --no-stream --format '{{.CPUPerc}} {{.MemUsage}}' "$CONTAINER_NAME" >> "$stats_log" 2>/dev/null
-        done &
-        stats_pid=$!
+        if [ "${GATEWAY_MODE:-false}" = "true" ]; then
+            # Collect stats from all compose containers — sum CPU and memory per snapshot
+            while true; do
+                docker stats --no-stream --format '{{.CPUPerc}} {{.MemUsage}}' $GATEWAY_CONTAINERS 2>/dev/null | \
+                    awk '{
+                        gsub(/%/,"",$1); cpu+=$1;
+                        split($2,a,"/"); v=a[1]; gsub(/[^0-9.]/,"",v);
+                        if($2 ~ /GiB/) v=v*1024;
+                        mem+=v+0
+                    } END { if(NR>0) printf "%.1f%% %.1fMiB\n", cpu, mem }' >> "$stats_log"
+            done &
+            stats_pid=$!
+        else
+            while true; do
+                docker stats --no-stream --format '{{.CPUPerc}} {{.MemUsage}}' "$CONTAINER_NAME" >> "$stats_log" 2>/dev/null
+            done &
+            stats_pid=$!
+        fi
 
-        if [ "$USE_OHA" = "true" ]; then
-            timeout --foreground 45 "${gc_args[@]}" || true
+        if [ "$USE_WRK" = "true" ]; then
+            output=$(timeout 45 taskset -c "$GCANNON_CPUS" "${gc_args[@]}" 2>&1) || true
+        elif [ "$USE_OHA" = "true" ]; then
+            timeout --foreground 45 taskset -c "$GCANNON_CPUS" "${gc_args[@]}" || true
             output=$(cat "$oha_out" 2>/dev/null)
             rm -f "$oha_out"
         elif [ "$USE_H2LOAD" = "true" ]; then
-            output=$(timeout 45 "${gc_args[@]}" 2>&1) || true
+            output=$(timeout 45 taskset -c "$GCANNON_CPUS" "${gc_args[@]}" 2>&1) || true
+        elif [ "$USE_GHZ" = "true" ]; then
+            output=$(timeout 45 taskset -c "$GCANNON_CPUS" "${gc_args[@]}" 2>&1) || true
+        elif [ "$GCANNON_MODE" = "native" ]; then
+            output=$(timeout 45 taskset -c "$GCANNON_CPUS" \
+                env LD_LIBRARY_PATH=/usr/lib "$GCANNON" "${gc_args[@]}" 2>&1) || true
         else
-            output=$(timeout 45 docker run --rm --network "$DOCKER_NETWORK" \
+            output=$(timeout 45 docker run --rm --network host \
+                --cpuset-cpus="$GCANNON_CPUS" \
                 --security-opt seccomp=unconfined \
                 --ulimit memlock=-1:-1 \
                 --ulimit nofile=1048576:1048576 \
@@ -672,13 +826,31 @@ for profile in "${profiles_to_run[@]}"; do
         echo "$output" | grep -Ev '^(Warm-up (started|phase)|Main benchmark duration (is started|is over)|Stopped all clients|progress: [0-9]+% of clients started)' || true
         echo "  CPU: $avg_cpu | Mem: $peak_mem"
 
-        if [ "$USE_OHA" = "true" ]; then
+        if [ "$USE_WRK" = "true" ]; then
+            # wrk: "Requests/sec: 1283707.14"
+            rps_int=$(echo "$output" | grep -oP 'Requests/sec:\s+\K[\d.]+' | cut -d. -f1 || echo "0")
+            rps_int=${rps_int:-0}
+        elif [ "$USE_OHA" = "true" ]; then
             # oha JSON: .summary.requestsPerSec
             rps_int=$(echo "$output" | python3 -c "import sys,json; d=json.load(sys.stdin); print(int(d['summary']['requestsPerSec']))" 2>/dev/null || echo "0")
             rps_int=${rps_int:-0}
         elif [ "$USE_H2LOAD" = "true" ]; then
             # h2load: "finished in 5.00s, 123456.78 req/s, 45.67MB/s"
             rps_int=$(echo "$output" | grep -oP 'finished in [\d.]+s, \K[\d.]+' | cut -d. -f1 || echo "0")
+            rps_int=${rps_int:-0}
+        elif [ "$USE_GHZ" = "true" ]; then
+            # ghz's "Requests/sec" counts *all* attempts including errors, so
+            # runs where the server rejected connections (connect refused during
+            # ramp-up) get a misleadingly high headline number. Use only OK
+            # responses divided by the configured duration, then multiply by
+            # msgs_per_call to get real successful messages/sec.
+            ok_count=$(echo "$output" | grep -oP '\[OK\]\s+\K\d+' | head -1 || echo "0")
+            dur_s=${DURATION%s}
+            if [ -z "$ok_count" ] || [ -z "$dur_s" ] || [ "$dur_s" = "0" ]; then
+                rps_int=0
+            else
+                rps_int=$(python3 -c "print(int(($ok_count / $dur_s) * ${ghz_msgs_per_call:-1}))" 2>/dev/null || echo "0")
+            fi
             rps_int=${rps_int:-0}
         else
             duration_secs=$(echo "$output" | grep -oP '(?:requests|frames sent) in ([\d.]+)s' | grep -oP '[\d.]+' || echo "1")
@@ -707,23 +879,39 @@ for profile in "${profiles_to_run[@]}"; do
     echo "=== Best: ${best_rps} req/s (CPU: $best_cpu, Mem: $best_mem) ==="
 
     # Extract metrics
-    if [ "$USE_OHA" = "true" ]; then
+    if [ "$USE_WRK" = "true" ]; then
+        # wrk: "Latency   3.70ms    8.37ms 279.91ms   96.41%"
+        avg_lat=$(echo "$best_output" | grep "Latency" | head -1 | awk '{print $2}')
+        p99_lat="$avg_lat"  # wrk doesn't report p99; use avg as placeholder
+        reconnects="0"
+        bandwidth=$(echo "$best_output" | grep -oP 'Transfer/sec:\s+\K\S+' || echo "0")
+        # wrk: "12966401 requests in 10.10s, 188.34GB read"
+        total_reqs=$(echo "$best_output" | grep -oP '(\d+) requests in' | grep -oP '\d+' || echo "0")
+        status_2xx=$total_reqs; status_3xx=0; status_4xx=0; status_5xx=0
+    elif [ "$USE_OHA" = "true" ]; then
         # oha JSON: .summary.average (seconds), .latencyPercentiles.p99 (seconds)
         avg_lat=$(echo "$best_output" | python3 -c "import sys,json; d=json.load(sys.stdin); v=d['summary']['average']; print(f'{v*1e6:.0f}us' if v<0.001 else f'{v*1000:.2f}ms')" 2>/dev/null || echo "—")
         p99_lat=$(echo "$best_output" | python3 -c "import sys,json; d=json.load(sys.stdin); v=d['latencyPercentiles']['p99']; print(f'{v*1e6:.0f}us' if v<0.001 else f'{v*1000:.2f}ms')" 2>/dev/null || echo "—")
         reconnects="0"
         bandwidth=$(echo "$best_output" | python3 -c "import sys,json; d=json.load(sys.stdin); v=d['summary']['sizePerSec']; print(f'{v/1024/1024:.2f}MB/s' if v>0 else '0')" 2>/dev/null || echo "0")
     elif [ "$USE_H2LOAD" = "true" ]; then
-        # h2 "time for request:" → mean at $6; h3 "request :" table → mean at $8, p99 at $7
+        # h2load: "time for request:  min  max  mean  sd  +/-sd" all on one line
+        # h2 "time for request:" line → mean at $6; h3 "request     :" line → mean at $8, p99 at $7
         if echo "$best_output" | grep -q '^[[:space:]]*request[[:space:]]*:'; then
             avg_lat=$(echo "$best_output" | awk '/^[[:space:]]*request[[:space:]]*:/{print $8; exit}')
             p99_lat=$(echo "$best_output" | awk '/^[[:space:]]*request[[:space:]]*:/{print $7; exit}')
         else
             avg_lat=$(echo "$best_output" | awk '/time for request:/{print $6}')
-            p99_lat="$avg_lat"
+            p99_lat="$avg_lat"  # h2load h2 mode doesn't report p99; use mean as placeholder
         fi
         reconnects="0"
         bandwidth=$(echo "$best_output" | grep -oP 'finished in [\d.]+s, [\d.]+ req/s, \K[\d.]+[KMGT]?B/s' || echo "0")
+    elif [ "$USE_GHZ" = "true" ]; then
+        # ghz: "Average: 12.34 ms", "Slowest: 56.78 ms" — per-call latency (not per-message).
+        avg_lat=$(echo "$best_output" | awk '/^\s*Average:/{print $2 $3; exit}')
+        p99_lat=$(echo "$best_output" | awk '/^\s*Slowest:/{print $2 $3; exit}')
+        reconnects="0"
+        bandwidth="0"
     else
         avg_lat=$(echo "$best_output" | grep "Latency" | head -1 | awk '{print $2}')
         p99_lat=$(echo "$best_output" | grep "Latency" | head -1 | awk '{print $5}')
@@ -731,9 +919,13 @@ for profile in "${profiles_to_run[@]}"; do
         bandwidth=$(echo "$best_output" | grep -oP 'Bandwidth:\s+\K\S+' || echo "0")
     fi
 
-    # Extract status codes
+    # Extract status codes (wrk sets them above in the latency section)
+    if [ "$USE_WRK" != "true" ]; then
     status_2xx=0; status_3xx=0; status_4xx=0; status_5xx=0
-    if [ "$USE_OHA" = "true" ]; then
+    fi
+    if [ "$USE_WRK" = "true" ]; then
+        : # already set above
+    elif [ "$USE_OHA" = "true" ]; then
         status_2xx=$(echo "$best_output" | python3 -c "import sys,json; d=json.load(sys.stdin).get('statusCodeDistribution',{}); print(sum(v for k,v in d.items() if 200<=int(k)<300))" 2>/dev/null || echo "0")
         status_3xx=$(echo "$best_output" | python3 -c "import sys,json; d=json.load(sys.stdin).get('statusCodeDistribution',{}); print(sum(v for k,v in d.items() if 300<=int(k)<400))" 2>/dev/null || echo "0")
         status_4xx=$(echo "$best_output" | python3 -c "import sys,json; d=json.load(sys.stdin).get('statusCodeDistribution',{}); print(sum(v for k,v in d.items() if 400<=int(k)<500))" 2>/dev/null || echo "0")
@@ -743,6 +935,12 @@ for profile in "${profiles_to_run[@]}"; do
         status_3xx=$(echo "$best_output" | grep -oP '\d+(?= 3xx)' || echo "0")
         status_4xx=$(echo "$best_output" | grep -oP '\d+(?= 4xx)' || echo "0")
         status_5xx=$(echo "$best_output" | grep -oP '\d+(?= 5xx)' || echo "0")
+    elif [ "$USE_GHZ" = "true" ]; then
+        # ghz prints "[OK]   N responses" for successful RPC calls. We surface this
+        # as status_2xx so it feeds into the same run_ok bookkeeping as other tools.
+        status_2xx=$(echo "$best_output" | grep -oP '\[OK\]\s+\K\d+' | head -1 || echo "0")
+        status_3xx=0; status_4xx=0
+        status_5xx=$(echo "$best_output" | grep -oP '\[Unavailable\]\s+\K\d+' | head -1 || echo "0")
     else
         if [ "$endpoint" = "ws-echo" ]; then
             status_2xx=$(echo "$best_output" | grep -oP 'WS frames:\s+\K\d+' || echo "0")
@@ -757,7 +955,7 @@ for profile in "${profiles_to_run[@]}"; do
 
     # Compute input bandwidth from raw template sizes × RPS
     input_bw=""
-    if [ "$USE_H2LOAD" = "false" ] && [ "$USE_OHA" = "false" ]; then
+    if [ "$USE_H2LOAD" = "false" ] && [ "$USE_OHA" = "false" ] && [ "$USE_WRK" = "false" ] && [ "$USE_GHZ" = "false" ]; then
         raw_arg=""
         prev_was_raw=false
         for arg in "${gc_args[@]}"; do
@@ -785,7 +983,7 @@ else: print(f'{bps}B/s')
 
     # Parse per-template response counts (gcannon mixed/multi-template output)
     tpl_json=""
-    if [ "$USE_H2LOAD" = "false" ] && [ "$USE_OHA" = "false" ]; then
+    if [ "$USE_H2LOAD" = "false" ] && [ "$USE_OHA" = "false" ] && [ "$USE_GHZ" = "false" ]; then
         tpl_line=$(echo "$best_output" | grep -oP 'Per-template-ok: \K.*' || echo "")
         if [ -n "$tpl_line" ] && ([ "$endpoint" = "api-4" ] || [ "$endpoint" = "api-16" ]); then
             # API-4 templates: get×3, json-get×3, async-db×2
@@ -804,6 +1002,19 @@ else: print(f'{bps}B/s')
         if [ -n "$tpl_line" ] && [ -n "${CUSTOM_TPL_PARSER:-}" ]; then
             tpl_json=$(echo "$best_output" | bash -c "$CUSTOM_TPL_PARSER")
         fi
+    fi
+
+    # Gateway-64: compute proportional split from h2load total (20 URIs: 12 static, 3 json, 3 async-db, 2 baseline)
+    if [ "$endpoint" = "gateway-64" ] && [ "${status_2xx:-0}" -gt 0 ]; then
+        t_static=$(( status_2xx * 12 / 20 ))
+        t_json=$(( status_2xx * 3 / 20 ))
+        t_async_db=$(( status_2xx * 3 / 20 ))
+        t_baseline=$(( status_2xx * 2 / 20 ))
+        tpl_json=",
+  \"tpl_static\": $t_static,
+  \"tpl_json\": $t_json,
+  \"tpl_async_db\": $t_async_db,
+  \"tpl_baseline\": $t_baseline"
     fi
 
     # Save results only with --save flag
@@ -836,19 +1047,35 @@ EOF
         # Save docker logs
         LOGS_DIR="$ROOT_DIR/site/static/logs/$profile/$CONNS"
         mkdir -p "$LOGS_DIR"
-        docker logs "$CONTAINER_NAME" > "$LOGS_DIR/${FRAMEWORK}.log" 2>&1 || true
-        # Truncate large logs (>10MB) to last 5000 lines
-        if [ -f "$LOGS_DIR/${FRAMEWORK}.log" ] && [ "$(stat -c%s "$LOGS_DIR/${FRAMEWORK}.log" 2>/dev/null)" -gt 10485760 ] 2>/dev/null; then
-            tail -5000 "$LOGS_DIR/${FRAMEWORK}.log" > "$LOGS_DIR/${FRAMEWORK}.log.tmp" && mv "$LOGS_DIR/${FRAMEWORK}.log.tmp" "$LOGS_DIR/${FRAMEWORK}.log"
+        if [ "${GATEWAY_MODE:-false}" != "true" ]; then
+            docker logs "$CONTAINER_NAME" > "$LOGS_DIR/${FRAMEWORK}.log" 2>&1 || true
+            # Truncate large logs (>10MB) to last 5000 lines
+            if [ -f "$LOGS_DIR/${FRAMEWORK}.log" ] && [ "$(stat -c%s "$LOGS_DIR/${FRAMEWORK}.log" 2>/dev/null)" -gt 10485760 ] 2>/dev/null; then
+                tail -5000 "$LOGS_DIR/${FRAMEWORK}.log" > "$LOGS_DIR/${FRAMEWORK}.log.tmp" && mv "$LOGS_DIR/${FRAMEWORK}.log.tmp" "$LOGS_DIR/${FRAMEWORK}.log"
+            fi
+            echo "[saved] site/static/logs/$profile/${CONNS}/${FRAMEWORK}.log"
         fi
-        echo "[saved] site/static/logs/$profile/${CONNS}/${FRAMEWORK}.log"
+        # Save per-service logs if gateway mode
+        if [ "${GATEWAY_MODE:-false}" = "true" ]; then
+            for svc in $(CERTS_DIR="$CERTS_DIR" DATA_DIR="$ROOT_DIR/data" DATABASE_URL="postgres://bench:bench@localhost:5432/benchmark" \
+                docker compose -f "$GATEWAY_COMPOSE" -p "$GATEWAY_PROJECT" ps --services 2>/dev/null); do
+                CERTS_DIR="$CERTS_DIR" DATA_DIR="$ROOT_DIR/data" DATABASE_URL="postgres://bench:bench@localhost:5432/benchmark" \
+                    docker compose -f "$GATEWAY_COMPOSE" -p "$GATEWAY_PROJECT" logs "$svc" > "$LOGS_DIR/${FRAMEWORK}-${svc}.log" 2>&1 || true
+                echo "[saved] site/static/logs/$profile/${CONNS}/${FRAMEWORK}-${svc}.log"
+            done
+        fi
     else
         echo "[dry-run] Results not saved (use --save to persist)"
     fi
 
-    # Stop container before next connection count
-    docker stop -t 5 "$CONTAINER_NAME" 2>/dev/null || true
-    docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+    # Stop container(s) before next connection count
+    if [ "${GATEWAY_MODE:-false}" = "true" ]; then
+        CERTS_DIR="$CERTS_DIR" DATA_DIR="$ROOT_DIR/data" DATABASE_URL="postgres://bench:bench@localhost:5432/benchmark" \
+            docker compose -f "$GATEWAY_COMPOSE" -p "$GATEWAY_PROJECT" down --remove-orphans 2>/dev/null || true
+    else
+        docker stop -t 5 "$CONTAINER_NAME" 2>/dev/null || true
+        docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
+    fi
 
     done # CONNS loop
 

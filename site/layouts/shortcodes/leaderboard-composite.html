@@ -12,7 +12,7 @@
   (dict "id" "async-db" "label" "Async DB" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 1024) "scored" true "engineScored" false)
   (dict "id" "baseline-h2" "label" "Baseline" "sublabel" "H/2" "proto" "h2" "conns" (slice 256 1024) "scored" true "engineScored" true)
   (dict "id" "static-h2" "label" "Static" "sublabel" "H/2" "proto" "h2" "conns" (slice 256 1024) "scored" true "engineScored" true)
-  (dict "id" "gateway-64" "label" "Gateway-64" "sublabel" "H/2 Gateway" "proto" "h2gw" "conns" (slice 256 1024) "scored" true "engineScored" true)
+  (dict "id" "gateway-64" "label" "Gateway-64" "sublabel" "H/2 Gateway" "proto" "h2gw" "conns" (slice 512 1024) "scored" true "engineScored" true)
   (dict "id" "unary-grpc" "label" "Unary" "sublabel" "gRPC" "proto" "grpc" "conns" (slice 256 1024) "scored" true "engineScored" true)
   (dict "id" "unary-grpc-tls" "label" "Unary TLS" "sublabel" "gRPC" "proto" "grpc" "conns" (slice 256 1024) "scored" true "engineScored" true)
   (dict "id" "stream-grpc" "label" "Stream" "sublabel" "gRPC" "proto" "grpc" "conns" (slice 64) "scored" true "engineScored" true)
@@ -600,6 +600,39 @@ function renderComposite() {
     }
   });
 
+  // For json-comp: reward better compression ratios by scaling rps against
+  // bytes-per-request. The framework with the smallest bytes/request wins the
+  // ratio contest; everyone else's effective rps is discounted by
+  // (minBpr / theirBpr)^2 — quadratic so a framework that ships twice as many
+  // bytes per response pays 4× in score. Mirrors the legacy /compression test.
+  var minBwPerReq = {};
+  if (activeIds.indexOf('json-comp') >= 0) {
+    var minVal = Infinity;
+    Object.keys(avgByProfile['json-comp'] || {}).forEach(function(fw) {
+      if (isExcluded(fw)) return;
+      var rps = avgByProfile['json-comp'][fw] || 0;
+      var bw = avgBwByProfile['json-comp'][fw] || 0;
+      if (rps > 0 && bw > 0) {
+        var bpr = bw / rps;
+        if (bpr < minVal) minVal = bpr;
+      }
+    });
+    if (minVal < Infinity) {
+      minBwPerReq['json-comp'] = minVal;
+      var maxAdj = 0;
+      Object.keys(avgByProfile['json-comp'] || {}).forEach(function(fw) {
+        if (isExcluded(fw)) return;
+        var rps = avgByProfile['json-comp'][fw] || 0;
+        var bw = avgBwByProfile['json-comp'][fw] || 0;
+        if (rps > 0 && bw > 0) {
+          var adj = rps * Math.pow(minVal / (bw / rps), 2);
+          if (adj > maxAdj) maxAdj = adj;
+        }
+      });
+      if (maxAdj > 0) maxRpsByProfile['json-comp'] = maxAdj;
+    }
+  }
+
   // Determine top-3 frameworks per profile for badges (always all profiles)
   var topFwByProfile = {}, secondFwByProfile = {}, thirdFwByProfile = {};
   allProfileIds.forEach(function(pid) {
@@ -618,6 +651,14 @@ function renderComposite() {
         if (isExcluded(fw)) return;
         var rps = avgByProfile[pid][fw] || 0;
         var score = rps;
+        // Match the json-comp bandwidth adjustment so badges reflect the
+        // composite-score winners, not raw rps.
+        if (pid === 'json-comp' && minBwPerReq['json-comp']) {
+          var bw = avgBwByProfile['json-comp'][fw] || 0;
+          if (bw > 0 && rps > 0) {
+            score = rps * Math.pow(minBwPerReq['json-comp'] / (bw / rps), 2);
+          }
+        }
         if (score > bestScore) { thirdScore = secondScore; thirdFw = secondFw; secondScore = bestScore; secondFw = bestFw; bestScore = score; bestFw = fw; }
         else if (score > secondScore) { thirdScore = secondScore; thirdFw = secondFw; secondScore = score; secondFw = fw; }
         else if (score > thirdScore) { thirdScore = score; thirdFw = fw; }
@@ -664,6 +705,14 @@ function renderComposite() {
         if ((pid === 'api-4' || pid === 'api-16') && avgTplByProfile[pid] && avgTplByProfile[pid][fw]) {
           var t = avgTplByProfile[pid][fw];
           effectiveRps = t.baseline * mixedWeights.baseline + t.json * mixedWeights.json + t.upload * mixedWeights.upload + (t.static || 0) * mixedWeights.static + (t.async_db || 0) * mixedWeights.async_db;
+        }
+        // For json-comp: discount rps by squared bytes-per-request ratio so
+        // better compression wins over raw throughput at the same rps.
+        if (pid === 'json-comp' && minBwPerReq['json-comp']) {
+          var bwJc = avgBwByProfile['json-comp'][fw] || 0;
+          if (bwJc > 0 && rps > 0) {
+            effectiveRps = rps * Math.pow(minBwPerReq['json-comp'] / (bwJc / rps), 2);
+          }
         }
         var rpsScore = (effectiveRps / maxRpsByProfile[pid]) * 100;
         var profileScore = rpsScore * wRps;
@@ -925,9 +974,13 @@ function renderComposite() {
       } else {
         var color = scored ? (s >= 85 ? '#16a34a' : s >= 70 ? '#65a30d' : s >= 50 ? '#ca8a04' : s >= 30 ? '#ea580c' : '#dc2626') : '#94a3b8';
         var suffix = '';
-        var rps = avgByProfile[pid][r.framework];
-        var rpsStr = rps >= 1000000 ? (rps / 1000000).toFixed(1) + 'M' : rps >= 10000 ? (rps / 1000).toFixed(0) + 'K' : rps >= 1000 ? (rps / 1000).toFixed(1) + 'K' : Math.round(rps);
-        suffix = ' <span style="font-size:0.6rem; color:#94a3b8; font-weight:400;">(' + rpsStr + ')</span>';
+        // json-comp is scored by a compression-weighted formula, not raw rps —
+        // showing the rps in parens is misleading (the score doesn't track it).
+        if (pid !== 'json-comp') {
+          var rps = avgByProfile[pid][r.framework];
+          var rpsStr = rps >= 1000000 ? (rps / 1000000).toFixed(1) + 'M' : rps >= 10000 ? (rps / 1000).toFixed(0) + 'K' : rps >= 1000 ? (rps / 1000).toFixed(1) + 'K' : Math.round(rps);
+          suffix = ' <span style="font-size:0.6rem; color:#94a3b8; font-weight:400;">(' + rpsStr + ')</span>';
+        }
         profileCells += '<div class="lb-stat" style="text-align:right; color:' + color + '; font-weight:500;' + bgStyle + '">' + s.toFixed(1) + suffix + '</div>';
       }
     });
