@@ -1,5 +1,5 @@
 {
-  "date": "2026-04-16",
+  "date": "2026-04-17",
   "cpu": "AMD Ryzen Threadripper PRO 3995WX 64-Cores",
   "cores": "64",
   "threads": "128",
@@ -9,10 +9,10 @@
   "kernel": "6.17.0-20-generic",
   "docker": "29.3.0",
   "docker_runtime": "runc",
-  "governor": "powersave",
-  "commit": "e5b3ac38",
+  "governor": "performance",
+  "commit": "3b7bdce6",
   "tcp": {
-    "lo_mtu": "65536",
+    "lo_mtu": "1500",
     "congestion": "cubic",
     "somaxconn": "65535",
     "rmem_max": "7500000",

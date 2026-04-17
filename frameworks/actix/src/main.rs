@@ -87,35 +87,15 @@ struct JsonResponse {
     count: usize,
 }
 
-// AppState is wrapped by web::Data which is already an Arc — no need to double-wrap
 struct AppState {
     dataset: Vec<DatasetItem>,
-    json_cache: JsonCache,
 }
-
-struct JsonCached {
-    identity: Bytes,
-    gzip: Bytes,
-    brotli: Bytes,
-}
-
-type JsonCache = HashMap<(usize, i64), JsonCached>;
-
-// (count, m) pairs the benchmark + validation script fires. Precomputing covers
-// 100% of hot-path traffic; anything outside this set falls through to dynamic
-// serialization in json_endpoint.
-const JSON_CACHE_PAIRS: &[(usize, i64)] = &[
-    // benchmark: json-gzip-{1,5,10,15,25,40,50}.raw
-    (1, 3), (5, 7), (10, 2), (15, 5), (25, 4), (40, 8), (50, 6),
-    // validation: validate.sh json-comp checks
-    (12, 9), (31, 4), (50, 1),
-];
 
 fn gzip_bytes(input: &[u8]) -> Bytes {
     use flate2::write::GzEncoder;
     use flate2::Compression;
     use std::io::Write;
-    let mut enc = GzEncoder::new(Vec::with_capacity(input.len()), Compression::new(6));
+    let mut enc = GzEncoder::new(Vec::with_capacity(input.len()), Compression::new(1));
     enc.write_all(input).ok();
     Bytes::from(enc.finish().unwrap_or_default())
 }
@@ -124,7 +104,7 @@ fn brotli_bytes(input: &[u8]) -> Bytes {
     use std::io::Write;
     let mut out = Vec::with_capacity(input.len());
     {
-        let mut enc = brotli::CompressorWriter::new(&mut out, 4096, 11, 22);
+        let mut enc = brotli::CompressorWriter::new(&mut out, 4096, 1, 22);
         enc.write_all(input).ok();
         enc.flush().ok();
     }
@@ -152,25 +132,6 @@ fn build_json_body(dataset: &[DatasetItem], count: usize, m: i64) -> Vec<u8> {
         .collect();
     let resp = JsonResponse { count, items };
     serde_json::to_vec(&resp).unwrap_or_default()
-}
-
-fn build_json_cache(dataset: &[DatasetItem]) -> JsonCache {
-    let mut cache = HashMap::new();
-    for &(count, m) in JSON_CACHE_PAIRS {
-        let body = build_json_body(dataset, count, m);
-        let identity = Bytes::from(body.clone());
-        let gzip = gzip_bytes(&body);
-        let brotli = brotli_bytes(&body);
-        cache.insert(
-            (count, m),
-            JsonCached {
-                identity,
-                gzip,
-                brotli,
-            },
-        );
-    }
-    cache
 }
 
 fn load_dataset() -> Vec<DatasetItem> {
@@ -341,7 +302,6 @@ async fn upload(mut payload: web::Payload) -> HttpResponse {
         .body(size.to_string())
 }
 
-// web::Data<AppState> — no Arc wrapping, web::Data handles it internally
 async fn json_endpoint(
     req: actix_web::HttpRequest,
     state: web::Data<AppState>,
@@ -356,35 +316,6 @@ async fn json_endpoint(
         .and_then(|v| v.to_str().ok())
         .unwrap_or("");
 
-    // Hot path: precomputed (count, m) pair. Serve bytes directly and skip both
-    // JSON serialization and runtime compression.
-    if let Some(cached) = state.json_cache.get(&(count, m)) {
-        if ae.contains("br") {
-            return HttpResponse::Ok()
-                .insert_header((SERVER, SERVER_HDR.clone()))
-                .insert_header(("Content-Type", "application/json"))
-                .insert_header(("Content-Encoding", "br"))
-                .insert_header(("Vary", "Accept-Encoding"))
-                .body(cached.brotli.clone());
-        }
-        if ae.contains("gzip") {
-            return HttpResponse::Ok()
-                .insert_header((SERVER, SERVER_HDR.clone()))
-                .insert_header(("Content-Type", "application/json"))
-                .insert_header(("Content-Encoding", "gzip"))
-                .insert_header(("Vary", "Accept-Encoding"))
-                .body(cached.gzip.clone());
-        }
-        return HttpResponse::Ok()
-            .insert_header((SERVER, SERVER_HDR.clone()))
-            .insert_header(("Content-Type", "application/json"))
-            .insert_header(("Vary", "Accept-Encoding"))
-            .body(cached.identity.clone());
-    }
-
-    // Fallback: dynamic serialization for non-cached queries (validation edge
-    // cases, manual curl, etc.). Still honors Accept-Encoding by compressing
-    // inline so the response is correct.
     let body = build_json_body(&state.dataset, count, m);
     if ae.contains("br") {
         return HttpResponse::Ok()
@@ -496,12 +427,7 @@ fn load_tls_config() -> Option<ServerConfig> {
 #[actix_web::main]
 async fn main() -> io::Result<()> {
     let dataset = load_dataset();
-    let json_cache = build_json_cache(&dataset);
-
-    let state = web::Data::new(AppState {
-        dataset,
-        json_cache,
-    });
+    let state = web::Data::new(AppState { dataset });
 
     let static_assets = web::Data::new(load_static_assets());
 
