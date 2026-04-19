@@ -13,8 +13,9 @@ bind = "0.0.0.0:8081"
 workers = _WRK_COUNT
 keepalive = 120
 loglevel = 'critical'
-accesslog = "-"
+accesslog = None
 errorlog = "-"
+disable_redirect_access_to_syslog = True
 pidfile = "gunicorn_ssl.pid"
 worker_class = "sync"
 

@@ -111,8 +111,10 @@ CPU efficiency was intentionally dropped: a framework that leaves CPU on the tab
 For each profile, compute the efficiency ratio for every framework:
 
 ```
-memEfficiency = rps / memoryMB
+memEfficiency = sqrt(rps) / memoryMB
 ```
+
+Why `sqrt(rps)` instead of `rps`? A plain `rps / MB` ratio double-counts throughput: high-rps frameworks would win both `rpsScore` *and* `memScore` because `rps` dominates the ratio. Taking the square root dampens rps to log-scale — it still matters (a dead framework shouldn't win "efficiency"), but memory can now actually move the needle.
 
 Normalize against the best efficiency in that profile:
 
@@ -130,19 +132,19 @@ With the toggle on, per-profile scores range 0–150 (up to 100 from throughput,
 
 ### Example
 
-| Framework | RPS | Mem (MB) | rps/MB |
+| Framework | RPS | Mem (MB) | sqrt(rps)/MB |
 |---|---|---|---|
-| A | 500,000 | 50 | 10,000 |
-| B | 100,000 | 20 | 5,000 |
+| A | 500,000 | 50 | 14.14 |
+| B | 100,000 | 20 | 15.81 |
 
 - RPS scores: A = 100, B = 20
-- Memory efficiency scores: A = 100 (best), B = 50
+- Memory efficiency scores: A = 89.4, B = 100 (best)
 
 With the memory toggle on:
-- A: `100 + 0.5 × 100 = 150.0`
-- B: `20 + 0.5 × 50 = 45.0`
+- A: `100 + 0.5 × 89.4 = 144.7`
+- B: `20 + 0.5 × 100 = 70.0`
 
-A leads on both axes and pulls the maximum bonus; B picks up a partial bonus for its lower absolute memory footprint but its 5× throughput deficit still dominates.
+B actually wins the memory term despite A's 5× throughput advantage, because `sqrt(rps)` only gives A a √5 ≈ 2.24× boost in the numerator — not enough to beat B's 2.5× memory savings. A still wins overall thanks to its raw throughput lead, but B's lean memory footprint is now rewarded meaningfully instead of being drowned out.
 
 ## Engine-level implementations
 

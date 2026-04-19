@@ -94,6 +94,13 @@
     "type": "production",
     "engine": "jsc"
   },
+  "fastapi": {
+    "dir": "fastapi",
+    "description": "FastAPI async web framework on Uvicorn (uvloop)",
+    "repo": "https://github.com/fastapi/fastapi",
+    "type": "production",
+    "engine": "uvicorn"
+  },
   "fastpysgi-asgi": {
     "dir": "fastpysgi-asgi",
     "description": "An ultra fast WSGI/ASGI server for Python",
@@ -107,6 +114,13 @@
     "repo": "https://github.com/remittor/fastpysgi",
     "type": "engine",
     "engine": "libuv"
+  },
+  "flask": {
+    "dir": "flask",
+    "description": "Flask web framework on Gunicorn with sync workers",
+    "repo": "https://github.com/pallets/flask",
+    "type": "production",
+    "engine": "gunicorn"
   },
   "Fletch": {
     "dir": "fletch",

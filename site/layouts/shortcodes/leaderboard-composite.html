@@ -569,7 +569,7 @@ function renderComposite() {
       if (rps > maxRpsByProfile[pid]) maxRpsByProfile[pid] = rps;
       var mem = avgMemByProfile[pid][fw] || 0;
       if (mem > 0 && rps > 0) {
-        var memEff = rps / mem;
+        var memEff = Math.sqrt(rps) / mem;
         if (memEff > maxMemEffByProfile[pid]) maxMemEffByProfile[pid] = memEff;
       }
     });
@@ -681,7 +681,8 @@ function renderComposite() {
   // CPU but produces less throughput already scores worse on rps alone, so
   // rewarding "low CPU" as its own factor double-counted the signal.
   // Memory (when toggled) adds a 0..50 bonus on top of the rpsScore:
-  // memScore = (rps / memMB) / best(rps / memMB) × 100, then × 0.5.
+  // memEff = sqrt(rps) / memMB (sqrt dampens rps so memory can actually
+  // win against throughput), memScore = (memEff / best) × 100, then × 0.5.
   // High rps + low memory can reach ~150; high rps + bloated memory stays
   // near 100; low rps gets little from either term. The composite is the
   // SUM across scored profiles (not the mean), so larger numbers separate
@@ -715,7 +716,7 @@ function renderComposite() {
         if (useMem && maxMemEffByProfile[pid] > 0) {
           var fwMem = avgMemByProfile[pid][fw] || 0;
           if (fwMem > 0) {
-            var memEff = rps / fwMem;
+            var memEff = Math.sqrt(rps) / fwMem;
             var memScore = (memEff / maxMemEffByProfile[pid]) * 100;
             profileScore += memScore * 0.5;
           }
