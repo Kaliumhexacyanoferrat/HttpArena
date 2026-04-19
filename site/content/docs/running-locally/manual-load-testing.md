@@ -32,7 +32,7 @@ If you need postgres for `async-db` / `api-*`:
 docker run -d --name httparena-postgres --network host \
     -e POSTGRES_USER=bench -e POSTGRES_PASSWORD=bench -e POSTGRES_DB=benchmark \
     -v "$(pwd)/data/pgdb-seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro" \
-    postgres:17-alpine -c max_connections=256
+    postgres:18 -c max_connections=256
 ```
 
 ### Option B: your own binary
