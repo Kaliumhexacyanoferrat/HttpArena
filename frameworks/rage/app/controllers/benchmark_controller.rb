@@ -10,6 +10,7 @@ class Hash
 end
 
 class BenchmarkController < RageController::API
+  SERVER_NAME = 'rage'.freeze
   DATA_DIR = ENV.fetch('DATA_DIR', '/data')
 
   dataset_path = File.join DATA_DIR, 'dataset.json'
@@ -18,7 +19,7 @@ class BenchmarkController < RageController::API
       item.symbolize_keys!
       item[:rating].symbolize_keys!
       item
-    end
+    end.freeze
   end
   def self.dataset_items = @dataset_items
 
@@ -27,7 +28,7 @@ class BenchmarkController < RageController::API
   PG_QUERY = 'SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN $1 AND $2 LIMIT $3'
 
   before_action do
-    headers["server"] = "rage"
+    headers["server"] = SERVER_NAME
   end
 
   def pipeline
