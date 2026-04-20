@@ -741,7 +741,16 @@ function renderComposite() {
   Object.keys(allFw).forEach(function(fw) {
     if (isExcluded(fw)) return;
     var scores = [];
-    var participated = 0;
+    // Visibility is separate from scoring: a row shows up whenever the
+    // framework has *any* data in the active profile set (hasAnyData),
+    // while the composite total sums only profiles that are scored for
+    // that framework's type (scoredCount / composite). Conflating the
+    // two was hiding infrastructure frameworks on every non-H/1.1-isolated
+    // tab because profileInfraScored is only true for baseline/pipelined/
+    // limited-conn/static — nginx/h2o then showed 0 scored profiles on
+    // an H/2 or H/3 tab and were dropped entirely.
+    var hasAnyData = false;
+    var scoredCount = 0;
     activeIds.forEach(function(pid) {
       if (avgByProfile[pid] && avgByProfile[pid][fw] && maxRpsByProfile[pid] > 0) {
         var rps = avgByProfile[pid][fw];
@@ -770,22 +779,18 @@ function renderComposite() {
           }
         }
         scores.push(profileScore);
-        if (isScoredForFw(pid, fw)) participated++;
+        hasAnyData = true;
+        if (isScoredForFw(pid, fw)) scoredCount++;
       } else {
         scores.push(0);
       }
     });
-    var composite;
-    if (participated === 0) {
-      return;
-    } else {
-      var sum = 0;
-      activeIds.forEach(function(pid, i) {
-        if (isScoredForFw(pid, fw) && scores[i] > 0) sum += scores[i];
-      });
-      composite = sum;
-    }
-    results.push({ framework: fw, language: fwLang[fw] || '', scores: scores, composite: composite, participated: participated });
+    if (!hasAnyData) return;
+    var sum = 0;
+    activeIds.forEach(function(pid, i) {
+      if (isScoredForFw(pid, fw) && scores[i] > 0) sum += scores[i];
+    });
+    results.push({ framework: fw, language: fwLang[fw] || '', scores: scores, composite: sum, participated: scoredCount });
   });
   // Sort by active column
   if (compositeSortCol === 'composite' || compositeSortCol === null) {
