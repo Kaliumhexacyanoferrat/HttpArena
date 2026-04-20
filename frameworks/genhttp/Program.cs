@@ -20,6 +20,7 @@ host.Bind(IPAddress.Any, 8080);
 
 if (hasCert)
 {
+    host.Bind(IPAddress.Any, 8081, X509Certificate2.CreateFromPemFile(certPath, keyPath));
     host.Bind(IPAddress.Any, 8443, X509Certificate2.CreateFromPemFile(certPath, keyPath));
 }
 
