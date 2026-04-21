@@ -136,6 +136,26 @@
     "status_5xx": 0
   },
   {
+    "framework": "bjoern",
+    "language": "Python",
+    "rps": 98987,
+    "avg_latency": "41.24ms",
+    "p99_latency": "43.70ms",
+    "cpu": "432.3%",
+    "memory": "190MiB",
+    "connections": 4096,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 1,
+    "bandwidth": "11.79MB/s",
+    "input_bw": "7.65MB/s",
+    "reconnects": 0,
+    "status_2xx": 494935,
+    "status_3xx": 0,
+    "status_4xx": 0,
+    "status_5xx": 0
+  },
+  {
     "framework": "caddy",
     "language": "Go",
     "rps": 480030,

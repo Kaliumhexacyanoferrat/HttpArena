@@ -120,6 +120,26 @@
     "status_5xx": 0
   },
   {
+    "framework": "bjoern",
+    "language": "Python",
+    "rps": 825,
+    "avg_latency": "38.66ms",
+    "p99_latency": "71.00ms",
+    "cpu": "397.5%",
+    "memory": "2.1GiB",
+    "connections": 32,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 1,
+    "bandwidth": "104.27KB/s",
+    "input_bw": "6.54GB/s",
+    "reconnects": 824,
+    "status_2xx": 4136,
+    "status_3xx": 0,
+    "status_4xx": 0,
+    "status_5xx": 0
+  },
+  {
     "framework": "elysia",
     "language": "TS",
     "rps": 1502,
