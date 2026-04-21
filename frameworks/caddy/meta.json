@@ -1,16 +1,11 @@
 {
   "display_name": "caddy",
   "language": "Go",
-  "type": "engine",
+  "type": "infrastructure",
   "engine": "caddy",
-  "description": "Caddy web server with a custom handler module for benchmark endpoints, native HTTP/2 support.",
+  "description": "Caddy with a custom Go handler module for /baseline11, compiled via xcaddy. Native file_server for /static.",
   "repo": "https://github.com/caddyserver/caddy",
   "enabled": true,
-  "tests": [
-    "baseline",
-    "pipelined",
-    "limited-conn",
-    "baseline-h2",
-    "static-h2"
-  ]
+  "tests": ["baseline", "pipelined", "limited-conn", "static"],
+  "maintainers": []
 }

@@ -1,24 +1,23 @@
 {
   "display_name": "flask",
   "language": "Python",
-  "type": "tuned",
+  "type": "production",
   "engine": "gunicorn",
-  "description": "Flask web framework on Gunicorn with sync workers, one worker per CPU core.",
+  "description": "Flask web framework on Gunicorn with sync workers",
   "repo": "https://github.com/pallets/flask",
   "enabled": true,
   "tests": [
     "baseline",
     "pipelined",
-    "noisy",
     "limited-conn",
     "json",
+    "json-comp",
+    "json-tls",
     "upload",
-    "compression",
     "api-4",
     "api-16",
     "async-db",
-    "sync-db",
-    "static",
-    "tcp-frag"
-  ]
+    "static"
+  ],
+  "maintainers": []
 }

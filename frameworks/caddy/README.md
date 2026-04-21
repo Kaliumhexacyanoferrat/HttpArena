@@ -1,29 +1,25 @@
 # caddy
 
-Caddy web server with a custom Go handler module for all benchmark endpoints, native HTTP/2 and HTTP/3 support.
+Caddy with a custom Go handler module (`httparena`) compiled into the caddy binary via `xcaddy`. Static files are served by Caddy's native `file_server`.
 
 ## Stack
 
-- **Language:** Go 1.24
-- **Framework:** Caddy 2.9.1 + custom `httparena` module
-- **Build:** `xcaddy` builder, `debian:bookworm-slim` runtime
+- **Language:** Go
+- **Engine:** Caddy v2.8.x
+- **Build:** `golang:1.22-bookworm` (xcaddy) -> `debian:bookworm-slim` runtime
 
 ## Endpoints
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/pipeline` | GET | Returns `ok` (plain text) |
-| `/baseline11` | GET/POST | Sums query parameter values (+ body for POST) |
-| `/baseline2` | GET | Sums query parameter values (HTTP/2 variant) |
-| `/json` | GET | Processes 50-item dataset, serializes JSON |
-| `/compression` | GET | Gzip-compressed large JSON response |
-| `/db` | GET | SQLite range query with JSON response |
-| `/upload` | POST | Receives 1 MB body, returns byte count |
-| `/static` | GET | Serves preloaded static files |
+| `/baseline11` | GET | Sums query parameter values |
+| `/baseline11` | POST | Sums query parameters + request body |
+| `/static/{filename}` | GET | Serves static files from `/data/static` |
 
 ## Notes
 
-- Custom Caddy module registered via `caddy.RegisterModule`
-- Connection pool sized to `runtime.NumCPU()`
-- Gzip encoding level 1 via Caddy config
-- Both HTTP and HTTPS listeners via Caddyfile
+- `httparena/` is a self-contained Go module; `xcaddy build --with <import path>=./httparena` plugs it into the caddy binary at build time.
+- The handler accepts only GET and POST; other methods get `405`.
+- Query values that fail to parse as `int64` are skipped (matches nginx/h2o reference behavior).
+- HTTP/1.1 on port 8080. No TLS, no HTTP/3.
+- `auto_https off`, `admin off`, access log discarded.

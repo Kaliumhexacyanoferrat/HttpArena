@@ -69,60 +69,60 @@ html.dark .test-card-endpoint { color: #64748b; }
 
 <div class="tests-section">
 <h2>20 Test Profiles Across H/1.1, H/2, H/3, gRPC and WebSocket</h2>
-<p class="tests-sub">Every framework is tested under diverse, realistic workloads — from raw throughput to compression, gRPC unary calls, and WebSocket echo.</p>
+<p class="tests-sub">Every framework is tested under diverse, realistic workloads — from raw throughput to JSON processing, gRPC unary calls, and WebSocket echo.</p>
 
 <div class="tests-proto">
 <span class="tests-proto-label tests-proto-h1">H/1.1 Isolated</span>
 <div class="tests-grid">
-  <a class="test-card" href="docs/test-profiles/h1/baseline">
+  <a class="test-card" href="docs/test-profiles/h1/isolated/baseline">
     <div class="test-card-title">Baseline</div>
     <div class="test-card-desc">Mixed GET/POST with keep-alive connections, query parsing, and chunked encoding.</div>
     <div class="test-card-endpoint">GET/POST /baseline11</div>
   </a>
-  <a class="test-card" href="docs/test-profiles/h1/short-lived">
+  <a class="test-card" href="docs/test-profiles/h1/isolated/short-lived">
     <div class="test-card-title">Short-lived Connection</div>
     <div class="test-card-desc">Connections closed after 10 requests — measures TCP handshake overhead.</div>
     <div class="test-card-endpoint">GET/POST /baseline11 (10 req/conn)</div>
   </a>
-  <a class="test-card" href="docs/test-profiles/h1/json-processing">
+  <a class="test-card" href="docs/test-profiles/h1/isolated/json-processing">
     <div class="test-card-title">JSON Processing</div>
     <div class="test-card-desc">Load dataset, compute derived fields, serialize ~10 KB JSON response.</div>
-    <div class="test-card-endpoint">GET /json</div>
+    <div class="test-card-endpoint">GET /json/{count}</div>
   </a>
-  <a class="test-card" href="docs/test-profiles/h1/upload">
+  <a class="test-card" href="docs/test-profiles/h1/isolated/json-compressed">
+    <div class="test-card-title">JSON Compressed</div>
+    <div class="test-card-desc">Same JSON workload with <code>Accept-Encoding: gzip, br</code> — measures serialization + compression.</div>
+    <div class="test-card-endpoint">GET /json/{count}?m=N</div>
+  </a>
+  <a class="test-card" href="docs/test-profiles/h1/isolated/json-tls">
+    <div class="test-card-title">JSON over TLS</div>
+    <div class="test-card-desc">Same JSON workload over HTTP/1.1 + TLS on port 8081 — measures encryption overhead on top of serialization.</div>
+    <div class="test-card-endpoint">GET /json/{count}?m=N (HTTPS :8081)</div>
+  </a>
+  <a class="test-card" href="docs/test-profiles/h1/isolated/upload">
     <div class="test-card-title">Upload (20 MB)</div>
     <div class="test-card-desc">Ingest a 20 MB binary payload and return its byte count.</div>
     <div class="test-card-endpoint">POST /upload</div>
   </a>
-  <a class="test-card" href="docs/test-profiles/h1/compression">
-    <div class="test-card-title">Compression</div>
-    <div class="test-card-desc">Serve ~1 MB JSON with gzip compression. Bandwidth-adjusted scoring.</div>
-    <div class="test-card-endpoint">GET /compression (gzip)</div>
-  </a>
-  <a class="test-card" href="docs/test-profiles/h1/noisy">
-    <div class="test-card-title">Noisy (Resilience)</div>
-    <div class="test-card-desc">Valid requests mixed with malformed noise — bad paths, bad content-length, binary. Only 2xx count.</div>
-    <div class="test-card-endpoint">GET/POST /baseline11 + noise</div>
-  </a>
-  <a class="test-card" href="docs/test-profiles/h1/async-database">
+  <a class="test-card" href="docs/test-profiles/h1/isolated/async-database">
     <div class="test-card-title">Async Database (Postgres)</div>
     <div class="test-card-desc">Async Postgres query over 100K rows — tests event loop scheduling, connection pooling, and async driver efficiency.</div>
-    <div class="test-card-endpoint">GET /async-db</div>
+    <div class="test-card-endpoint">GET /async-db?limit=N</div>
   </a>
-  <a class="test-card" href="docs/test-profiles/h1/static">
+  <a class="test-card" href="docs/test-profiles/h1/isolated/static">
     <div class="test-card-title">Static Files</div>
-    <div class="test-card-desc">Round-robin across 20 pre-loaded static files — CSS, JS, HTML, fonts, images.</div>
+    <div class="test-card-desc">Round-robin across 20 static files — CSS, JS, HTML, fonts, images.</div>
     <div class="test-card-endpoint">GET /static/*</div>
   </a>
-  <a class="test-card" href="docs/test-profiles/h1/tcp-frag">
-    <div class="test-card-title">TCP Fragmentation</div>
-    <div class="test-card-desc">Baseline workload with MTU 69 — every packet fragmented into ~29-byte segments. Stress tests TCP reassembly.</div>
-    <div class="test-card-endpoint">GET/POST /baseline11 (MTU 69)</div>
-  </a>
-  <a class="test-card" href="docs/test-profiles/h1/pipelined">
+  <a class="test-card" href="docs/test-profiles/h1/isolated/pipelined">
     <div class="test-card-title">Pipelined (16x)</div>
     <div class="test-card-desc">16 requests sent back-to-back per connection. Tests pipeline batching.</div>
     <div class="test-card-endpoint">GET /pipeline</div>
+  </a>
+  <a class="test-card" href="docs/test-profiles/h1/isolated/crud">
+    <div class="test-card-title">CRUD (REST API)</div>
+    <div class="test-card-desc">Realistic REST API with paginated list, cached reads, create, and update against Postgres.</div>
+    <div class="test-card-endpoint">GET/POST/PUT /crud/items</div>
   </a>
 </div>
 </div>
@@ -130,11 +130,6 @@ html.dark .test-card-endpoint { color: #64748b; }
 <div class="tests-proto">
 <span class="tests-proto-label tests-proto-h1">H/1.1 Workload</span>
 <div class="tests-grid">
-  <a class="test-card" href="docs/test-profiles/h1/mixed">
-    <div class="test-card-title">Mixed Workload</div>
-    <div class="test-card-desc">Realistic mix of baseline, JSON, DB, upload, and compression requests with weighted scoring.</div>
-    <div class="test-card-endpoint">GET/POST mixed endpoints (100 req/conn)</div>
-  </a>
   <a class="test-card" href="docs/test-profiles/h1/workload/api-4">
     <div class="test-card-title">API-4</div>
     <div class="test-card-desc">Lighter workload (baseline, JSON, async-db) constrained to 4 CPUs and 16 GB memory — measures efficiency under limited resources.</div>
@@ -158,8 +153,29 @@ html.dark .test-card-endpoint { color: #64748b; }
   </a>
   <a class="test-card" href="docs/test-profiles/h2/static-h2">
     <div class="test-card-title">Static Files</div>
-    <div class="test-card-desc">Round-robin across 20 pre-loaded static files — CSS, JS, HTML, fonts, images.</div>
+    <div class="test-card-desc">Round-robin across 20 static files — CSS, JS, HTML, fonts, images.</div>
     <div class="test-card-endpoint">GET /static/* (h2)</div>
+  </a>
+</div>
+</div>
+
+<div class="tests-proto">
+<span class="tests-proto-label tests-proto-h2">Gateway</span>
+<div class="tests-grid">
+  <a class="test-card" href="docs/test-profiles/gateway/gateway-h2">
+    <div class="test-card-title">Gateway H2</div>
+    <div class="test-card-desc">Two-service proxy + server stack over HTTP/2 + TLS. Mixed workload: static, JSON, baseline, async-db.</div>
+    <div class="test-card-endpoint">proxy:8443 → server (h2)</div>
+  </a>
+  <a class="test-card" href="docs/test-profiles/gateway/gateway-h3">
+    <div class="test-card-title">Gateway H3</div>
+    <div class="test-card-desc">Same two-service stack as Gateway H2 but with HTTP/3 + QUIC at the edge.</div>
+    <div class="test-card-endpoint">proxy:8443 → server (h3/quic)</div>
+  </a>
+  <a class="test-card" href="docs/test-profiles/gateway/production-stack">
+    <div class="test-card-title">Production Stack H2</div>
+    <div class="test-card-desc">Four-service CRUD API: edge + Redis + JWT auth sidecar + server. 10K-item cache-aside, concurrent reads + writes.</div>
+    <div class="test-card-endpoint">edge:8443 → authsvc → server → redis/postgres</div>
   </a>
 </div>
 </div>
@@ -192,6 +208,16 @@ html.dark .test-card-endpoint { color: #64748b; }
     <div class="test-card-title">Unary (TLS)</div>
     <div class="test-card-desc">Same unary gRPC call over encrypted HTTP/2 with TLS 1.3.</div>
     <div class="test-card-endpoint">BenchmarkService/GetSum (TLS)</div>
+  </a>
+  <a class="test-card" href="docs/test-profiles/grpc/stream">
+    <div class="test-card-title">Stream (h2c)</div>
+    <div class="test-card-desc">Server-streaming gRPC over cleartext HTTP/2 — sustained message throughput over a single long-lived call.</div>
+    <div class="test-card-endpoint">BenchmarkService/StreamSums (h2c)</div>
+  </a>
+  <a class="test-card" href="docs/test-profiles/grpc/stream">
+    <div class="test-card-title">Stream (TLS)</div>
+    <div class="test-card-desc">Same server-streaming gRPC call over encrypted HTTP/2 with TLS 1.3.</div>
+    <div class="test-card-endpoint">BenchmarkService/StreamSums (TLS)</div>
   </a>
 </div>
 </div>

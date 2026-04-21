@@ -1,9 +1,9 @@
 {
   "display_name": "workerman",
   "language": "PHP",
-  "type": "tuned",
+  "type": "production",
   "engine": "workerman",
-  "description": "Workerman with PHP content handlers for all benchmark endpoints.",
+  "description": "An asynchronous event driven PHP socket framework. Supports HTTP, Websocket, SSL and other custom protocols.",
   "repo": "https://github.com/walkor/Workerman",
   "enabled": true,
   "tests": [
@@ -11,14 +11,14 @@
     "pipelined",
     "limited-conn",
     "json",
-    "upload",
-    "compression",
-    "noisy",
+    "json-tls",
     "static",
-    "tcp-frag",
     "api-4",
     "api-16",
     "async-db",
-    "sync-db"
+    "upload"
+  ],
+  "maintainers": [
+    "joanhey"
   ]
 }

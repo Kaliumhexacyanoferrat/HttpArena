@@ -2,8 +2,8 @@
   "display_name": "elysia",
   "language": "TS",
   "type": "production",
-  "engine": "bun",
-  "description": "Ergonomic TypeScript framework built for Bun with end-to-end type safety and excellent DX.",
+  "engine": "jsc",
+  "description": "An ergonomic framework for Humans",
   "repo": "https://github.com/elysiajs/elysia",
   "enabled": true,
   "tests": [
@@ -11,13 +11,12 @@
     "pipelined",
     "limited-conn",
     "json",
+    "json-comp",
     "upload",
-    "compression",
     "api-4",
     "api-16",
     "async-db",
-    "sync-db",
-    "static",
-    "tcp-frag"
-  ]
+    "static"
+  ],
+  "maintainers": ["saltyaom"]
 }

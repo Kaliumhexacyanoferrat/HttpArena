@@ -15,14 +15,10 @@ fn cgroup_cpus() -> usize {
 
 use actix_files::Files;
 use actix_web::http::header::{ContentType, HeaderValue, SERVER};
+use actix_web::middleware::Compress;
 use actix_web::{web, App, HttpResponse, HttpServer};
-use bytes::Bytes;
 use deadpool_postgres::{Manager, ManagerConfig, Pool as PgPool, RecyclingMethod};
-use flate2::write::GzEncoder;
-use flate2::Compression;
 use futures_util::StreamExt;
-use r2d2::Pool as SqlitePool;
-use r2d2_sqlite::SqliteConnectionManager;
 use rustls::ServerConfig;
 use serde::{Deserialize, Serialize};
 use std::io;
@@ -38,13 +34,19 @@ struct BaselineQuery {
 // Shared query struct for both DB endpoints — replaces manual query string parsing
 #[derive(Deserialize)]
 struct PriceQuery {
-    min: Option<f64>,
-    max: Option<f64>,
+    min: Option<i32>,
+    max: Option<i32>,
+    limit: Option<i32>,
+}
+
+#[derive(Deserialize)]
+struct JsonQuery {
+    m: Option<i64>,
 }
 
 #[derive(Deserialize, Clone)]
 struct Rating {
-    score: f64,
+    score: i64,
     count: i64,
 }
 
@@ -53,30 +55,30 @@ struct DatasetItem {
     id: i64,
     name: String,
     category: String,
-    price: f64,
+    price: i64,
     quantity: i64,
     active: bool,
     tags: Vec<String>,
     rating: Rating,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct RatingOut {
-    score: f64,
+    score: i64,
     count: i64,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 struct ProcessedItem {
     id: i64,
     name: String,
     category: String,
-    price: f64,
+    price: i64,
     quantity: i64,
     active: bool,
     tags: Vec<String>,
     rating: RatingOut,
-    total: f64,
+    total: i64,
 }
 
 #[derive(Serialize)]
@@ -85,23 +87,13 @@ struct JsonResponse {
     count: usize,
 }
 
-// AppState is wrapped by web::Data which is already an Arc — no need to double-wrap
 struct AppState {
     dataset: Vec<DatasetItem>,
-    // Bytes is cheaply cloneable (ref-counted), safe to clone per-request
-    json_large_cache: Bytes,
 }
 
-fn load_dataset() -> Vec<DatasetItem> {
-    let path = std::env::var("DATASET_PATH").unwrap_or_else(|_| "/data/dataset.json".to_string());
-    match std::fs::read_to_string(&path) {
-        Ok(data) => serde_json::from_str(&data).unwrap_or_default(),
-        Err(_) => Vec::new(),
-    }
-}
-
-fn build_json_cache(dataset: &[DatasetItem]) -> Bytes {
-    let items: Vec<ProcessedItem> = dataset
+fn build_json_body(dataset: &[DatasetItem], count: usize, m: i64) -> Vec<u8> {
+    let count = count.min(dataset.len());
+    let items: Vec<ProcessedItem> = dataset[..count]
         .iter()
         .map(|d| ProcessedItem {
             id: d.id,
@@ -115,14 +107,19 @@ fn build_json_cache(dataset: &[DatasetItem]) -> Bytes {
                 score: d.rating.score,
                 count: d.rating.count,
             },
-            total: (d.price * d.quantity as f64 * 100.0).round() / 100.0,
+            total: d.price * d.quantity * m,
         })
         .collect();
-    let resp = JsonResponse {
-        count: items.len(),
-        items,
-    };
-    Bytes::from(serde_json::to_vec(&resp).unwrap_or_default())
+    let resp = JsonResponse { count, items };
+    serde_json::to_vec(&resp).unwrap_or_default()
+}
+
+fn load_dataset() -> Vec<DatasetItem> {
+    let path = std::env::var("DATASET_PATH").unwrap_or_else(|_| "/data/dataset.json".to_string());
+    match std::fs::read_to_string(&path) {
+        Ok(data) => serde_json::from_str(&data).unwrap_or_default(),
+        Err(_) => Vec::new(),
+    }
 }
 
 async fn pipeline() -> HttpResponse {
@@ -136,6 +133,7 @@ async fn baseline11_get(query: web::Query<BaselineQuery>) -> HttpResponse {
     let sum = query.a.unwrap_or(0) + query.b.unwrap_or(0);
     HttpResponse::Ok()
         .insert_header((SERVER, SERVER_HDR.clone()))
+        .content_type(ContentType::plaintext())
         .body(sum.to_string())
 }
 
@@ -156,6 +154,7 @@ async fn baseline2(query: web::Query<BaselineQuery>) -> HttpResponse {
     let sum = query.a.unwrap_or(0) + query.b.unwrap_or(0);
     HttpResponse::Ok()
         .insert_header((SERVER, SERVER_HDR.clone()))
+        .content_type(ContentType::plaintext())
         .body(sum.to_string())
 }
 
@@ -172,115 +171,21 @@ async fn upload(mut payload: web::Payload) -> HttpResponse {
         .body(size.to_string())
 }
 
-// web::Data<AppState> — no Arc wrapping, web::Data handles it internally
-async fn json_endpoint(state: web::Data<AppState>) -> HttpResponse {
-    if state.dataset.is_empty() {
-        return HttpResponse::InternalServerError().body("No dataset");
-    }
-    let items: Vec<ProcessedItem> = state
-        .dataset
-        .iter()
-        .map(|d| ProcessedItem {
-            id: d.id,
-            name: d.name.clone(),
-            category: d.category.clone(),
-            price: d.price,
-            quantity: d.quantity,
-            active: d.active,
-            tags: d.tags.clone(),
-            rating: RatingOut {
-                score: d.rating.score,
-                count: d.rating.count,
-            },
-            total: (d.price * d.quantity as f64 * 100.0).round() / 100.0,
-        })
-        .collect();
-    let resp = JsonResponse {
-        count: items.len(),
-        items,
-    };
-    let body = serde_json::to_vec(&resp).unwrap_or_default();
+// JSON endpoint. Serialize fresh per request with serde_json; the Compress
+// middleware on the App handles Accept-Encoding negotiation and response
+// encoding so the handler body stays encoding-agnostic.
+async fn json_endpoint(
+    state: web::Data<AppState>,
+    path: web::Path<usize>,
+    query: web::Query<JsonQuery>,
+) -> HttpResponse {
+    let count = path.into_inner().min(state.dataset.len());
+    let m = query.m.unwrap_or(1);
+    let body = build_json_body(&state.dataset, count, m);
     HttpResponse::Ok()
         .insert_header((SERVER, SERVER_HDR.clone()))
         .content_type(ContentType::json())
         .body(body)
-}
-
-async fn compression(req: actix_web::HttpRequest, state: web::Data<AppState>) -> HttpResponse {
-    let accepts_gzip = req
-        .headers()
-        .get("accept-encoding")
-        .and_then(|v| v.to_str().ok())
-        .map(|v| v.contains("gzip"))
-        .unwrap_or(false);
-
-    if accepts_gzip {
-        let mut encoder = GzEncoder::new(Vec::new(), Compression::fast());
-        std::io::Write::write_all(&mut encoder, &state.json_large_cache).unwrap();
-        let compressed = encoder.finish().unwrap();
-        HttpResponse::Ok()
-            .insert_header(("Content-Type", "application/json"))
-            .insert_header(("Content-Encoding", "gzip"))
-            .insert_header(("Server", "actix"))
-            .body(compressed)
-    } else {
-        HttpResponse::Ok()
-            .insert_header(("Server", "actix"))
-            .content_type(ContentType::json())
-            .body(state.json_large_cache.clone())
-    }
-}
-
-async fn db_endpoint(
-    query: web::Query<PriceQuery>,
-    pool: web::Data<Option<SqlitePool<SqliteConnectionManager>>>,
-) -> HttpResponse {
-    let pool = match pool.as_ref() {
-        Some(p) => p.clone(),
-        None => {
-            return HttpResponse::Ok()
-                .insert_header((SERVER, SERVER_HDR.clone()))
-                .content_type(ContentType::json())
-                .body(r#"{"items":[],"count":0}"#);
-        }
-    };
-    let min = query.min.unwrap_or(10.0);
-    let max = query.max.unwrap_or(50.0);
-
-    // SQLite is synchronous — offload to the blocking thread pool so we don't stall the runtime
-    let items = web::block(move || {
-        let conn = pool.get().unwrap();
-        let mut stmt = conn.prepare_cached(
-            "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count \
-             FROM items WHERE price BETWEEN ?1 AND ?2 LIMIT 50",
-        ).unwrap();
-        let rows = stmt.query_map(rusqlite::params![min, max], |row| {
-            Ok(serde_json::json!({
-                "id": row.get::<_, i64>(0)?,
-                "name": row.get::<_, String>(1)?,
-                "category": row.get::<_, String>(2)?,
-                "price": row.get::<_, f64>(3)?,
-                "quantity": row.get::<_, i64>(4)?,
-                "active": row.get::<_, i64>(5)? == 1,
-                "tags": serde_json::from_str::<serde_json::Value>(
-                    &row.get::<_, String>(6)?
-                ).unwrap_or_default(),
-                "rating": {
-                    "score": row.get::<_, f64>(7)?,
-                    "count": row.get::<_, i64>(8)?
-                }
-            }))
-        }).unwrap();
-        rows.filter_map(|r| r.ok()).collect::<Vec<_>>()
-    })
-    .await
-    .unwrap_or_default();
-
-    let result = serde_json::json!({"items": items, "count": items.len()});
-    HttpResponse::Ok()
-        .insert_header((SERVER, SERVER_HDR.clone()))
-        .content_type(ContentType::json())
-        .body(result.to_string())
 }
 
 async fn pgdb_endpoint(
@@ -296,8 +201,9 @@ async fn pgdb_endpoint(
                 .body(r#"{"items":[],"count":0}"#);
         }
     };
-    let min = query.min.unwrap_or(10.0);
-    let max = query.max.unwrap_or(50.0);
+    let min: i32 = query.min.unwrap_or(10);
+    let max: i32 = query.max.unwrap_or(50);
+    let limit: i64 = query.limit.unwrap_or(50).clamp(1, 50) as i64;
 
     let client = match pool.get().await {
         Ok(c) => c,
@@ -311,11 +217,11 @@ async fn pgdb_endpoint(
     let stmt = client
         .prepare_cached(
             "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count \
-             FROM items WHERE price BETWEEN $1 AND $2 LIMIT 50",
+             FROM items WHERE price BETWEEN $1 AND $2 LIMIT $3",
         )
         .await
         .unwrap();
-    let rows = match client.query(&stmt, &[&min, &max]).await {
+    let rows = match client.query(&stmt, &[&min, &max, &limit]).await {
         Ok(r) => r,
         Err(_) => {
             return HttpResponse::Ok()
@@ -331,12 +237,12 @@ async fn pgdb_endpoint(
                 "id": row.get::<_, i32>(0) as i64,
                 "name": row.get::<_, &str>(1),
                 "category": row.get::<_, &str>(2),
-                "price": row.get::<_, f64>(3),
-                "quantity": row.get::<_, i32>(4) as i64,
+                "price": row.get::<_, i32>(3),
+                "quantity": row.get::<_, i32>(4),
                 "active": row.get::<_, bool>(5),
                 "tags": row.get::<_, serde_json::Value>(6),
                 "rating": {
-                    "score": row.get::<_, f64>(7),
+                    "score": row.get::<_, i32>(7),
                     "count": row.get::<_, i32>(8) as i64,
                 }
             })
@@ -362,6 +268,9 @@ fn load_tls_config() -> Option<ServerConfig> {
         .with_no_client_auth()
         .with_single_cert(certs, key)
         .ok()?;
+    // ALPN protocol identifier for HTTP/2. Required to negotiate H2 over TLS;
+    // rustls doesn't pick a default. This is the minimum configuration to
+    // enable HTTP/2, not "custom TLS tuning".
     config.alpn_protocols = vec![b"h2".to_vec()];
     Some(config)
 }
@@ -369,19 +278,7 @@ fn load_tls_config() -> Option<ServerConfig> {
 #[actix_web::main]
 async fn main() -> io::Result<()> {
     let dataset = load_dataset();
-
-    let large_dataset: Vec<DatasetItem> =
-        match std::fs::read_to_string("/data/dataset-large.json") {
-            Ok(data) => serde_json::from_str(&data).unwrap_or_default(),
-            Err(_) => Vec::new(),
-        };
-    let json_large_cache = build_json_cache(&large_dataset);
-
-    // web::Data::new() wraps in Arc internally — no manual Arc needed
-    let state = web::Data::new(AppState {
-        dataset,
-        json_large_cache,
-    });
+    let state = web::Data::new(AppState { dataset });
 
     let pg_pool: Option<PgPool> = std::env::var("DATABASE_URL").ok().and_then(|url| {
         let pg_config: tokio_postgres::Config = url.parse().ok()?;
@@ -399,42 +296,36 @@ async fn main() -> io::Result<()> {
         PgPool::builder(mgr).max_size(pool_size).build().ok()
     });
 
-    // r2d2 pool shared across all workers — each get() hands out a connection from the pool
-    let sqlite_pool: Option<SqlitePool<SqliteConnectionManager>> = {
-        let mgr = SqliteConnectionManager::file("/data/benchmark.db")
-            .with_flags(rusqlite::OpenFlags::SQLITE_OPEN_READ_ONLY)
-            .with_init(|conn| conn.execute_batch("PRAGMA mmap_size=268435456"));
-        r2d2::Pool::builder().max_size(16).build(mgr).ok()
-    };
-
     let tls_config = load_tls_config();
     let workers = cgroup_cpus();
 
     let mut server = HttpServer::new({
         let state = state.clone();
         let pg_pool = pg_pool.clone();
-        let sqlite_pool = sqlite_pool.clone();
         move || {
             App::new()
-                .wrap(actix_web::middleware::Compress::default())
+                // Compress middleware performs on-the-fly response compression
+                // based on the request's Accept-Encoding. Framework-standard —
+                // no handmade gzip/brotli, no pre-compressed caches.
+                .wrap(Compress::default())
                 .app_data(state.clone())
-                .app_data(web::Data::new(sqlite_pool.clone()))
                 .app_data(web::PayloadConfig::new(25 * 1024 * 1024))
                 .app_data(web::Data::new(pg_pool.clone()))
                 .route("/pipeline", web::get().to(pipeline))
                 .route("/baseline11", web::get().to(baseline11_get))
                 .route("/baseline11", web::post().to(baseline11_post))
                 .route("/baseline2", web::get().to(baseline2))
-                .route("/json", web::get().to(json_endpoint))
-                .route("/compression", web::get().to(compression))
-                .route("/db", web::get().to(db_endpoint))
                 .route("/upload", web::post().to(upload))
                 .route("/async-db", web::get().to(pgdb_endpoint))
+                .route("/json/{count}", web::get().to(json_endpoint))
+                // actix-files Files service reads from disk per request.
+                // Combined with the Compress middleware above, identity files
+                // are served from disk and compressed on the wire when the
+                // client advertises gzip/brotli in Accept-Encoding.
                 .service(Files::new("/static", "/data/static"))
         }
     })
     .workers(workers)
-    .backlog(4096)
     .bind("0.0.0.0:8080")?;
 
     if let Some(tls_cfg) = tls_config {

@@ -5,6 +5,12 @@ Bundler.require(:default)
 
 require 'zlib'
 
+class Hash
+  def symbolize_keys!
+    transform_keys! { |key| key.to_sym }
+  end
+end
+
 class App < Roda
   SERVER_NAME = 'roda'.freeze
 
@@ -12,98 +18,68 @@ class App < Roda
   # Load dataset
   dataset_path = File.join DATA_DIR, 'dataset.json'
   if File.exist?(dataset_path)
-    opts[:dataset_items] = JSON.parse(File.read(dataset_path))
-  end
-
-  # Large dataset for compression
-  dataset_large_path = File.join DATA_DIR, 'dataset-large.json'
-  if File.exist?(dataset_large_path)
-    raw = JSON.parse(File.read(dataset_large_path))
-    items = raw.map do |d|
-      d.merge('total' => (d['price'] * d['quantity'] * 100).round / 100.0)
+    items = JSON.parse(File.read(dataset_path)).map do |item|
+      item.symbolize_keys!
+      item[:rating].symbolize_keys!
+      item
     end
-    opts[:large_json_payload] = JSON.generate({ 'items' => items, 'count' => items.length })
+    opts[:dataset_items] = items
   end
 
-  # Load static files into memory
-  MIME_TYPES = {
-    '.css'   => 'text/css',
-    '.js'    => 'application/javascript',
-    '.html'  => 'text/html',
-    '.woff2' => 'font/woff2',
-    '.svg'   => 'image/svg+xml',
-    '.webp'  => 'image/webp',
-    '.json'  => 'application/json'
-  }.freeze
+  plugin :public, root: DATA_DIR, gzip: true, brotli: true
 
-  static_dir = File.join DATA_DIR, 'static'
-  opts[:static_files_cache] = {}
-  if Dir.exist?(static_dir)
-    Dir.foreach(static_dir) do |name|
-      next if name == '.' || name == '..'
-      path = File.join(static_dir, name)
-      next unless File.file?(path)
-      ext = File.extname(name)
-      ct = MIME_TYPES.fetch(ext, 'application/octet-stream')
-      opts[:static_files_cache][name] = { data: File.binread(path), content_type: ct }
-    end
-  end
-  opts[:static_files_cache].freeze
-
-  # SQLite
-  opts[:database_path] = File.join(DATA_DIR, 'benchmark.db').freeze
-
-  DB_QUERY = 'SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ? AND ? LIMIT 50'.freeze
-  PG_QUERY = 'SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN $1 AND $2 LIMIT 50'.freeze
+  PG_QUERY = 'SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN $1 AND $2 LIMIT $3'.freeze
 
   plugin :default_headers, 'Server' => SERVER_NAME
-  plugin :halt
   plugin :request_headers
+  plugin :plain_hash_response_headers
+  plugin :halt
+  plugin :send_file
 
   route do |r|
     r.root { 'ok' }
 
+    r.public
+
     r.is 'pipeline' do
-      response[RodaResponseHeaders::CONTENT_TYPE] = 'text/plain'
-      'ok'
+      render_plain 'ok'
     end
 
-    r.is('baseline11') { handle_baseline11 }
+    r.is('baseline11') do
+      total = request.params['a'].to_i + request.params['b'].to_i
+      if request.post?
+        total += request.body.read.to_i
+      end
+      render_plain total.to_s
+    end
 
     r.is 'baseline2' do
-      total = 0
-      request.GET.each do |_k, v|
-        total += v.to_i
-      end
-      response[RodaResponseHeaders::CONTENT_TYPE] = 'text/plain'
-      total.to_s
+      total = request.params['a'].to_i + request.params['b'].to_i
+      render_plain total.to_s
     end
 
-    r.is 'json' do
+    r.is 'json', Integer do |count|
       dataset = opts[:dataset_items]
       r.halt 500, 'No dataset' unless dataset
-      items = dataset.map do |d|
-        d.merge('total' => (d['price'] * d['quantity'] * 100).round / 100.0)
+      m = (request.params['m'] || 1).to_i
+      items = dataset.slice(0, count).map do |d|
+        d.merge(total: (d[:price] * d[:quantity] * m))
       end
-      response[RodaResponseHeaders::CONTENT_TYPE] = 'application/json'
-      JSON.generate({ 'items' => items, 'count' => items.length })
-    end
 
-    r.is 'compression' do
-      payload = opts[:large_json_payload]
-      r.halt 500, 'No dataset' unless payload
-      accept_encodings = r.headers['Accept-Encoding'].split(',').map(&:strip)
-      if accept_encodings.include? 'gzip'
-        sio = StringIO.new
-        gz = Zlib::GzipWriter.new(sio, 1)
-        gz.write(payload)
-        gz.close
-        response[RodaResponseHeaders::CONTENT_TYPE] = 'application/json'
-        response[RodaResponseHeaders::CONTENT_ENCODING] = 'gzip'
-        sio.string
-      else
-        payload
+      result = JSON.generate({ 'items' => items, 'count' => count })
+
+      if accept_encodings = r.headers['Accept-Encoding']
+        type = accept_encodings.split(',').map(&:strip)
+        if type.include? 'gzip'
+          sio = StringIO.new
+          gz = Zlib::GzipWriter.new(sio, 1)
+          gz.write(result)
+          gz.close
+          response[RodaResponseHeaders::CONTENT_ENCODING] = 'gzip'
+          result = sio.string
+        end
       end
+      render_json result
     end
 
     r.is 'upload' do
@@ -115,79 +91,41 @@ class App < Roda
       size.to_s
     end
 
-    r.is 'db' do
-      min_val = (request.params['min'] || 10).to_i
-      max_val = (request.params['max'] || 50).to_i
-
-      rows = get_db&.execute(DB_QUERY, [min_val, max_val]) || []
-
-      items = rows.map do |row|
-        {
-          'id' => row['id'], 'name' => row['name'], 'category' => row['category'],
-          'price' => row['price'], 'quantity' => row['quantity'], 'active' => row['active'] == 1,
-          'tags' => JSON.parse(row['tags']),
-          'rating' => { 'score' => row['rating_score'], 'count' => row['rating_count'] }
-        }
-      end
-      response[RodaResponseHeaders::CONTENT_TYPE] = 'application/json'
-      JSON.generate({ 'items' => items, 'count' => items.length })
-    end
-
     r.is 'async-db' do
       min_val = (request.params['min'] || 10).to_i
       max_val = (request.params['max'] || 50).to_i
+      limit = (request.params['limit'] || 50).to_i.clamp(1, 50)
 
       rows = self.class.get_async_db&.with do |connection|
-        connection.exec_prepared('select', [min_val, max_val])
+        connection.exec_prepared('select', [min_val, max_val, limit])
       end || []
 
       items = rows.map do |row|
         {
-          'id' => row['id'], 'name' => row['name'], 'category' => row['category'],
-          'price' => row['price'], 'quantity' => row['quantity'], 'active' => row['active'] == 1,
-          'tags' => JSON.parse(row['tags']),
-          'rating' => { 'score' => row['rating_score'], 'count' => row['rating_count'] }
+          id: row['id'],
+          name: row['name'],
+          category: row['category'],
+          price: row['price'],
+          quantity: row['quantity'],
+          active: row['active'] == 1,
+          tags: JSON.parse(row['tags']),
+          rating: { score: row['rating_score'], count: row['rating_count'] }
         }
       end
-      response[RodaResponseHeaders::CONTENT_TYPE] = 'application/json'
-      JSON.generate({ 'items' => items, 'count' => items.length })
+      render_json JSON.generate({ items: items, count: items.length })
     end
-
-    r.on 'static', String do |filename|
-      if entry = opts[:static_files_cache][filename]
-        response[RodaResponseHeaders::CONTENT_TYPE] = entry[:content_type]
-        entry[:data]
-      else
-        r.halt 404
-      end
-    end
-  end
-
-  def handle_baseline11
-    total = 0
-    request.GET.each do |_k, v|
-      total += v.to_i
-    end
-    if request.post?
-      request.body.rewind
-      body_str = request.body.read.strip
-      total += body_str.to_i
-    end
-    response[RodaResponseHeaders::CONTENT_TYPE] = 'text/plain'
-    total.to_s
   end
 
   private
 
-  def get_db
-    Thread.current[:roda_db] ||= begin
-      db = SQLite3::Database.new(opts[:database_path], readonly: true)
-      db.execute('PRAGMA mmap_size=268435456')
-      db.results_as_hash = true
-      db
-    rescue
-      nil
-    end
+  def render_json(json)
+    response[RodaResponseHeaders::CONTENT_TYPE] = 'application/json'
+    json
+  end
+
+  def render_plain(plain)
+    response[RodaResponseHeaders::CONTENT_TYPE] = 'text/plain'
+    plain
   end
 
   def self.get_async_db

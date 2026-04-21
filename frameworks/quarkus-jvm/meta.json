@@ -11,16 +11,14 @@
     "pipelined",
     "limited-conn",
     "json",
+    "json-comp",
     "upload",
-    "compression",
-    "noisy",
     "api-4",
     "api-16",
     "static",
-    "tcp-frag",
     "baseline-h2",
     "static-h2",
-    "async-db",
-    "sync-db"
-  ]
+    "async-db"
+  ],
+  "maintainers": []
 }

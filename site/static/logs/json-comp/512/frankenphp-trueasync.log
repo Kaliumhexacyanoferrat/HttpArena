@@ -1,0 +1,146 @@
+{"level":"info","ts":1776204666.2770665,"msg":"maxprocs: Leaving GOMAXPROCS=64: CPU quota undefined"}
+{"level":"info","ts":1776204666.2770889,"msg":"GOMEMLIMIT is updated","GOMEMLIMIT":243039541248,"previous":9223372036854775807}
+{"level":"info","ts":1776204666.2770915,"msg":"using config from file","file":"/etc/caddy/Caddyfile"}
+{"level":"info","ts":1776204666.2770934,"msg":"adapted config to JSON","adapter":"caddyfile"}
+{"level":"warn","ts":1776204666.2770958,"logger":"admin","msg":"admin endpoint disabled"}
+{"level":"info","ts":1776204666.2773104,"logger":"tls.cache.maintenance","msg":"started background certificate maintenance","cache":"0x100377a9fd80"}
+{"level":"info","ts":1776204666.2775345,"logger":"http.auto_https","msg":"automatic HTTPS is completely disabled for server","server_name":"srv0"}
+{"level":"info","ts":1776204666.2775483,"logger":"http.auto_https","msg":"automatic HTTPS is completely disabled for server","server_name":"srv1"}
+{"level":"info","ts":1776204666.383793,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":1}
+{"level":"info","ts":1776204666.3838575,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":4}
+{"level":"info","ts":1776204666.3838773,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":5}
+{"level":"info","ts":1776204666.3838537,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":3}
+{"level":"info","ts":1776204666.3837957,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":2}
+{"level":"info","ts":1776204666.3839319,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":6}
+{"level":"info","ts":1776204666.3839881,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":7}
+{"level":"info","ts":1776204666.384042,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":8}
+{"level":"info","ts":1776204666.384094,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":9}
+{"level":"info","ts":1776204666.384229,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":10}
+{"level":"info","ts":1776204666.3842313,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":11}
+{"level":"info","ts":1776204666.3843217,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":13}
+{"level":"info","ts":1776204666.3843124,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":12}
+{"level":"info","ts":1776204666.384405,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":14}
+{"level":"info","ts":1776204666.3844247,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":15}
+{"level":"info","ts":1776204666.3845117,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":16}
+{"level":"info","ts":1776204666.3845901,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":17}
+{"level":"info","ts":1776204666.3845925,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":18}
+{"level":"info","ts":1776204666.384619,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":19}
+{"level":"info","ts":1776204666.3846886,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":20}
+{"level":"info","ts":1776204666.3847322,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":21}
+{"level":"info","ts":1776204666.3847508,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":22}
+{"level":"info","ts":1776204666.384849,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":23}
+{"level":"info","ts":1776204666.3848565,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":24}
+{"level":"info","ts":1776204666.3850849,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":25}
+{"level":"info","ts":1776204666.3864837,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":26}
+{"level":"info","ts":1776204666.393272,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":28}
+{"level":"info","ts":1776204666.3932638,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":27}
+{"level":"info","ts":1776204666.3933835,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":29}
+{"level":"info","ts":1776204666.4071953,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":30}
+{"level":"info","ts":1776204666.407307,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":31}
+{"level":"info","ts":1776204666.407373,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":32}
+{"level":"info","ts":1776204666.4074612,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":33}
+{"level":"info","ts":1776204666.4074724,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":34}
+{"level":"info","ts":1776204666.4075246,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":35}
+{"level":"info","ts":1776204666.4075809,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":36}
+{"level":"info","ts":1776204666.407653,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":37}
+{"level":"info","ts":1776204666.4076731,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":38}
+{"level":"info","ts":1776204666.4077916,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":39}
+{"level":"info","ts":1776204666.4078062,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":40}
+{"level":"info","ts":1776204666.407883,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":41}
+{"level":"info","ts":1776204666.4079142,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":43}
+{"level":"info","ts":1776204666.407961,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":44}
+{"level":"info","ts":1776204666.4080305,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":45}
+{"level":"info","ts":1776204666.4080505,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":46}
+{"level":"info","ts":1776204666.407909,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":42}
+{"level":"info","ts":1776204666.420251,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":47}
+{"level":"info","ts":1776204666.4202733,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":48}
+{"level":"info","ts":1776204666.420351,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":49}
+{"level":"info","ts":1776204666.4203565,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":50}
+{"level":"info","ts":1776204666.4204323,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":51}
+{"level":"info","ts":1776204666.4204764,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":52}
+{"level":"info","ts":1776204666.4205334,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":53}
+{"level":"info","ts":1776204666.4205527,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":54}
+{"level":"info","ts":1776204666.4206393,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":55}
+{"level":"info","ts":1776204666.4206483,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":56}
+{"level":"info","ts":1776204666.4207418,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":58}
+{"level":"info","ts":1776204666.4207327,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":57}
+{"level":"info","ts":1776204666.4208126,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":59}
+{"level":"info","ts":1776204666.4208248,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":60}
+{"level":"info","ts":1776204666.42085,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":61}
+{"level":"info","ts":1776204666.4209151,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":62}
+{"level":"info","ts":1776204666.420979,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":63}
+{"level":"info","ts":1776204666.420988,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php","thread":64}
+{"level":"info","ts":1776204666.4209964,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":65}
+{"level":"info","ts":1776204666.4211185,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":66}
+{"level":"info","ts":1776204666.4212415,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":68}
+{"level":"info","ts":1776204666.4212437,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":67}
+{"level":"info","ts":1776204666.4212534,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":69}
+{"level":"info","ts":1776204666.4213393,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":70}
+{"level":"info","ts":1776204666.4213898,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":71}
+{"level":"info","ts":1776204666.4214015,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":72}
+{"level":"info","ts":1776204666.4215014,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":73}
+{"level":"info","ts":1776204666.4216912,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":75}
+{"level":"info","ts":1776204666.4215574,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":74}
+{"level":"info","ts":1776204666.4223657,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":77}
+{"level":"info","ts":1776204666.4223542,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":76}
+{"level":"info","ts":1776204666.422391,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":78}
+{"level":"info","ts":1776204666.4224565,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":79}
+{"level":"info","ts":1776204666.4225075,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":80}
+{"level":"info","ts":1776204666.4474225,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":81}
+{"level":"info","ts":1776204666.447434,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":82}
+{"level":"info","ts":1776204666.447502,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":84}
+{"level":"info","ts":1776204666.4475195,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":85}
+{"level":"info","ts":1776204666.4474406,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":83}
+{"level":"info","ts":1776204666.4475937,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":86}
+{"level":"info","ts":1776204666.4476752,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":88}
+{"level":"info","ts":1776204666.4476902,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":87}
+{"level":"info","ts":1776204666.4477577,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":89}
+{"level":"info","ts":1776204666.4477775,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":91}
+{"level":"info","ts":1776204666.447777,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":90}
+{"level":"info","ts":1776204666.447858,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":92}
+{"level":"info","ts":1776204666.447864,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":93}
+{"level":"info","ts":1776204666.4479423,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":94}
+{"level":"info","ts":1776204666.4479644,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":96}
+{"level":"info","ts":1776204666.4479682,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":95}
+{"level":"info","ts":1776204666.44804,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":97}
+{"level":"info","ts":1776204666.4480543,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":98}
+{"level":"info","ts":1776204666.4481025,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":99}
+{"level":"info","ts":1776204666.4482043,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":100}
+{"level":"info","ts":1776204666.448208,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":101}
+{"level":"info","ts":1776204666.4482887,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":102}
+{"level":"info","ts":1776204666.4483852,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":105}
+{"level":"info","ts":1776204666.448386,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":104}
+{"level":"info","ts":1776204666.4484158,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":103}
+{"level":"info","ts":1776204666.448469,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":107}
+{"level":"info","ts":1776204666.4484868,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":108}
+{"level":"info","ts":1776204666.44846,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":106}
+{"level":"info","ts":1776204666.4485424,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":109}
+{"level":"info","ts":1776204666.4485488,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":110}
+{"level":"info","ts":1776204666.4486594,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":111}
+{"level":"info","ts":1776204666.4486668,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":112}
+{"level":"info","ts":1776204666.4486697,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":113}
+{"level":"info","ts":1776204666.4486957,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":114}
+{"level":"info","ts":1776204666.4487536,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":115}
+{"level":"info","ts":1776204666.4487767,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":116}
+{"level":"info","ts":1776204666.4488645,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":118}
+{"level":"info","ts":1776204666.4488673,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":119}
+{"level":"info","ts":1776204666.4505198,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":121}
+{"level":"info","ts":1776204666.4505,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":120}
+{"level":"info","ts":1776204666.44879,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":117}
+{"level":"info","ts":1776204666.4505904,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":123}
+{"level":"info","ts":1776204666.450605,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":122}
+{"level":"info","ts":1776204666.4507382,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":125}
+{"level":"info","ts":1776204666.4506276,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":124}
+{"level":"info","ts":1776204666.4508975,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":126}
+{"level":"info","ts":1776204666.4509757,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":127}
+{"level":"info","ts":1776204666.4510252,"logger":"frankenphp","msg":"async worker thread started","worker":"m#/app/worker.php_0","thread":128}
+{"level":"info","ts":1776204666.4511368,"logger":"frankenphp","msg":"FrankenPHP started 🐘","php_version":"8.6.0-dev","num_threads":129,"max_threads":129}
+{"level":"info","ts":1776204666.4514742,"logger":"http","msg":"enabling HTTP/3 listener","addr":":8443"}
+{"level":"info","ts":1776204666.4516296,"logger":"http.log","msg":"server running","name":"srv1","protocols":["h1","h2","h3"]}
+{"level":"warn","ts":1776204666.4516711,"logger":"http","msg":"HTTP/2 skipped because it requires TLS","network":"tcp","addr":":8080"}
+{"level":"warn","ts":1776204666.4516773,"logger":"http","msg":"HTTP/3 skipped because it requires TLS","network":"tcp","addr":":8080"}
+{"level":"info","ts":1776204666.4516802,"logger":"http.log","msg":"server running","name":"srv0","protocols":["h1","h2","h3"]}
+{"level":"info","ts":1776204666.457552,"msg":"autosaved config (load with --resume flag)","file":"/root/.config/caddy/autosave.json"}
+{"level":"info","ts":1776204666.45756,"msg":"serving initial configuration"}
+{"level":"info","ts":1776204666.4613197,"logger":"tls","msg":"cleaning storage unit","storage":"FileStorage:/root/.local/share/caddy"}
+{"level":"info","ts":1776204666.4644017,"logger":"tls","msg":"finished cleaning storage units"}

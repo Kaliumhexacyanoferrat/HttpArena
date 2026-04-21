@@ -1,0 +1,29 @@
+{
+  "display_name": "php-fpm",
+  "language": "PHP",
+  "type": "production",
+  "engine": "nginx",
+  "description": "Plain PHP with PHP-FPM & nginx.",
+  "repo": "https://github.com/php/php-src",
+  "enabled": true,
+  "tests": [
+    "baseline",
+    "pipelined",
+    "limited-conn",
+    "json",
+    "json-comp",
+    "json-lts",
+    "upload",
+    "api-4",
+    "api-16",
+    "static",
+    "async-db",
+    "baseline-h2",
+    "static-h2",
+    "baseline-h3",
+    "static-h3"
+  ],
+  "maintainers": [
+    "joanhey"
+  ]
+}

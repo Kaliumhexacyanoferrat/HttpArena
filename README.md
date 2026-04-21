@@ -4,7 +4,7 @@
 
 HTTP framework benchmark platform.
 
-20 test profiles. 64-core dedicated hardware. Same conditions for every framework.
+24 test profiles. 64-core dedicated hardware. Same conditions for every framework.
 
 [View Leaderboard](https://www.http-arena.com/) | [Documentation](https://www.http-arena.com/docs/) | [Add a Framework](https://www.http-arena.com/docs/add-framework/)
 
@@ -30,10 +30,16 @@ Always specify `-f <framework>`. Results are automatically compared against the 
 
 | Category | Profiles | Description |
 |----------|----------|-------------|
-| Connection | Baseline (512-16K), Pipelined, Limited | Performance scaling with connection count |
-| Workload | JSON, Compression, Upload, Database, Async DB | Serialization, gzip, streaming I/O, SQLite queries, async Postgres |
-| Resilience | Noisy, Mixed, API-4 | Malformed requests, concurrent endpoints, resource-constrained (4 CPU, 16 GB) |
-| Protocol | HTTP/2, HTTP/3, gRPC, WebSocket | Multi-protocol support |
+| Connection | `baseline`, `pipelined`, `limited-conn` | Mixed GET/POST with query parsing (512/4K conns), 16× batched pipelining, short-lived connections that close after 10 requests |
+| Workload | `json`, `json-comp`, `json-tls`, `upload`, `static` | JSON serialization, gzip/brotli compression, HTTP/1.1 over TLS, 20 MB body ingestion, 20-file static asset serving |
+| Database | `async-db`, `crud` | Async Postgres sequential scan; realistic REST API with cached reads, list, upsert, update, and optional Redis cache |
+| Multi-endpoint | `api-4`, `api-16` | Mixed baseline + JSON + async-db at CPU-budget cliffs (4 and 16 CPUs) |
+| H/2 | `baseline-h2`, `static-h2` | Baseline and static over TLS with HTTP/2 stream multiplexing |
+| H/3 | `baseline-h3`, `static-h3` | Baseline and static over QUIC with TLS 1.3 |
+| gRPC | `unary-grpc`, `unary-grpc-tls`, `stream-grpc`, `stream-grpc-tls` | Unary and server-streaming gRPC over plaintext HTTP/2 and TLS |
+| Gateway | `gateway-64`, `gateway-h3` | Reverse proxy + server stack over HTTP/2 and HTTP/3 with mixed workload |
+| Production Stack | `production-stack` | Four-service architecture: edge + Redis + JWT auth sidecar + server, 10K-item cache-aside, concurrent reads + writes |
+| WebSocket | `echo-ws` | WebSocket echo throughput across connection counts |
 
 ## Run Locally
 
@@ -47,29 +53,17 @@ cd HttpArena
 ./scripts/benchmark.sh <framework> --save    # save results
 ```
 
-## AI Agents
-
-HttpArena uses autonomous AI agents to help with PR reviews, community engagement, and benchmark auditing.
-
-### BennyFranciscus
-
-The primary maintainer agent. Benny runs three cron jobs:
-
-- **PR Review** — Monitors open PRs and issues on MDA2AV/HttpArena. Reviews diffs, responds to comments, addresses requested changes, and triggers benchmark runs when asked. Tracks commitments in a memory file to ensure follow-through.
-- **Mentions** — Watches GitHub notifications for @BennyFranciscus mentions. Replies with technical context and actual benchmark data. Can trigger benchmark workflows directly from PR comments.
-
-### jerrythetruckdriver
-
-The benchmark auditor. Cotton is an io_uring specialist who keeps HttpArena fair. Three active cron jobs:
-
-- **Cheater Audit** — Audits framework implementations for cheating or non-compliance with test profile specs. Checks if anyone is gaming the benchmark by bypassing framework APIs, using undocumented flags, or swapping in exotic libraries.
-- **PR Review** — Reviews open PRs that add or modify frameworks. Checks diffs for rule violations and implementation issues.
-- **Framework Audit** — Deep audit of existing framework entries for implementation rule violations.
-
-
 ## Contributing
 
 - [Add a new framework](https://www.http-arena.com/docs/add-framework/)
 - Improve an existing implementation — open a PR modifying files under `frameworks/<name>/`
 - [Open an issue](https://github.com/MDA2AV/HttpArena/issues)
 - Comment on any open issue or PR
+
+### Framework Maintainers
+
+Add your GitHub username to the `maintainers` array in your framework's `meta.json` to get notified when someone opens a PR that touches your framework:
+
+```json
+"maintainers": ["your-github-username"]
+```

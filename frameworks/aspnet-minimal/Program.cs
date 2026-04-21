@@ -2,10 +2,11 @@ using System.Security.Cryptography.X509Certificates;
 
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Caching.Memory;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
+builder.Services.AddMemoryCache();
 
 var certPath = Environment.GetEnvironmentVariable("TLS_CERT") ?? "/certs/server.crt";
 var keyPath = Environment.GetEnvironmentVariable("TLS_KEY") ?? "/certs/server.key";
@@ -29,6 +30,15 @@ builder.WebHost.ConfigureKestrel(options =>
             lo.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
             lo.UseHttps(X509Certificate2.CreateFromPemFile(certPath, keyPath));
         });
+
+        // HTTP/1.1-only TLS listener for the json-tls profile. Kestrel
+        // advertises http/1.1 via ALPN so HTTP/1.1-only clients (wrk) negotiate
+        // correctly and never upgrade to h2.
+        options.ListenAnyIP(8081, lo =>
+        {
+            lo.Protocols = HttpProtocols.Http1;
+            lo.UseHttps(X509Certificate2.CreateFromPemFile(certPath, keyPath));
+        });
     }
 });
 
@@ -36,10 +46,7 @@ builder.Services.AddResponseCompression();
 
 var app = builder.Build();
 
-app.UseWhen(ctx => ctx.Request.Path.StartsWithSegments("/compression"), subApp => 
-{
-    subApp.UseResponseCompression();
-});
+app.UseResponseCompression();
 
 app.Use((ctx, next) =>
 {
@@ -56,23 +63,18 @@ app.MapPost("/baseline11", Handlers.SumBody);
 app.MapGet("/baseline2", Handlers.Sum);
 
 app.MapPost("/upload", Handlers.Upload);
-app.MapGet("/json", Handlers.Json);
-app.MapGet("/compression", Handlers.Compression);
-app.MapGet("/db", Handlers.Database);
+app.MapGet("/json/{count}", Handlers.Json);
 app.MapGet("/async-db", Handlers.AsyncDatabase);
 
-if (Directory.Exists("/data/static"))
-{
-    var typeProvider = new FileExtensionContentTypeProvider();
-    
-    typeProvider.Mappings[".js"] = "application/javascript";
-    
-    app.UseStaticFiles(new StaticFileOptions
-    {
-        FileProvider = new PhysicalFileProvider("/data/static"),
-        ContentTypeProvider = typeProvider,
-        RequestPath = "/static"
-    });
-}
+// ── CRUD endpoints ─────────────────────────────────────────────────────────
+// Realistic REST API: paginated list, cached single-item read, create, update.
+// In-process IMemoryCache with 1s TTL on single-item reads, invalidated on PUT.
+
+app.MapGet("/crud/items", Handlers.CrudList);
+app.MapGet("/crud/items/{id:int}", Handlers.CrudRead);
+app.MapPost("/crud/items", Handlers.CrudCreate);
+app.MapPut("/crud/items/{id:int}", Handlers.CrudUpdate);
+
+app.MapStaticAssets();
 
 app.Run();

@@ -2,7 +2,7 @@
   "display_name": "frankenphp-trueasync",
   "language": "PHP",
   "type": "tuned",
-  "engine": "frankenphp + true-async",
+  "engine": "frankenphp",
   "description": "FrankenPHP with TrueAsync coroutine engine. Each HTTP request runs as a cooperative coroutine with PDO connection pooling, async I/O, and OPcache JIT. Built on Caddy with native HTTP/2 and HTTP/3 support.",
   "repo": "https://github.com/true-async/php-async",
   "enabled": true,
@@ -11,10 +11,9 @@
     "pipelined",
     "limited-conn",
     "json",
+    "json-comp",
     "upload",
-    "noisy",
     "static",
-    "sync-db",
     "async-db",
     "api-4",
     "api-16",
@@ -22,5 +21,6 @@
     "static-h2",
     "baseline-h3",
     "static-h3"
-  ]
+  ],
+  "maintainers": []
 }

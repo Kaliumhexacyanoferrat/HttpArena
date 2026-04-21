@@ -14,7 +14,7 @@ Each profile is run at multiple connection counts to show how frameworks scale u
 
 | Parameter | Value |
 |-----------|-------|
-| Threads | 12 |
+| Threads | 64 (gcannon) / 128 (h2load) |
 | Duration | 5s |
 | Runs | 3 (best taken) |
 | Networking | Docker `--network host` |
@@ -26,8 +26,6 @@ Data files are **mounted automatically** by the benchmark runner — your Docker
 | Path | Description |
 |------|-------------|
 | `/data/dataset.json` | 50-item dataset for `/json` |
-| `/data/dataset-large.json` | 6000-item dataset for `/compression` |
-| `/data/benchmark.db` | SQLite database (100K rows) for `/db` |
 | `/data/static/` | 20 static files for `/static/*` |
 | `/certs/server.crt`, `/certs/server.key` | TLS certificate and key for HTTPS/H2/H3 |
 | `DATABASE_URL` env var | Postgres connection string for `/async-db` (set automatically when `async-db` profile runs) |
@@ -35,6 +33,7 @@ Data files are **mounted automatically** by the benchmark runner — your Docker
 {{< cards >}}
   {{< card link="h1" title="H/1.1" subtitle="Isolated single-endpoint benchmarks and multi-endpoint workload mixes over plain TCP." icon="lightning-bolt" >}}
   {{< card link="h2" title="H/2" subtitle="Baseline and static file benchmarks over encrypted TLS connections with stream multiplexing." icon="globe-alt" >}}
+  {{< card link="gateway" title="Gateway" subtitle="Multi-service deployments: proxy + server (H2/H3) and full CRUD production stack with JWT auth + cache-aside." icon="server" >}}
   {{< card link="h3" title="H/3" subtitle="Baseline and static file benchmarks over QUIC for frameworks with native H/3 support." icon="globe-alt" >}}
   {{< card link="grpc" title="gRPC" subtitle="Unary RPC throughput over cleartext HTTP/2 using Protocol Buffers serialization." icon="globe-alt" >}}
   {{< card link="ws" title="WebSocket" subtitle="WebSocket echo throughput measuring frame processing performance." icon="globe-alt" >}}

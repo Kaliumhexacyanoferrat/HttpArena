@@ -1,24 +1,28 @@
 {{ $profiles := slice
-  (dict "id" "api-4" "label" "API-4" "sublabel" "H/1.1 Workload" "proto" "h1wk" "conns" (slice 256) "scored" true "engineScored" true)
-  (dict "id" "api-16" "label" "API-16" "sublabel" "H/1.1 Workload" "proto" "h1wk" "conns" (slice 1024) "scored" true "engineScored" false)
-  (dict "id" "baseline" "label" "Baseline" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096) "scored" true "engineScored" true)
-  (dict "id" "pipelined" "label" "Pipelined" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096) "scored" true "engineScored" true)
-  (dict "id" "limited-conn" "label" "Short-lived" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096) "scored" true "engineScored" true)
-  (dict "id" "json" "label" "JSON" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 4096) "scored" true "engineScored" false)
-  (dict "id" "upload" "label" "Upload" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 32 256) "scored" true "engineScored" false)
-  (dict "id" "compression" "label" "Compression" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096) "scored" true "engineScored" false)
-  (dict "id" "static" "label" "Static" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 1024 4096 6800) "scored" true "engineScored" false)
-  (dict "id" "tcp-frag" "label" "TCP Frag" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096 16384) "scored" false "engineScored" false)
-  (dict "id" "noisy" "label" "Noisy" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096 16384) "scored" false "engineScored" false)
-  (dict "id" "sync-db" "label" "Sync DB" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 1024) "scored" true "engineScored" false)
-  (dict "id" "async-db" "label" "Async DB" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 1024) "scored" true "engineScored" false)
-  (dict "id" "baseline-h2" "label" "Baseline" "sublabel" "H/2" "proto" "h2" "conns" (slice 256 1024) "scored" true "engineScored" true)
-  (dict "id" "static-h2" "label" "Static" "sublabel" "H/2" "proto" "h2" "conns" (slice 256 1024) "scored" true "engineScored" true)
-  (dict "id" "unary-grpc" "label" "Unary" "sublabel" "gRPC" "proto" "grpc" "conns" (slice 256 1024) "scored" true "engineScored" true)
-  (dict "id" "unary-grpc-tls" "label" "Unary TLS" "sublabel" "gRPC" "proto" "grpc" "conns" (slice 256 1024) "scored" true "engineScored" true)
-  (dict "id" "baseline-h3" "label" "Baseline" "sublabel" "H/3" "proto" "h3" "conns" (slice 256 512) "scored" true "engineScored" true)
-  (dict "id" "static-h3" "label" "Static" "sublabel" "H/3" "proto" "h3" "conns" (slice 256 512) "scored" true "engineScored" true)
-  (dict "id" "echo-ws" "label" "Echo" "sublabel" "WebSocket" "proto" "ws" "conns" (slice 512 4096 16384) "scored" true "engineScored" true)
+  (dict "id" "api-4" "label" "API-4" "sublabel" "H/1.1 Workload" "proto" "h1wk" "conns" (slice 256) "scored" true "engineScored" true "infraScored" false)
+  (dict "id" "api-16" "label" "API-16" "sublabel" "H/1.1 Workload" "proto" "h1wk" "conns" (slice 1024) "scored" true "engineScored" false "infraScored" false)
+  (dict "id" "baseline" "label" "Baseline" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096) "scored" true "engineScored" true "infraScored" true)
+  (dict "id" "pipelined" "label" "Pipelined" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096) "scored" true "engineScored" true "infraScored" true)
+  (dict "id" "limited-conn" "label" "Short-lived" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096) "scored" true "engineScored" true "infraScored" true)
+  (dict "id" "json" "label" "JSON" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 4096) "scored" true "engineScored" false "infraScored" false)
+  (dict "id" "json-comp" "label" "JSON Compressed" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 512 4096 16384) "scored" true "engineScored" false "infraScored" false)
+  (dict "id" "json-tls" "label" "JSON TLS" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 4096) "scored" true "engineScored" false "infraScored" false)
+  (dict "id" "upload" "label" "Upload" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 32 256) "scored" true "engineScored" false "infraScored" false)
+  (dict "id" "static" "label" "Static" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 1024 4096 6800) "scored" true "engineScored" false "infraScored" true)
+  (dict "id" "async-db" "label" "Async DB" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 1024) "scored" true "engineScored" false "infraScored" false)
+  (dict "id" "crud" "label" "CRUD" "sublabel" "H/1.1 Isolated" "proto" "h1iso" "conns" (slice 4096) "scored" true "engineScored" false "infraScored" false)
+  (dict "id" "baseline-h2" "label" "Baseline" "sublabel" "H/2" "proto" "h2" "conns" (slice 256 1024) "scored" true "engineScored" true "infraScored" false)
+  (dict "id" "static-h2" "label" "Static" "sublabel" "H/2" "proto" "h2" "conns" (slice 256 1024) "scored" true "engineScored" true "infraScored" false)
+  (dict "id" "gateway-64" "label" "Gateway-64" "sublabel" "H/2 Gateway" "proto" "h2gw" "conns" (slice 512 1024) "scored" true "engineScored" true "infraScored" false)
+  (dict "id" "gateway-h3" "label" "Gateway-H3" "sublabel" "H/3 Gateway" "proto" "h3gw" "conns" (slice 64 256) "scored" true "engineScored" true "infraScored" false)
+  (dict "id" "production-stack" "label" "Prod Stack" "sublabel" "Production Stack" "proto" "prodstack" "conns" (slice 256 1024) "scored" true "engineScored" true "infraScored" false)
+  (dict "id" "unary-grpc" "label" "Unary" "sublabel" "gRPC" "proto" "grpc" "conns" (slice 256 1024) "scored" true "engineScored" true "infraScored" false)
+  (dict "id" "unary-grpc-tls" "label" "Unary TLS" "sublabel" "gRPC" "proto" "grpc" "conns" (slice 256 1024) "scored" true "engineScored" true "infraScored" false)
+  (dict "id" "stream-grpc" "label" "Stream" "sublabel" "gRPC" "proto" "grpc" "conns" (slice 64) "scored" true "engineScored" true "infraScored" false)
+  (dict "id" "stream-grpc-tls" "label" "Stream TLS" "sublabel" "gRPC" "proto" "grpc" "conns" (slice 64) "scored" true "engineScored" true "infraScored" false)
+  (dict "id" "baseline-h3" "label" "Baseline" "sublabel" "H/3" "proto" "h3" "conns" (slice 64) "scored" true "engineScored" true "infraScored" false)
+  (dict "id" "static-h3" "label" "Static" "sublabel" "H/3" "proto" "h3" "conns" (slice 64) "scored" true "engineScored" true "infraScored" false)
+  (dict "id" "echo-ws" "label" "Echo" "sublabel" "WebSocket" "proto" "ws" "conns" (slice 512 4096 16384) "scored" true "engineScored" true "infraScored" false)
 }}
 
 {{/* Build a clean JSON blob: array of {profile, framework, rps, language} entries */}}
@@ -29,7 +33,7 @@
     {{ $data := index site.Data $key }}
     {{ if $data }}
       {{ range $data }}
-        {{ $entries = $entries | append (dict "profile" $p.id "label" $p.label "framework" .framework "rps" .rps "language" (.language | default "") "cpu" (.cpu | default "") "memory" (.memory | default "") "bandwidth" (.bandwidth | default "") "tpl_baseline" (.tpl_baseline | default 0) "tpl_json" (.tpl_json | default 0) "tpl_db" (.tpl_db | default 0) "tpl_upload" (.tpl_upload | default 0) "tpl_compression" (.tpl_compression | default 0) "tpl_static" (.tpl_static | default 0) "tpl_async_db" (.tpl_async_db | default 0)) }}
+        {{ $entries = $entries | append (dict "profile" $p.id "label" $p.label "framework" .framework "rps" .rps "language" (.language | default "") "cpu" (.cpu | default "") "memory" (.memory | default "") "bandwidth" (.bandwidth | default "") "tpl_baseline" (.tpl_baseline | default 0) "tpl_json" (.tpl_json | default 0) "tpl_upload" (.tpl_upload | default 0) "tpl_static" (.tpl_static | default 0) "tpl_async_db" (.tpl_async_db | default 0)) }}
       {{ end }}
     {{ end }}
   {{ end }}
@@ -60,6 +64,7 @@ html.dark #composite-type-note { color: #e2e8f0 !important; background: linear-g
     <span class="lb-filters-label">Type</span>
     <div class="composite-type-filter active" data-type="production">Production</div>
     <div class="composite-type-filter active" data-type="tuned">Tuned</div>
+    <div class="composite-type-filter" data-type="infrastructure">Infrastructure</div>
     <div class="composite-type-filter" data-type="engine">Engine</div>
   </div>
   <style>
@@ -67,13 +72,22 @@ html.dark #composite-type-note { color: #e2e8f0 !important; background: linear-g
   .composite-type-filter:hover { color:#475569; border-color:#cbd5e1; transform:translateY(-1px); box-shadow:0 2px 4px rgba(0,0,0,0.08); }
   .composite-type-filter[data-type="production"].active { color:#22c55e; border-color:#22c55e; background:rgba(34,197,94,0.06); font-weight:600; }
   .composite-type-filter[data-type="tuned"].active { color:#ca8a04; border-color:#eab308; background:rgba(234,179,8,0.06); font-weight:600; }
+  .composite-type-filter[data-type="infrastructure"].active { color:#0891b2; border-color:#0891b2; background:rgba(8,145,178,0.06); font-weight:600; }
   .composite-type-filter[data-type="engine"].active { color:#f59e0b; border-color:#f59e0b; background:rgba(245,158,11,0.06); font-weight:600; }
   html.dark .composite-type-wrap { background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.10); }
   html.dark .composite-type-filter { color:#64748b; border-color:#334155; }
   html.dark .composite-type-filter:hover { color:#94a3b8; border-color:#475569; }
   html.dark .composite-type-filter[data-type="production"].active { color:#4ade80; border-color:#22c55e; background:rgba(34,197,94,0.12); }
   html.dark .composite-type-filter[data-type="tuned"].active { color:#fbbf24; border-color:#eab308; background:rgba(234,179,8,0.12); }
+  html.dark .composite-type-filter[data-type="infrastructure"].active { color:#22d3ee; border-color:#0891b2; background:rgba(8,145,178,0.12); }
   html.dark .composite-type-filter[data-type="engine"].active { color:#fbbf24; border-color:#f59e0b; background:rgba(245,158,11,0.12); }
+  .composite-badges { display:inline-flex; flex-wrap:wrap; gap:0; margin-left:0.15rem; vertical-align:middle; }
+  .composite-badge { display:inline-flex; align-items:center; justify-content:center; font-size:1.05rem; line-height:1; cursor:default; margin-left:-0.15rem; }
+  .composite-banana { display:inline-flex; align-items:center; margin-left:0.25rem; cursor:default; line-height:1; vertical-align:middle; }
+  .composite-banana-emoji { font-size:0.95rem; line-height:1; }
+  .composite-eggplant { display:inline-flex; align-items:center; margin-left:0.25rem; cursor:default; line-height:1; vertical-align:middle; }
+  .composite-eggplant-emoji { font-size:0.95rem; line-height:1; }
+  html.dark .composite-badge { opacity:0.9; }
   </style>
 
   <div class="composite-profiles-wrap" style="margin:0.5rem 0 0 0; padding:0.75rem 1rem; background:rgba(0,0,0,0.04); border-radius:8px; border:1px solid rgba(0,0,0,0.08); display:flex; flex-direction:column; gap:0.5rem;">
@@ -141,8 +155,7 @@ html.dark #composite-type-note { color: #e2e8f0 !important; background: linear-g
 
   <div class="lb-filters composite-resource-wrap" style="margin:0.5rem 0 0 0; padding:0.5rem 1rem; background:rgba(0,0,0,0.02); border-radius:8px; border:1px solid rgba(0,0,0,0.06);">
     <span class="lb-filters-label">Resource factors</span>
-    <div class="composite-resource-toggle" data-resource="cpu">CPU efficiency <span style="font-size:0.6rem; color:#94a3b8;">(1x weight)</span></div>
-    <div class="composite-resource-toggle" data-resource="mem">Memory efficiency <span style="font-size:0.6rem; color:#94a3b8;">(0.5x weight)</span></div>
+    <div class="composite-resource-toggle active" data-resource="mem">Memory efficiency <span style="font-size:0.6rem; color:#94a3b8;">(0.5x weight)</span></div>
   </div>
   <style>
   .composite-resource-toggle { padding:0.3rem 0.75rem; font-size:0.8rem; font-weight:500; color:#94a3b8; cursor:pointer; border-radius:6px; border:1.5px solid #e2e8f0; background:transparent; transition:all 0.15s ease; user-select:none; }
@@ -199,9 +212,17 @@ html.dark #composite-type-note { color: #e2e8f0 !important; background: linear-g
   html.dark .composite-search-input:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,0.12); }
   html.dark .composite-search-clear { color:#64748b; }
   html.dark .composite-search-clear:hover { color:#94a3b8; }
+  .composite-vote-link:hover { border-color:rgba(234,179,8,0.45); background:linear-gradient(135deg, rgba(234,179,8,0.1), rgba(202,138,4,0.1)); }
+  html.dark .composite-vote-link { color:#FACC15; background:linear-gradient(135deg, rgba(250,204,21,0.08), rgba(234,179,8,0.08)); border-color:rgba(250,204,21,0.25); }
+  html.dark .composite-vote-link:hover { border-color:rgba(250,204,21,0.45); background:linear-gradient(135deg, rgba(250,204,21,0.15), rgba(234,179,8,0.15)); }
   </style>
 
-  <div style="overflow-x:auto; overflow-y:hidden; margin-top:1rem;">
+  <a class="composite-vote-link" href="https://strawpoll.com/6QnMQ0pmane" target="_blank" rel="noreferrer" style="display:flex; align-items:center; gap:0.6rem; margin-top:0.75rem; margin-bottom:0.75rem; padding:0.7rem 1rem; border-radius:8px; background:linear-gradient(135deg, rgba(234,179,8,0.06), rgba(202,138,4,0.06)); border:1px solid rgba(234,179,8,0.25); color:#CA8A04; font-size:0.88rem; font-weight:500; text-decoration:none; transition:border-color 0.15s, background 0.15s;">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="12" width="4" height="9" rx="1"/><rect x="10" y="7" width="4" height="14" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>
+    Which tests matter the most to you? Help us improve our benchmark — <span style="font-size:1.05rem; font-weight:700; color:#EAB308;">Vote here</span> — or suggest new test ideas in the comments
+  </a>
+
+  <div style="overflow-x:auto; overflow-y:hidden;">
   <div id="composite-table" class="lb" style="min-width:50rem;">
   </div>
   </div>
@@ -222,8 +243,9 @@ var profileLabels = {};
 var profileProtos = {};
 var profileScored = {};
 var profileEngineScored = {};
+var profileInfraScored = {};
 var profileSublabels = {};
-profiles.forEach(function(p) { profileLabels[p.id] = p.label; profileProtos[p.id] = p.proto; profileScored[p.id] = p.scored !== false; profileEngineScored[p.id] = p.engineScored === true; profileSublabels[p.id] = p.sublabel || ''; });
+profiles.forEach(function(p) { profileLabels[p.id] = p.label; profileProtos[p.id] = p.proto; profileScored[p.id] = p.scored !== false; profileEngineScored[p.id] = p.engineScored === true; profileInfraScored[p.id] = p.infraScored === true; profileSublabels[p.id] = p.sublabel || ''; });
 
 function parseCpu(s) {
   if (!s) return 0;
@@ -261,7 +283,7 @@ function entriesFromRound(roundData) {
       var data = roundData[key];
       if (data) {
         data.forEach(function(d) {
-          entries.push({ profile: p.id, label: p.label, framework: d.framework, rps: d.rps, language: d.language || '', cpu: d.cpu || '', memory: d.memory || '', bandwidth: d.bandwidth || '', tpl_baseline: d.tpl_baseline || 0, tpl_json: d.tpl_json || 0, tpl_db: d.tpl_db || 0, tpl_upload: d.tpl_upload || 0, tpl_compression: d.tpl_compression || 0, tpl_static: d.tpl_static || 0, tpl_async_db: d.tpl_async_db || 0 });
+          entries.push({ profile: p.id, label: p.label, framework: d.framework, rps: d.rps, language: d.language || '', cpu: d.cpu || '', memory: d.memory || '', bandwidth: d.bandwidth || '', tpl_baseline: d.tpl_baseline || 0, tpl_json: d.tpl_json || 0, tpl_upload: d.tpl_upload || 0, tpl_static: d.tpl_static || 0, tpl_async_db: d.tpl_async_db || 0 });
         });
       }
     });
@@ -288,13 +310,11 @@ function loadData(newEntries, newMeta) {
     if (e.profile === 'api-4' || e.profile === 'api-16') {
       if (!tplSumsByProfile[e.profile]) tplSumsByProfile[e.profile] = {};
       var fw = e.framework;
-      if (!tplSumsByProfile[e.profile][fw]) tplSumsByProfile[e.profile][fw] = {baseline:0, json:0, db:0, upload:0, compression:0, static:0, async_db:0, count:0};
+      if (!tplSumsByProfile[e.profile][fw]) tplSumsByProfile[e.profile][fw] = {baseline:0, json:0, upload:0, static:0, async_db:0, count:0};
       var t = tplSumsByProfile[e.profile][fw];
       t.baseline += (e.tpl_baseline || 0);
       t.json += (e.tpl_json || 0);
-      t.db += (e.tpl_db || 0);
       t.upload += (e.tpl_upload || 0);
-      t.compression += (e.tpl_compression || 0);
       t.static += (e.tpl_static || 0);
       t.async_db += (e.tpl_async_db || 0);
       t.count++;
@@ -315,9 +335,7 @@ function loadData(newEntries, newMeta) {
       avgTplByProfile[pid][fw] = {
         baseline: t.baseline / t.count,
         json: t.json / t.count,
-        db: t.db / t.count,
         upload: t.upload / t.count,
-        compression: t.compression / t.count,
         static: t.static / t.count,
         async_db: t.async_db / t.count
       };
@@ -484,27 +502,39 @@ function getActiveTypes() {
   return types.length > 0 ? types : ['production'];
 }
 
+var bananaTiers = {
+  bronze:   { label:'Bronze',   color:'#B45309', filter:'brightness(0.7) sepia(1) saturate(3) hue-rotate(-10deg)', msg:'Welcome to the banana club' },
+  silver:   { label:'Silver',   color:'#9CA3AF', filter:'brightness(0.9) saturate(0) contrast(1.1)', msg:'He is starting to believe!' },
+  gold:     { label:'Gold',     color:'#EAB308', filter:'brightness(1.05) saturate(1.5) hue-rotate(-10deg) drop-shadow(0 0 2px rgba(234,179,8,0.5))', msg:'Chimp' },
+  platinum: { label:'Platinum', color:'#A78BFA', filter:'brightness(0.95) sepia(1) saturate(2) hue-rotate(210deg) drop-shadow(0 0 2px rgba(167,139,250,0.5))', msg:'Monkey King' },
+  diamond:  { label:'Diamond',  color:'#22D3EE', filter:'brightness(1) sepia(1) saturate(3) hue-rotate(140deg) drop-shadow(0 0 3px rgba(34,211,238,0.6))', msg:'It\\\'s lonely at the top.' }
+};
+var eggplantTiers = {
+  bronze:   { label:'Bronze',   color:'#B45309', filter:'brightness(1.2) sepia(1) saturate(5) hue-rotate(350deg)' },
+  silver:   { label:'Silver',   color:'#9CA3AF', filter:'grayscale(1) brightness(1.6) contrast(0.9)' },
+  gold:     { label:'Golden',   color:'#EAB308', filter:'brightness(1.3) sepia(1) saturate(5) hue-rotate(10deg) drop-shadow(0 0 2px rgba(234,179,8,0.5))' },
+  platinum: { label:'Platinum', color:'#A78BFA', filter:'brightness(1.3) contrast(0.9) saturate(1.5) hue-rotate(30deg) drop-shadow(0 0 2px rgba(167,139,250,0.5))' },
+  diamond:  { label:'Diamond',  color:'#22D3EE', filter:'brightness(1.3) sepia(1) saturate(5) hue-rotate(120deg) drop-shadow(0 0 3px rgba(34,211,238,0.6))' }
+};
+
 function renderComposite() {
   var activeIds = getActiveProfiles();
   var activeCount = activeIds.length;
   if (activeCount === 0) activeIds = allProfileIds.slice();
   activeCount = activeIds.length;
 
-  var useCpu = document.querySelector('.composite-resource-toggle[data-resource="cpu"]').classList.contains('active');
   var useMem = document.querySelector('.composite-resource-toggle[data-resource="mem"]').classList.contains('active');
   var activeTypes = getActiveTypes();
   var hasEngine = activeTypes.indexOf('engine') >= 0;
 
-  // Per-framework scored profile check: engines use engineScored, others use scored
+  // Per-framework scored profile check: each type has its own scored set.
   function isScoredForFw(pid, fw) {
     var fmeta = meta[fw] || {};
     var ftype = fmeta.type || 'production';
-    return ftype === 'engine' ? profileEngineScored[pid] : profileScored[pid];
+    if (ftype === 'engine') return profileEngineScored[pid];
+    if (ftype === 'infrastructure') return profileInfraScored[pid];
+    return profileScored[pid];
   }
-  var scoredIds = activeIds.filter(function(pid) { return profileScored[pid]; });
-  var scoredCount = scoredIds.length;
-  var engineScoredIds = activeIds.filter(function(pid) { return profileEngineScored[pid]; });
-  var engineScoredCount = engineScoredIds.length;
 
   // Search filter
   var searchVal = (document.querySelector('.composite-search-input').value || '').toLowerCase().trim();
@@ -533,86 +563,194 @@ function renderComposite() {
     return false;
   }
 
-  // Compute max RPS and max efficiency per active profile (filtered by type)
+  // Compute max RPS and max memory efficiency per active profile.
   var maxRpsByProfile = {};
-  var maxCpuEffByProfile = {};
   var maxMemEffByProfile = {};
   activeIds.forEach(function(pid) {
     maxRpsByProfile[pid] = 0;
-    maxCpuEffByProfile[pid] = 0;
     maxMemEffByProfile[pid] = 0;
     Object.keys(avgByProfile[pid] || {}).forEach(function(fw) {
       if (isExcluded(fw)) return;
       var rps = avgByProfile[pid][fw] || 0;
       if (rps > maxRpsByProfile[pid]) maxRpsByProfile[pid] = rps;
-      var cpu = avgCpuByProfile[pid][fw] || 0;
-      if (cpu > 0 && rps > 0) {
-        var cpuEff = rps / cpu;
-        if (cpuEff > maxCpuEffByProfile[pid]) maxCpuEffByProfile[pid] = cpuEff;
-      }
       var mem = avgMemByProfile[pid][fw] || 0;
       if (mem > 0 && rps > 0) {
-        var memEff = rps / mem;
+        var memEff = Math.sqrt(rps) / mem;
         if (memEff > maxMemEffByProfile[pid]) maxMemEffByProfile[pid] = memEff;
       }
     });
   });
 
   // For api workloads: compute weighted scores and re-normalize
-  var mixedWeights = {baseline:0.15, json:1, db:10, upload:10, compression:7, static:2, async_db:10};
+  var mixedWeights = {baseline:0.15, json:1, upload:10, static:2, async_db:10};
   ['api-4', 'api-16'].forEach(function(mpid) {
     if (activeIds.indexOf(mpid) >= 0) {
       var maxWeighted = 0;
       Object.keys(avgTplByProfile[mpid] || {}).forEach(function(fw) {
         if (isExcluded(fw)) return;
         var t = avgTplByProfile[mpid][fw];
-        var w = t.baseline * mixedWeights.baseline + t.json * mixedWeights.json + t.db * mixedWeights.db + t.upload * mixedWeights.upload + t.compression * mixedWeights.compression + (t.static || 0) * mixedWeights.static + (t.async_db || 0) * mixedWeights.async_db;
+        var w = t.baseline * mixedWeights.baseline + t.json * mixedWeights.json + t.upload * mixedWeights.upload + (t.static || 0) * mixedWeights.static + (t.async_db || 0) * mixedWeights.async_db;
         if (w > maxWeighted) maxWeighted = w;
       });
       if (maxWeighted > 0) maxRpsByProfile[mpid] = maxWeighted;
     }
   });
 
-  // For compression: compute bandwidth-adjusted RPS and re-normalize
+  // For json-comp: reward better compression ratios by scaling rps against
+  // bytes-per-request. The framework with the smallest bytes/request wins the
+  // ratio contest; everyone else's effective rps is discounted by
+  // (minBpr / theirBpr)^2 — quadratic so a framework that ships twice as many
+  // bytes per response pays 4× in score. Mirrors the legacy /compression test.
   var minBwPerReq = {};
-  activeIds.forEach(function(pid) {
-    if (pid !== 'compression') return;
+  if (activeIds.indexOf('json-comp') >= 0) {
     var minVal = Infinity;
-    Object.keys(avgByProfile[pid] || {}).forEach(function(fw) {
+    Object.keys(avgByProfile['json-comp'] || {}).forEach(function(fw) {
       if (isExcluded(fw)) return;
-      var rps = avgByProfile[pid][fw] || 0;
-      var bw = avgBwByProfile[pid][fw] || 0;
+      var rps = avgByProfile['json-comp'][fw] || 0;
+      var bw = avgBwByProfile['json-comp'][fw] || 0;
       if (rps > 0 && bw > 0) {
         var bpr = bw / rps;
         if (bpr < minVal) minVal = bpr;
       }
     });
     if (minVal < Infinity) {
-      minBwPerReq[pid] = minVal;
+      minBwPerReq['json-comp'] = minVal;
       var maxAdj = 0;
-      Object.keys(avgByProfile[pid] || {}).forEach(function(fw) {
+      Object.keys(avgByProfile['json-comp'] || {}).forEach(function(fw) {
         if (isExcluded(fw)) return;
-        var rps = avgByProfile[pid][fw] || 0;
-        var bw = avgBwByProfile[pid][fw] || 0;
+        var rps = avgByProfile['json-comp'][fw] || 0;
+        var bw = avgBwByProfile['json-comp'][fw] || 0;
         if (rps > 0 && bw > 0) {
-          var adj = rps * (minVal / (bw / rps));
+          var adj = rps * Math.pow(minVal / (bw / rps), 2);
           if (adj > maxAdj) maxAdj = adj;
         }
       });
-      if (maxAdj > 0) maxRpsByProfile[pid] = maxAdj;
+      if (maxAdj > 0) maxRpsByProfile['json-comp'] = maxAdj;
+    }
+  }
+
+  // Per-profile normalization denominators (max of effective-rps and max of
+  // memory-efficiency) across all frameworks in the current filter. These
+  // feed profileScoreFor() below, which is the one score function used by
+  // medals, crowns, bananas, and eggplants — so they all react to the
+  // memory-efficiency toggle the same way the composite score does.
+  var allMaxRps = {};
+  var allMaxMemEffByProfile = {};
+  allProfileIds.forEach(function(pid) {
+    allMaxRps[pid] = 0;
+    allMaxMemEffByProfile[pid] = 0;
+    Object.keys(avgByProfile[pid] || {}).forEach(function(fw) {
+      if (isExcluded(fw)) return;
+      var rps = avgByProfile[pid][fw] || 0;
+      var effective = rps;
+      if ((pid === 'api-4' || pid === 'api-16') && avgTplByProfile[pid] && avgTplByProfile[pid][fw]) {
+        var t = avgTplByProfile[pid][fw];
+        effective = t.baseline * mixedWeights.baseline + t.json * mixedWeights.json + t.upload * mixedWeights.upload + (t.static || 0) * mixedWeights.static + (t.async_db || 0) * mixedWeights.async_db;
+      } else if (pid === 'json-comp' && minBwPerReq['json-comp']) {
+        var bw = avgBwByProfile['json-comp'][fw] || 0;
+        if (bw > 0 && rps > 0) {
+          effective = rps * Math.pow(minBwPerReq['json-comp'] / (bw / rps), 2);
+        }
+      }
+      if (effective > allMaxRps[pid]) allMaxRps[pid] = effective;
+      var mem = avgMemByProfile[pid][fw] || 0;
+      if (mem > 0 && rps > 0) {
+        var memEff = Math.sqrt(rps) / mem;
+        if (memEff > allMaxMemEffByProfile[pid]) allMaxMemEffByProfile[pid] = memEff;
+      }
+    });
+  });
+
+  // Memory-aware per-profile score (0..150) — the same shape the composite
+  // uses, so badges and awards track whatever the visible leaderboard shows.
+  // When useMem=false this is just the normalized rps score and the ranking
+  // is identical to the pre-toggle behavior.
+  function profileScoreFor(pid, fw) {
+    var rps = (avgByProfile[pid] && avgByProfile[pid][fw]) || 0;
+    if (rps <= 0) return 0;
+    var maxRps = allMaxRps[pid] || 0;
+    if (maxRps <= 0) return 0;
+    var effectiveRps = rps;
+    if ((pid === 'api-4' || pid === 'api-16') && avgTplByProfile[pid] && avgTplByProfile[pid][fw]) {
+      var t = avgTplByProfile[pid][fw];
+      effectiveRps = t.baseline * mixedWeights.baseline + t.json * mixedWeights.json + t.upload * mixedWeights.upload + (t.static || 0) * mixedWeights.static + (t.async_db || 0) * mixedWeights.async_db;
+    } else if (pid === 'json-comp' && minBwPerReq['json-comp']) {
+      var bwJc = avgBwByProfile['json-comp'][fw] || 0;
+      if (bwJc > 0) {
+        effectiveRps = rps * Math.pow(minBwPerReq['json-comp'] / (bwJc / rps), 2);
+      }
+    }
+    var rpsScore = (effectiveRps / maxRps) * 100;
+    if (!useMem) return rpsScore;
+    var maxMemEff = allMaxMemEffByProfile[pid] || 0;
+    if (maxMemEff <= 0) return rpsScore;
+    var mem = avgMemByProfile[pid][fw] || 0;
+    if (mem <= 0) return rpsScore;
+    var memEff = Math.sqrt(rps) / mem;
+    return rpsScore + (memEff / maxMemEff) * 100 * 0.5;
+  }
+
+  // Determine top-3 frameworks per profile for badges (always all profiles)
+  var topFwByProfile = {}, secondFwByProfile = {}, thirdFwByProfile = {};
+  allProfileIds.forEach(function(pid) {
+    var bestFw = null, bestScore = 0, secondFw = null, secondScore = 0, thirdFw = null, thirdScore = 0;
+    Object.keys(avgByProfile[pid] || {}).forEach(function(fw) {
+      if (isExcluded(fw)) return;
+      var score = profileScoreFor(pid, fw);
+      if (score <= 0) return;
+      if (score > bestScore) { thirdScore = secondScore; thirdFw = secondFw; secondScore = bestScore; secondFw = bestFw; bestScore = score; bestFw = fw; }
+      else if (score > secondScore) { thirdScore = secondScore; thirdFw = secondFw; secondScore = score; secondFw = fw; }
+      else if (score > thirdScore) { thirdScore = score; thirdFw = fw; }
+    });
+    if (bestFw) topFwByProfile[pid] = bestFw;
+    if (secondFw) secondFwByProfile[pid] = secondFw;
+    if (thirdFw) thirdFwByProfile[pid] = thirdFw;
+  });
+  var badgesByFw = {};
+  allProfileIds.forEach(function(pid) {
+    var fw = topFwByProfile[pid];
+    if (fw) {
+      if (!badgesByFw[fw]) badgesByFw[fw] = [];
+      badgesByFw[fw].push({ pid: pid, label: profileLabels[pid], proto: profileProtos[pid], place: 1 });
+    }
+    var fw2 = secondFwByProfile[pid];
+    if (fw2) {
+      if (!badgesByFw[fw2]) badgesByFw[fw2] = [];
+      badgesByFw[fw2].push({ pid: pid, label: profileLabels[pid], proto: profileProtos[pid], place: 2 });
+    }
+    var fw3 = thirdFwByProfile[pid];
+    if (fw3) {
+      if (!badgesByFw[fw3]) badgesByFw[fw3] = [];
+      badgesByFw[fw3].push({ pid: pid, label: profileLabels[pid], proto: profileProtos[pid], place: 3 });
     }
   });
 
-  // Weight config
-  var wRps = 1, wCpu = useCpu ? 1 : 0, wMem = useMem ? 0.5 : 0;
-  var totalWeight = wRps + wCpu + wMem;
+  // Scoring model. CPU efficiency was dropped: a framework that uses less
+  // CPU but produces less throughput already scores worse on rps alone, so
+  // rewarding "low CPU" as its own factor double-counted the signal.
+  // Memory (when toggled) adds a 0..50 bonus on top of the rpsScore:
+  // memEff = sqrt(rps) / memMB (sqrt dampens rps so memory can actually
+  // win against throughput), memScore = (memEff / best) × 100, then × 0.5.
+  // High rps + low memory can reach ~150; high rps + bloated memory stays
+  // near 100; low rps gets little from either term. The composite is the
+  // SUM across scored profiles (not the mean), so larger numbers separate
+  // strong all-rounders from frameworks that only win a single profile.
 
   // Compute scores
   var results = [];
   Object.keys(allFw).forEach(function(fw) {
     if (isExcluded(fw)) return;
     var scores = [];
-    var participated = 0;
+    // Visibility is separate from scoring: a row shows up whenever the
+    // framework has *any* data in the active profile set (hasAnyData),
+    // while the composite total sums only profiles that are scored for
+    // that framework's type (scoredCount / composite). Conflating the
+    // two was hiding infrastructure frameworks on every non-H/1.1-isolated
+    // tab because profileInfraScored is only true for baseline/pipelined/
+    // limited-conn/static — nginx/h2o then showed 0 scored profiles on
+    // an H/2 or H/3 tab and were dropped entirely.
+    var hasAnyData = false;
+    var scoredCount = 0;
     activeIds.forEach(function(pid) {
       if (avgByProfile[pid] && avgByProfile[pid][fw] && maxRpsByProfile[pid] > 0) {
         var rps = avgByProfile[pid][fw];
@@ -620,49 +758,39 @@ function renderComposite() {
         // For api workloads: use weighted template score
         if ((pid === 'api-4' || pid === 'api-16') && avgTplByProfile[pid] && avgTplByProfile[pid][fw]) {
           var t = avgTplByProfile[pid][fw];
-          effectiveRps = t.baseline * mixedWeights.baseline + t.json * mixedWeights.json + t.db * mixedWeights.db + t.upload * mixedWeights.upload + t.compression * mixedWeights.compression + (t.static || 0) * mixedWeights.static + (t.async_db || 0) * mixedWeights.async_db;
+          effectiveRps = t.baseline * mixedWeights.baseline + t.json * mixedWeights.json + t.upload * mixedWeights.upload + (t.static || 0) * mixedWeights.static + (t.async_db || 0) * mixedWeights.async_db;
         }
-        // For compression: use bandwidth-adjusted RPS
-        if (pid === 'compression' && minBwPerReq[pid]) {
-          var bw = avgBwByProfile[pid][fw] || 0;
-          if (bw > 0 && rps > 0) {
-            effectiveRps = rps * (minBwPerReq[pid] / (bw / rps));
+        // For json-comp: discount rps by squared bytes-per-request ratio so
+        // better compression wins over raw throughput at the same rps.
+        if (pid === 'json-comp' && minBwPerReq['json-comp']) {
+          var bwJc = avgBwByProfile['json-comp'][fw] || 0;
+          if (bwJc > 0 && rps > 0) {
+            effectiveRps = rps * Math.pow(minBwPerReq['json-comp'] / (bwJc / rps), 2);
           }
         }
         var rpsScore = (effectiveRps / maxRpsByProfile[pid]) * 100;
-        var profileScore = rpsScore * wRps;
-        if (wCpu > 0 && maxCpuEffByProfile[pid] > 0) {
-          var fwCpu = avgCpuByProfile[pid][fw] || 0;
-          var cpuEff = (fwCpu > 0) ? rps / fwCpu : 0;
-          var cpuScore = (cpuEff / maxCpuEffByProfile[pid]) * 100;
-          profileScore += cpuScore * wCpu;
-        }
-        if (wMem > 0 && maxMemEffByProfile[pid] > 0) {
+        var profileScore = rpsScore;
+        if (useMem && maxMemEffByProfile[pid] > 0) {
           var fwMem = avgMemByProfile[pid][fw] || 0;
-          var memEff = (fwMem > 0) ? rps / fwMem : 0;
-          var memScore = (memEff / maxMemEffByProfile[pid]) * 100;
-          profileScore += memScore * wMem;
+          if (fwMem > 0) {
+            var memEff = Math.sqrt(rps) / fwMem;
+            var memScore = (memEff / maxMemEffByProfile[pid]) * 100;
+            profileScore += memScore * 0.5;
+          }
         }
-        scores.push(profileScore / totalWeight);
-        if (isScoredForFw(pid, fw)) participated++;
+        scores.push(profileScore);
+        hasAnyData = true;
+        if (isScoredForFw(pid, fw)) scoredCount++;
       } else {
         scores.push(0);
       }
     });
-    var composite;
-    if (participated === 0) {
-      return;
-    } else {
-      var fmeta = meta[fw] || {};
-      var ftype = fmeta.type || 'production';
-      var fwScoredCount = ftype === 'engine' ? engineScoredCount : scoredCount;
-      var sum = 0;
-      activeIds.forEach(function(pid, i) {
-        if (isScoredForFw(pid, fw) && scores[i] > 0) sum += scores[i];
-      });
-      composite = fwScoredCount > 0 ? (sum / fwScoredCount) : 0;
-    }
-    results.push({ framework: fw, language: fwLang[fw] || '', scores: scores, composite: composite, participated: participated });
+    if (!hasAnyData) return;
+    var sum = 0;
+    activeIds.forEach(function(pid, i) {
+      if (isScoredForFw(pid, fw) && scores[i] > 0) sum += scores[i];
+    });
+    results.push({ framework: fw, language: fwLang[fw] || '', scores: scores, composite: sum, participated: scoredCount });
   });
   // Sort by active column
   if (compositeSortCol === 'composite' || compositeSortCol === null) {
@@ -676,6 +804,96 @@ function renderComposite() {
     }
   }
 
+  // Compute section champions (trophy/medal badges) using raw avgByProfile data
+  var sectionGroups = { h1iso: [], h1wk: [], h2: [], h3: [], grpc: [], ws: [] };
+  allProfileIds.forEach(function(pid) {
+    var proto = profileProtos[pid];
+    if (proto === 'h1iso') sectionGroups.h1iso.push(pid);
+    else if (proto === 'h1wk') sectionGroups.h1wk.push(pid);
+    else if (proto === 'h2') sectionGroups.h2.push(pid);
+    else if (proto === 'h3') sectionGroups.h3.push(pid);
+    else if (proto === 'grpc') sectionGroups.grpc.push(pid);
+    else if (proto === 'ws') sectionGroups.ws.push(pid);
+  });
+  // allMaxRps + allMaxMemEffByProfile (and the mix/json-comp adjustments) are
+  // already computed up front and used by profileScoreFor(); nothing extra to
+  // build here.
+  var crownsByFw = {};
+  var sectionLabels = { h1iso: 'H/1.1 Isolated', h1wk: 'H/1.1 Workload', h2: 'H/2', h3: 'H/3', grpc: 'gRPC', ws: 'WebSocket' };
+  var sectionColors = { h1iso: '#3b82f6', h1wk: '#2563eb', h2: '#eab308', h3: '#22c55e', grpc: '#7c3aed', ws: '#0891b2' };
+  Object.keys(sectionGroups).forEach(function(section) {
+    var pids = sectionGroups[section];
+    if (pids.length === 0) return;
+    var bestFw = null, bestAvg = 0, secondFw = null, secondAvg = 0, thirdFw = null, thirdAvg = 0;
+    var totalPids = pids.length;
+    Object.keys(allFw).forEach(function(fw) {
+      if (isExcluded(fw)) return;
+      var sum = 0;
+      pids.forEach(function(pid) {
+        sum += profileScoreFor(pid, fw);
+      });
+      var avg = totalPids > 0 ? sum / totalPids : 0;
+      if (avg > bestAvg) { thirdAvg = secondAvg; thirdFw = secondFw; secondAvg = bestAvg; secondFw = bestFw; bestAvg = avg; bestFw = fw; }
+      else if (avg > secondAvg) { thirdAvg = secondAvg; thirdFw = secondFw; secondAvg = avg; secondFw = fw; }
+      else if (avg > thirdAvg) { thirdAvg = avg; thirdFw = fw; }
+    });
+    if (bestFw) {
+      if (!crownsByFw[bestFw]) crownsByFw[bestFw] = [];
+      crownsByFw[bestFw].push({ section: section, label: sectionLabels[section], color: sectionColors[section], place: 1 });
+    }
+    if (secondFw) {
+      if (!crownsByFw[secondFw]) crownsByFw[secondFw] = [];
+      crownsByFw[secondFw].push({ section: section, label: sectionLabels[section], color: sectionColors[section], place: 2 });
+    }
+    if (thirdFw) {
+      if (!crownsByFw[thirdFw]) crownsByFw[thirdFw] = [];
+      crownsByFw[thirdFw].push({ section: section, label: sectionLabels[section], color: sectionColors[section], place: 3 });
+    }
+  });
+
+  // Compute banana points per framework
+  // Medals: gold=5, silver=2, bronze=1. Trophies: same but ×3.
+  var bananaByFw = {};
+  Object.keys(allFw).forEach(function(fw) {
+    var points = 0;
+    var medals = badgesByFw[fw];
+    if (medals) {
+      medals.forEach(function(m) {
+        points += m.place === 1 ? 5 : m.place === 2 ? 2 : 1;
+      });
+    }
+    var crowns = crownsByFw[fw];
+    if (crowns) {
+      crowns.forEach(function(c) {
+        points += (c.place === 1 ? 5 : c.place === 2 ? 2 : 1) * 3;
+      });
+    }
+    if (points > 0) {
+      var tier = points >= 50 ? 'diamond' : points >= 40 ? 'platinum' : points >= 30 ? 'gold' : points >= 20 ? 'silver' : points >= 10 ? 'bronze' : null;
+      if (tier) bananaByFw[fw] = { points: points, tier: tier };
+    }
+  });
+
+  // Compute eggplant points per framework across ALL profiles.
+  // One point per scored profile where the framework's profileScoreFor is
+  // below 10. When the memory toggle is on, a bad-on-rps framework that's
+  // also memory-efficient gets pulled above the threshold — which is why
+  // this goes through profileScoreFor rather than raw rps.
+  var eggplantByFw = {};
+  Object.keys(allFw).forEach(function(fw) {
+    if (isExcluded(fw)) return;
+    var points = 0;
+    allProfileIds.forEach(function(pid) {
+      if (!isScoredForFw(pid, fw)) return;
+      var score = profileScoreFor(pid, fw);
+      if (score > 0 && score < 10) points++;
+    });
+    if (points >= 5) {
+      var tier = points >= 12 ? 'diamond' : points >= 9 ? 'gold' : points >= 7 ? 'silver' : 'bronze';
+      eggplantByFw[fw] = { points: points, tier: tier };
+    }
+  });
+
   // Render
   var table = document.getElementById('composite-table');
   table.innerHTML = '';
@@ -686,7 +904,7 @@ function renderComposite() {
   // Header
   var header = document.createElement('div');
   header.className = 'lb-row lb-header';
-  header.style.gridTemplateColumns = '2rem 9rem 3.5rem 3.5rem repeat(' + activeCount + ', minmax(4.2rem, 5.5rem))';
+  header.style.gridTemplateColumns = '2rem 16.8rem 3.5rem 3.5rem repeat(' + activeCount + ', minmax(4.2rem, 5.5rem))';
   var headerHtml = '<div title="Rank">#</div>' +
     '<div>Framework</div>' +
     '<div>Lang</div>' +
@@ -735,7 +953,7 @@ function renderComposite() {
     row.dataset.name = r.framework;
     row.dataset.lang = r.language;
     row.dataset.type = ftype;
-    row.style.gridTemplateColumns = '2rem 9rem 3.5rem 3.5rem repeat(' + activeCount + ', minmax(4.2rem, 5.5rem))';
+    row.style.gridTemplateColumns = '2rem 16.8rem 3.5rem 3.5rem repeat(' + activeCount + ', minmax(4.2rem, 5.5rem))';
     row.style.cursor = 'pointer';
 
     var rank = String(idx + 1);
@@ -747,35 +965,41 @@ function renderComposite() {
       var pid = activeIds[i];
       var proto = profileProtos[pid];
       var scored = isScoredForFw(pid, r.framework);
-      var bgStyle;
-      if (!scored) {
-        bgStyle = ' background:rgba(148,163,184,0.08); margin:-0.5rem -0.25rem; padding:0.5rem 0.25rem; border-radius:4px; opacity:0.5;';
-      } else if (proto === 'h3') {
-        bgStyle = ' background:rgba(34,197,94,0.12); margin:-0.5rem -0.25rem; padding:0.5rem 0.25rem; border-radius:4px;';
-      } else if (proto === 'h2') {
-        bgStyle = ' background:rgba(234,179,8,0.12); margin:-0.5rem -0.25rem; padding:0.5rem 0.25rem; border-radius:4px;';
-      } else if (proto === 'grpc') {
-        bgStyle = ' background:rgba(124,58,237,0.10); margin:-0.5rem -0.25rem; padding:0.5rem 0.25rem; border-radius:4px;';
-      } else if (proto === 'ws') {
-        bgStyle = ' background:rgba(8,145,178,0.10); margin:-0.5rem -0.25rem; padding:0.5rem 0.25rem; border-radius:4px;';
-      } else {
-        bgStyle = ' background:rgba(59,130,246,0.08); margin:-0.5rem -0.25rem; padding:0.5rem 0.25rem; border-radius:4px;';
-      }
+      // Value cells are unstyled except for a dim on unscored profiles.
+      var bgStyle = scored ? '' : ' opacity:0.5;';
       if (s === 0) {
         profileCells += '<div class="lb-stat" style="text-align:right; color:#cbd5e1;' + bgStyle + '">—</div>';
       } else {
         var color = scored ? (s >= 85 ? '#16a34a' : s >= 70 ? '#65a30d' : s >= 50 ? '#ca8a04' : s >= 30 ? '#ea580c' : '#dc2626') : '#94a3b8';
         var suffix = '';
-        var rps = avgByProfile[pid][r.framework];
-        var rpsStr = rps >= 1000000 ? (rps / 1000000).toFixed(1) + 'M' : rps >= 10000 ? (rps / 1000).toFixed(0) + 'K' : rps >= 1000 ? (rps / 1000).toFixed(1) + 'K' : Math.round(rps);
-        suffix = ' <span style="font-size:0.6rem; color:#94a3b8; font-weight:400;">(' + rpsStr + ')</span>';
+        // json-comp is scored by a compression-weighted formula, not raw rps —
+        // showing the rps in parens is misleading (the score doesn't track it).
+        if (pid !== 'json-comp') {
+          var rps = avgByProfile[pid][r.framework];
+          var rpsStr = rps >= 1000000 ? (rps / 1000000).toFixed(1) + 'M' : rps >= 10000 ? (rps / 1000).toFixed(0) + 'K' : rps >= 1000 ? (rps / 1000).toFixed(1) + 'K' : Math.round(rps);
+          suffix = ' <span style="font-size:0.6rem; color:#94a3b8; font-weight:400;">(' + rpsStr + ')</span>';
+        }
         profileCells += '<div class="lb-stat" style="text-align:right; color:' + color + '; font-weight:500;' + bgStyle + '">' + s.toFixed(1) + suffix + '</div>';
       }
     });
 
+    var badgeHtml = '';
+    var fwBanana = bananaByFw[r.framework];
+    if (fwBanana) {
+      var bt = bananaTiers[fwBanana.tier];
+      badgeHtml += '<span class="composite-banana" title="' + bt.label + ' Banana (' + fwBanana.points + ' pts) — ' + bt.msg + '"><span class="composite-banana-emoji" style="filter:' + bt.filter + ';">\uD83C\uDF4C</span></span>';
+    }
+    var fwEggplant = eggplantByFw[r.framework];
+    if (fwEggplant) {
+      var et = eggplantTiers[fwEggplant.tier];
+      badgeHtml += '<span class="composite-eggplant" title="' + et.label + ' Eggplant (' + fwEggplant.points + ' tests below 10) — This is not a dildo"><span class="composite-eggplant-emoji" style="filter:' + et.filter + ';">\uD83C\uDF46</span></span>';
+    }
+    if (r.framework === 'genhttp') {
+      badgeHtml += '<span style="display:inline-flex; align-items:center; margin-left:0.25rem; cursor:default; line-height:1; vertical-align:middle; filter:brightness(0.7) sepia(1) saturate(3) hue-rotate(-10deg);" title="Participation Award — He\'s happy to be here">\uD83C\uDFC5</span>';
+    }
     row.innerHTML =
       '<div class="lb-rank">' + rank + '</div>' +
-      '<div class="lb-name" style="font-weight:400; font-size:0.8rem;">' + r.framework + '</div>' +
+      '<div class="lb-name" style="font-weight:400; font-size:0.8rem;">' + r.framework + badgeHtml + '</div>' +
       '<div class="lb-lang">' + r.language + '</div>' +
       '<div class="lb-rps" style="font-weight:400; text-align:left; padding-left:0.5rem; color:' + (pct >= 85 ? '#16a34a' : pct >= 70 ? '#65a30d' : pct >= 50 ? '#ca8a04' : pct >= 30 ? '#ea580c' : '#dc2626') + ';">' + r.composite.toFixed(1) + '</div>' +
       profileCells;
@@ -802,8 +1026,69 @@ function renderComposite() {
             '</div>';
         }
       });
-      var repoHtml = fmeta.repo ? '<a class="lb-popup-link" href="' + fmeta.repo + '" target="_blank" rel="noreferrer">View source &rarr;</a>' : '';
-      var benchHtml = '<a class="lb-popup-link" href="https://github.com/MDA2AV/HttpArena/tree/main/frameworks/' + encodeURIComponent(r.framework) + '" target="_blank" rel="noreferrer">Benchmark implementation &rarr;</a>';
+      // Build popup banana section
+      var popupBadges = '';
+      var popupBanana = bananaByFw[r.framework];
+      var popupCrowns = crownsByFw[r.framework];
+      var popupProfileBadges = badgesByFw[r.framework];
+      var protoColorsPopup = { h1iso: '#3b82f6', h1wk: '#2563eb', h2: '#eab308', h2gw: '#eab308', h3: '#22c55e', h3gw: '#22c55e', grpc: '#7c3aed', ws: '#0891b2', prodstack: '#ec4899' };
+      if (popupBanana) {
+        var pbt = bananaTiers[popupBanana.tier];
+        popupBadges += '<div style="margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.5rem;">\uD83C\uDF4C</span><span style="font-weight:700; font-size:0.95rem; color:' + pbt.color + ';">' + pbt.label + ' Banana</span><span style="font-size:0.8rem; color:#64748b;">(' + popupBanana.points + ' pts)</span></div><div style="margin-bottom:0.5rem; font-size:0.8rem; font-style:italic; color:' + pbt.color + ';">' + pbt.msg + '</div>';
+      }
+      if (popupCrowns && popupCrowns.length > 0) {
+        popupBadges += '<div style="margin-bottom:0.4rem;"><span style="font-weight:600; font-size:0.78rem; color:#64748b;">Section Podium (x3 pts)</span><div style="margin-top:0.2rem;">';
+        popupCrowns.forEach(function(c) {
+          var placeLabel = c.place === 1 ? '#1 (15pts)' : c.place === 2 ? '#2 (6pts)' : '#3 (3pts)';
+          popupBadges += '<span style="display:inline-flex; align-items:center; gap:0.3rem; margin:0.15rem 0.3rem 0.15rem 0; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.78rem; font-weight:600; color:' + c.color + '; background:rgba(0,0,0,0.04); border:1px solid ' + c.color + ';">' + placeLabel + ' in ' + c.label + '</span>';
+        });
+        popupBadges += '</div></div>';
+      }
+      if (popupProfileBadges && popupProfileBadges.length > 0) {
+        popupBadges += '<div style="margin-bottom:0.4rem;"><span style="font-weight:600; font-size:0.78rem; color:#64748b;">Test Podium</span><div style="margin-top:0.2rem;">';
+        popupProfileBadges.forEach(function(b) {
+          var color = protoColorsPopup[b.proto] || '#3b82f6';
+          var sublabel = profileSublabels[b.pid] || b.proto;
+          var placeLabel = b.place === 1 ? '#1 (5pts)' : b.place === 2 ? '#2 (2pts)' : '#3 (1pt)';
+          popupBadges += '<span style="display:inline-flex; align-items:center; gap:0.3rem; margin:0.15rem 0.3rem 0.15rem 0; padding:0.2rem 0.5rem; border-radius:4px; font-size:0.78rem; font-weight:500; color:' + color + '; background:rgba(0,0,0,0.04); border:1px solid ' + color + ';">' + placeLabel + ' ' + b.label + ' (' + sublabel + ')</span>';
+        });
+        popupBadges += '</div></div>';
+      }
+      var popupEggplant = eggplantByFw[r.framework];
+      if (popupEggplant) {
+        var pet = eggplantTiers[popupEggplant.tier];
+        popupBadges += '<div style="margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.5rem; filter:' + pet.filter + ';">\uD83C\uDF46</span><span style="font-weight:700; font-size:0.95rem; color:' + pet.color + ';">' + pet.label + ' Eggplant</span><span style="font-size:0.8rem; color:#64748b;">(' + popupEggplant.points + ' tests below 10)</span></div><div style="margin-bottom:0.5rem; font-size:0.8rem; font-style:italic; color:' + pet.color + ';">This is not a dildo</div>';
+      }
+      if (r.framework === 'genhttp') {
+        popupBadges += '<div style="margin-bottom:0.5rem; display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.5rem; filter:brightness(0.7) sepia(1) saturate(3) hue-rotate(-10deg);">\uD83C\uDFC5</span><span style="font-weight:700; font-size:0.95rem; color:#B45309;">Participation Award</span></div><div style="margin-bottom:0.5rem; font-size:0.8rem; font-style:italic; color:#B45309;">He\'s happy to be here</div>';
+      }
+      // Awards section collapsed by default (<details>) — was occupying too much vertical space
+      var popupBadgeSection = popupBadges
+        ? '<details class="lb-popup-awards" style="margin:0.75rem 0; padding:0.6rem 0.75rem; background:rgba(0,0,0,0.02); border-radius:8px; border:1px solid rgba(0,0,0,0.06);">'
+          + '<summary style="cursor:pointer; font-weight:600; font-size:0.85rem; color:#475569; user-select:none;">Awards &amp; Badges</summary>'
+          + '<div style="margin-top:0.6rem;">' + popupBadges + '</div>'
+          + '</details>'
+        : '';
+
+      // Build one "variant" section per framework directory sharing this display_name.
+      // `fmeta.variants` contains sibling entries; we merge primary + variants into one list.
+      var variantsList = [{ dir: fmeta.dir || r.framework, description: fmeta.description || '', repo: fmeta.repo || '' }];
+      if (Array.isArray(fmeta.variants)) {
+        fmeta.variants.forEach(function(v) {
+          variantsList.push({ dir: v.dir, description: v.description || '', repo: v.repo || '' });
+        });
+      }
+      var variantsHtml = variantsList.map(function(v) {
+        var header = variantsList.length > 1
+          ? '<div style="font-size:0.75rem; font-weight:600; color:#64748b; text-transform:uppercase; letter-spacing:0.04em; margin-top:0.5rem;">' + v.dir + '</div>'
+          : '';
+        var desc = v.description ? '<div class="lb-popup-desc" style="margin-top:0.2rem;">' + v.description + '</div>' : '';
+        var repoLink = v.repo ? '<a class="lb-popup-link" href="' + v.repo + '" target="_blank" rel="noreferrer">View source &rarr;</a>' : '';
+        var benchLink = '<a class="lb-popup-link" href="https://github.com/MDA2AV/HttpArena/tree/main/frameworks/' + encodeURIComponent(v.dir) + '" target="_blank" rel="noreferrer">Benchmark implementation &rarr;</a>';
+        var links = '<div class="lb-popup-links" style="margin-top:0.35rem;">' + repoLink + benchLink + '</div>';
+        return header + desc + links;
+      }).join('');
+
       var overlay = document.createElement('div');
       overlay.className = 'lb-overlay';
       overlay.innerHTML =
@@ -811,12 +1096,12 @@ function renderComposite() {
           '<button class="lb-popup-close" aria-label="Close">&times;</button>' +
           '<div class="lb-popup-name">' + r.framework + '</div>' +
           '<div class="lb-popup-lang">' + r.language + '</div>' +
-          '<div class="lb-popup-desc">' + (fmeta.description || '') + '</div>' +
+          variantsHtml +
+          popupBadgeSection +
           '<div class="lb-popup-stats">' +
             '<div><div class="lb-popup-stat-label">Composite Score</div><div class="lb-popup-stat-value" style="font-size:1.5rem; font-weight:700;">' + r.composite.toFixed(1) + '</div></div>' +
             profileDetails +
           '</div>' +
-          '<div class="lb-popup-links">' + repoHtml + benchHtml + '</div>' +
         '</div>';
       document.body.appendChild(overlay);
       function close() { overlay.remove(); }
@@ -855,11 +1140,13 @@ function updateCompositeNote() {
   if (!note) return;
   var prodActive = document.querySelector('.composite-type-filter[data-type="production"]').classList.contains('active');
   var tunedActive = document.querySelector('.composite-type-filter[data-type="tuned"]').classList.contains('active');
+  var infraActive = document.querySelector('.composite-type-filter[data-type="infrastructure"]').classList.contains('active');
   var engineActive = document.querySelector('.composite-type-filter[data-type="engine"]').classList.contains('active');
   var defs = [];
-  if (prodActive) defs.push('<span class="lb-type-badge lb-type-badge-production">$ Production</span> Standard framework configuration. Must follow production-specific implementation rules for each test.');
-  if (tunedActive) defs.push('<span class="lb-type-badge lb-type-badge-tuned"># Tuned</span> May use experimental flags and non-default optimizations. Not bound by production implementation rules.');
-  if (engineActive) defs.push('<span class="lb-type-badge lb-type-badge-engine">* Engine</span> Bare-metal HTTP servers — not frameworks. A different breed entirely.');
+  if (prodActive) defs.push('<span class="lb-type-badge lb-type-badge-production"><span class="lb-type-square" style="background:#22c55e;"></span> Production</span> Standard framework configuration. Must follow production-specific implementation rules for each test.');
+  if (tunedActive) defs.push('<span class="lb-type-badge lb-type-badge-tuned"><span class="lb-type-square" style="background:#eab308;"></span> Tuned</span> May use experimental flags and non-default optimizations. Not bound by production implementation rules.');
+  if (infraActive) defs.push('<span class="lb-type-badge lb-type-badge-infrastructure"><span class="lb-type-square" style="background:#0891b2;"></span> Infrastructure</span> Reverse proxies, static-file servers, and their scripting extensions (nginx, h2o, caddy). Scored only on baseline, pipelined, short-lived, and static.');
+  if (engineActive) defs.push('<span class="lb-type-badge lb-type-badge-engine"><span class="lb-type-square" style="background:#dc2626;"></span> Engine</span> Bare-metal HTTP servers — not frameworks. A different breed entirely.');
   note.innerHTML = defs.join('<br>');
 }
 updateCompositeNote();
@@ -913,15 +1200,17 @@ document.querySelectorAll('.composite-resource-toggle').forEach(function(btn) {
 });
 
 // Type filter click handlers
-// Production and Tuned can be selected together; Engine is always exclusive
+// Production and Tuned can be selected together. Engine and Infrastructure
+// are each exclusive — selecting them clears all other types.
 document.querySelectorAll('.composite-type-filter').forEach(function(btn) {
   btn.addEventListener('click', function() {
     var type = btn.dataset.type;
-    if (type === 'engine') {
+    if (type === 'engine' || type === 'infrastructure') {
       document.querySelectorAll('.composite-type-filter').forEach(function(f) { f.classList.remove('active'); });
       btn.classList.add('active');
     } else {
       document.querySelector('.composite-type-filter[data-type="engine"]').classList.remove('active');
+      document.querySelector('.composite-type-filter[data-type="infrastructure"]').classList.remove('active');
       btn.classList.toggle('active');
       var prodActive = document.querySelector('.composite-type-filter[data-type="production"]').classList.contains('active');
       var tunedActive = document.querySelector('.composite-type-filter[data-type="tuned"]').classList.contains('active');

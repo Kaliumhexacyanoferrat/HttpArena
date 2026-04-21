@@ -57,21 +57,13 @@ docker rm -f "$CONTAINER_NAME" 2>/dev/null || true
 # Build docker run args — mount all data files unconditionally for local testing
 docker_args=(--name "$CONTAINER_NAME" --network host)
 docker_args+=(-v "$DATA_DIR/dataset.json:/data/dataset.json:ro")
-docker_args+=(-v "$DATA_DIR/dataset-large.json:/data/dataset-large.json:ro")
 docker_args+=(-v "$DATA_DIR/static:/data/static:ro")
 docker_args+=(-e "DATABASE_URL=postgres://bench:bench@localhost:5432/benchmark")
-docker_args+=(-e "DATABASE_MAX_CONN=512")
+docker_args+=(-e "DATABASE_MAX_CONN=256")
 
 if [ -d "$CERTS_DIR" ]; then
     docker_args+=( -v "$CERTS_DIR:/certs:ro")
 fi
-
-DB_FILE="$DATA_DIR/benchmark.db"
-if [ ! -f "$DB_FILE" ]; then
-    echo "[db] benchmark.db not found, generating..."
-    python3 "$SCRIPT_DIR/generate-db.py" "$DATA_DIR/dataset.json" "$DB_FILE"
-fi
-docker_args+=(-v "$DB_FILE:/data/benchmark.db:ro")
 
 # Start Postgres sidecar
 PG_CONTAINER="httparena-pg"
@@ -83,7 +75,7 @@ docker run -d --name "$PG_CONTAINER" --network host \
     -e POSTGRES_PASSWORD=bench \
     -e POSTGRES_DB=benchmark \
     -v "$DATA_DIR/pgdb-seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro" \
-    postgres:17-alpine \
+    postgres:18 \
     -c max_connections=256
 for i in $(seq 1 60); do
     if docker exec "$PG_CONTAINER" pg_isready -U bench -d benchmark >/dev/null 2>&1; then

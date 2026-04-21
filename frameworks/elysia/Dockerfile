@@ -1,8 +1,33 @@
-FROM oven/bun:latest
+# https://elysiajs.com/patterns/deploy.html#deploy-to-production
+FROM oven/bun AS build
+
 WORKDIR /app
-COPY package.json ./
+
+# Cache packages installation
+COPY package.json package.json
+COPY bun.lock bun.lock
+
 RUN bun install --production
-COPY server.ts entrypoint.sh ./
-RUN chmod +x entrypoint.sh
-EXPOSE 8080 8443
-CMD ["/app/entrypoint.sh"]
+
+COPY server.ts .
+
+ENV NODE_ENV=production
+
+RUN bun build \
+	--compile \
+	--minify \
+	--target bun \
+	--outfile server \
+	server.ts
+
+FROM gcr.io/distroless/base
+
+WORKDIR /app
+
+COPY --from=build /app/server server
+
+ENV NODE_ENV=production
+
+CMD ["./server"]
+
+EXPOSE 3000

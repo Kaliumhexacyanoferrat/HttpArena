@@ -1,106 +1,135 @@
-import json
 import os
+import sys
+import multiprocessing
+import json
 import gzip
-import sqlite3
-import zlib
-from flask import Flask, request, make_response
-import psycopg_pool
-import psycopg.rows
+import mimetypes
 
-app = Flask(__name__)
+import psycopg_pool
+import psycopg.rows 
+
+from flask import Flask, request, make_response, Response 
+from flask import send_from_directory, jsonify
+
+
+app = Flask(__name__, static_folder = None)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
-# ── MIME types ────────────────────────────────────────────────────────
-MIME_TYPES = {
-    '.css': 'text/css', '.js': 'application/javascript', '.html': 'text/html',
-    '.woff2': 'font/woff2', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.json': 'application/json',
-}
 
-# ── Pre-load static files ────────────────────────────────────────────
-static_files = {}
+# -- Dataset and constants --------------------------------------------------------
+
+CPU_COUNT = int(multiprocessing.cpu_count())
+WRK_COUNT = min(len(os.sched_getaffinity(0)), 128)
+WRK_COUNT = max(WRK_COUNT, 4)
+
+DATASET_LARGE_PATH = "/data/dataset-large.json"
+DATASET_PATH = os.environ.get("DATASET_PATH", "/data/dataset.json")
+DATASET_ITEMS = None
 try:
-    for name in os.listdir('/data/static'):
-        filepath = os.path.join('/data/static', name)
-        if os.path.isfile(filepath):
-            with open(filepath, 'rb') as f:
-                data = f.read()
-            ext = os.path.splitext(name)[1]
-            ct = MIME_TYPES.get(ext, 'application/octet-stream')
-            static_files[name] = (data, ct)
+    with open(DATASET_PATH) as file:
+        DATASET_ITEMS = json.load(file)
 except Exception:
     pass
 
-# Load raw dataset for per-request processing
-dataset_items = None
-dataset_path = os.environ.get('DATASET_PATH', '/data/dataset.json')
-try:
-    with open(dataset_path) as f:
-        dataset_items = json.load(f)
-except Exception:
-    pass
 
-# Large dataset for compression
-large_json_buf = None
-try:
-    with open('/data/dataset-large.json') as f:
-        raw = json.load(f)
-    items = []
-    for d in raw:
-        item = dict(d)
-        item['total'] = round(d['price'] * d['quantity'] * 100) / 100
-        items.append(item)
-    large_json_buf = json.dumps({'items': items, 'count': len(items)}).encode()
-except Exception:
-    pass
+# -- Postgres DB ------------------------------------------------------------
 
-# SQLite
-db_available = os.path.exists('/data/benchmark.db')
-DB_QUERY = 'SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count FROM items WHERE price BETWEEN ? AND ? LIMIT 50'
-
-def get_db():
-    if not hasattr(get_db, '_local'):
-        import threading
-        get_db._local = threading.local()
-    local = get_db._local
-    if not hasattr(local, 'conn'):
-        local.conn = sqlite3.connect('/data/benchmark.db', uri=True)
-        local.conn.execute('PRAGMA mmap_size=268435456')
-        local.conn.row_factory = sqlite3.Row
-    return local.conn
-
-# Postgres (sync via psycopg)
-pg_pool = None
-PG_QUERY = (
-    'SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count '
-    'FROM items WHERE price BETWEEN %s AND %s LIMIT 50'
+DATABASE_URL = os.environ.get("DATABASE_URL", '')
+DATABASE_POOL = None
+DATABASE_QUERY = (
+    "SELECT id, name, category, price, quantity, active, tags, rating_score, rating_count"
+    "  FROM items"
+    " WHERE price BETWEEN %s AND %s LIMIT %s"
 )
-_pg_url = os.environ.get('DATABASE_URL')
-if _pg_url:
-    try:
-        pg_pool = psycopg_pool.ConnectionPool(
-            conninfo=_pg_url,
-            min_size=2,
-            max_size=4,
-            kwargs={'row_factory': psycopg.rows.dict_row},
-        )
-    except Exception:
-        pg_pool = None
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = "postgresql://" + DATABASE_URL[len("postgres://"):]
 
+PG_POOL_MIN_SIZE = 1
+PG_POOL_MAX_SIZE = 2
+
+def db_close():
+    global DATABASE_POOL
+    if DATABASE_POOL:
+        try:
+            DATABASE_POOL.close()
+        except Exception:
+            pass
+    DATABASE_POOL = None
+
+def db_setup():
+    global DATABASE_POOL, DATABASE_URL, PG_POOL_MIN_SIZE, PG_POOL_MAX_SIZE, WRK_COUNT
+    db_close()
+    if not DATABASE_URL:
+        return
+    DATABASE_MAX_CONN = os.environ.get("DATABASE_MAX_CONN", None)
+    if DATABASE_MAX_CONN:
+        avr_pool_size = int(DATABASE_MAX_CONN) * 0.92 / WRK_COUNT
+        #PG_POOL_MIN_SIZE = int(avr_pool_size + 0.35)
+        PG_POOL_MAX_SIZE = int(avr_pool_size + 0.95)
+    try:
+        DATABASE_POOL = psycopg_pool.ConnectionPool(
+            conninfo = DATABASE_URL,
+            min_size = max(PG_POOL_MIN_SIZE, 1),
+            max_size = max(PG_POOL_MAX_SIZE, 2),
+            kwargs = { 'row_factory': psycopg.rows.dict_row },
+        )
+        #DATABASE_POOL.wait()
+    except Exception:
+        DATABASE_POOL = None
+
+db_setup()
+
+        
+# -- flask features ----------------------------------------------------------
+
+@app.after_request
+def compress_response(response):
+    if response.status_code < 200 or response.status_code in (204, 304, 206):
+        return response
+
+    accept_encoding = request.headers.get('Accept-Encoding', '')
+    if 'gzip' not in accept_encoding:
+        return response
+
+    if response.headers.get('Content-Encoding'):
+        return response
+
+    #if response.direct_passthrough:
+    #    return response
+
+    if response.content_length == 0:
+        return response
+
+    try:
+        body = response.get_data()
+    except Exception:
+        return response
+
+    if isinstance(body, str):
+        body = body.encode('utf-8')
+
+    compressed_body = gzip.compress(body, compresslevel = 5)
+    new_response = make_response(compressed_body)
+    new_response.headers.update(response.headers)
+    new_response.headers['Content-Encoding'] = 'gzip'
+    new_response.headers.pop('Content-Length', None)
+    #new_response.headers['Vary'] = new_response.headers.get('Vary', '') + ', Accept-Encoding'
+    return new_response
+
+
+# -- Routes ------------------------------------------------------------------
 
 @app.route('/pipeline')
 def pipeline():
-    resp = make_response(b'ok')
-    resp.content_type = 'text/plain'
-    resp.headers['Server'] = 'flask'
-    return resp
+    return b'ok' 
 
 
 @app.route('/baseline11', methods=['GET', 'POST'])
 def baseline11():
     total = 0
-    for v in request.args.values():
+    for val in request.args.values():
         try:
-            total += int(v)
+            total += int(val)
         except ValueError:
             pass
     if request.method == 'POST' and request.data:
@@ -108,135 +137,72 @@ def baseline11():
             total += int(request.data.strip())
         except ValueError:
             pass
-    resp = make_response(str(total))
-    resp.content_type = 'text/plain'
-    resp.headers['Server'] = 'flask'
-    return resp
+    return str(total)
 
 
-@app.route('/baseline2')
-def baseline2():
-    total = 0
-    for v in request.args.values():
-        try:
-            total += int(v)
-        except ValueError:
-            pass
-    resp = make_response(str(total))
-    resp.content_type = 'text/plain'
-    resp.headers['Server'] = 'flask'
-    return resp
-
-
-@app.route('/json')
-def json_endpoint():
-    if dataset_items:
-        items = []
-        for d in dataset_items:
-            item = dict(d)
-            item['total'] = round(d['price'] * d['quantity'] * 100) / 100
-            items.append(item)
-        resp = make_response(json.dumps({'items': items, 'count': len(items)}))
-        resp.content_type = 'application/json'
-        resp.headers['Server'] = 'flask'
-        return resp
-    return 'No dataset', 500
-
-
-@app.route('/compression')
-def compression_endpoint():
-    if large_json_buf:
-        accept_encoding = request.headers.get('Accept-Encoding', '')
-        if 'gzip' in accept_encoding:
-            compressed = gzip.compress(large_json_buf, compresslevel=1)
-            resp = make_response(compressed)
-            resp.content_type = 'application/json'
-            resp.headers['Content-Encoding'] = 'gzip'
-            resp.headers['Server'] = 'flask'
-            return resp
-        resp = make_response(large_json_buf)
-        resp.content_type = 'application/json'
-        resp.headers['Server'] = 'flask'
-        return resp
-    return 'No dataset', 500
-
-
-@app.route('/db')
-def db_endpoint():
-    if not db_available:
-        resp = make_response('{"items":[],"count":0}')
-        resp.content_type = 'application/json'
-        resp.headers['Server'] = 'flask'
-        return resp
-    min_val = request.args.get('min', 10, type=float)
-    max_val = request.args.get('max', 50, type=float)
-    conn = get_db()
-    rows = conn.execute(DB_QUERY, (min_val, max_val)).fetchall()
-    items = []
-    for r in rows:
-        items.append({
-            'id': r['id'], 'name': r['name'], 'category': r['category'],
-            'price': r['price'], 'quantity': r['quantity'], 'active': bool(r['active']),
-            'tags': json.loads(r['tags']),
-            'rating': {'score': r['rating_score'], 'count': r['rating_count']}
-        })
-    body = json.dumps({'items': items, 'count': len(items)})
-    resp = make_response(body)
-    resp.content_type = 'application/json'
-    resp.headers['Server'] = 'flask'
-    return resp
+@app.route('/json/<int:count>')
+@app.route('/json-comp/<int:count>')
+def json_endpoint(count: int):
+    global DATASET_ITEMS
+    if not DATASET_ITEMS:
+        return Response("No dataset", status=500)
+    m_val = request.args.get('m', 1, type=float)
+    items = [ ]
+    for idx, dsitem in enumerate(DATASET_ITEMS):
+        if idx >= count:
+            break
+        item = dict(dsitem)
+        item["total"] = dsitem["price"] * dsitem["quantity"] * m_val
+        items.append(item)
+    return { 'items': items, 'count': len(items) }
 
 
 @app.route('/async-db')
 def async_db_endpoint():
-    if pg_pool is None:
-        resp = make_response('{"items":[],"count":0}')
-        resp.content_type = 'application/json'
-        resp.headers['Server'] = 'flask'
-        return resp
-    min_val = request.args.get('min', 10, type=float)
-    max_val = request.args.get('max', 50, type=float)
+    global DATABASE_POOL
+    if not DATABASE_POOL:
+        return { "items": [ ], "count": 0 }
     try:
-        with pg_pool.connection() as conn:
-            rows = conn.execute(PG_QUERY, (min_val, max_val)).fetchall()
-        items = []
-        for r in rows:
-            items.append({
-                'id': r['id'], 'name': r['name'], 'category': r['category'],
-                'price': r['price'], 'quantity': r['quantity'], 'active': r['active'],
-                'tags': r['tags'],
-                'rating': {'score': r['rating_score'], 'count': r['rating_count']}
-            })
-        body = json.dumps({'items': items, 'count': len(items)})
-        resp = make_response(body)
-        resp.content_type = 'application/json'
-        resp.headers['Server'] = 'flask'
-        return resp
+        min_val = request.args.get('min', type=float)
+        max_val = request.args.get('max', type=float)
+        limit = request.args.get('limit', type=int)
+        with DATABASE_POOL.connection() as db_conn:
+            rows = db_conn.execute(DATABASE_QUERY, (min_val, max_val, limit)).fetchall()
+        items = [
+            {
+                'id'      : row['id'],
+                'name'    : row['name'],
+                'category': row['category'],
+                'price'   : row['price'],
+                'quantity': row['quantity'],
+                'active'  : row['active'],
+                'tags'    : json.loads(row['tags']) if isinstance(row['tags'], str) else row['tags'],
+                'rating': {
+                    'score': row['rating_score'],
+                    'count': row['rating_count'],
+                }
+            }
+            for row in rows
+        ]
+        return { "items": items, "count": len(items) }
     except Exception:
-        resp = make_response('{"items":[],"count":0}')
-        resp.content_type = 'application/json'
-        resp.headers['Server'] = 'flask'
-        return resp
-
-
-@app.route('/static/<filename>')
-def static_file(filename):
-    entry = static_files.get(filename)
-    if entry is None:
-        return 'Not Found', 404, {'Content-Type': 'text/plain', 'Server': 'flask'}
-    data, ct = entry
-    resp = make_response(data)
-    resp.content_type = ct
-    resp.headers['Server'] = 'flask'
-    return resp
+        return { "items": [ ], "count": 0 }
 
 
 @app.route('/upload', methods=['POST'])
 def upload_endpoint():
     size = 0
     while True:
-        chunk = request.stream.read(65536)
+        chunk = request.stream.read(256*1024)
         if not chunk:
             break
         size += len(chunk)
-    return str(size), 200, {'Content-Type': 'text/plain', 'Server': 'flask'}
+    return str(size)
+
+
+mimetypes.add_type('.woff2', 'font/woff2')
+mimetypes.add_type('.webp', 'image/webp')
+
+@app.route('/static/<path:filepath>')
+def static_endpoint(filepath):
+    return send_from_directory('/data/static', filepath)

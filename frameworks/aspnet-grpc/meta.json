@@ -1,5 +1,5 @@
 {
-  "display_name": "aspnet-grpc",
+  "display_name": "aspnet-minimal",
   "language": "C#",
   "type": "production",
   "engine": "kestrel",
@@ -8,6 +8,9 @@
   "enabled": true,
   "tests": [
     "unary-grpc",
-    "unary-grpc-tls"
-  ]
+    "unary-grpc-tls",
+    "stream-grpc",
+    "stream-grpc-tls"
+  ],
+  "maintainers": []
 }

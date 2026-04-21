@@ -17,9 +17,9 @@ public class Json
             PropertyNameCaseInsensitive = true,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
-        
+
         var datasetPath = Environment.GetEnvironmentVariable("DATASET_PATH") ?? "/data/dataset.json";
-        
+
         if (File.Exists(datasetPath))
         {
             return JsonSerializer.Deserialize<List<DatasetItem>>(File.ReadAllText(datasetPath), jsonOptions);
@@ -27,29 +27,34 @@ public class Json
 
         return null;
     }
-    
-    [ResourceMethod]
-    public ListWithCount<ProcessedItem> Compute()
+
+    [ResourceMethod(":count")]
+    public ListWithCount<ProcessedItem> Compute(int count, int m = 1)
     {
         if (DatasetItems == null)
         {
             throw new ProviderException(ResponseStatus.InternalServerError, "No dataset");
         }
-        
-        var processed = new List<ProcessedItem>(DatasetItems.Count);
-        
-        foreach (var d in DatasetItems)
+
+        if (count > DatasetItems.Count) count = DatasetItems.Count;
+        if (count < 0) count = 0;
+
+        var processed = new List<ProcessedItem>(count);
+
+        for (var i = 0; i < count; i++)
         {
+            var d = DatasetItems[i];
+
             processed.Add(new ProcessedItem
             {
                 Id = d.Id, Name = d.Name, Category = d.Category,
                 Price = d.Price, Quantity = d.Quantity, Active = d.Active,
                 Tags = d.Tags, Rating = d.Rating,
-                Total = Math.Round(d.Price * d.Quantity, 2)
+                Total = d.Price * d.Quantity * m
             });
         }
 
         return new(processed);
     }
-    
+
 }

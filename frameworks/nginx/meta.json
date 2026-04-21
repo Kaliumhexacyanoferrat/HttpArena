@@ -1,7 +1,7 @@
 {
   "display_name": "nginx",
   "language": "C",
-  "type": "engine",
+  "type": "infrastructure",
   "engine": "nginx",
   "description": "Nginx with a custom C handler module, compiled with -O3 -march=native.",
   "repo": "https://github.com/nginx/nginx",
@@ -10,7 +10,11 @@
     "baseline",
     "pipelined",
     "limited-conn",
+    "static",
     "baseline-h2",
-    "static-h2"
-  ]
+    "static-h2",
+    "baseline-h3",
+    "static-h3"
+  ],
+  "maintainers": []
 }
