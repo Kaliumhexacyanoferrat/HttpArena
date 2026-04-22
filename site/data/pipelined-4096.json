@@ -116,6 +116,25 @@
     "status_5xx": 0
   },
   {
+    "framework": "bjoern",
+    "language": "Python",
+    "rps": 98022,
+    "avg_latency": "623.18ms",
+    "p99_latency": "685.40ms",
+    "cpu": "328.8%",
+    "memory": "429MiB",
+    "connections": 4096,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 16,
+    "bandwidth": "11.67MB/s",
+    "reconnects": 0,
+    "status_2xx": 490110,
+    "status_3xx": 0,
+    "status_4xx": 0,
+    "status_5xx": 0
+  },
+  {
     "framework": "caddy",
     "language": "Go",
     "rps": 0,
@@ -622,6 +641,25 @@
     "status_2xx": 0,
     "status_3xx": 0,
     "status_4xx": 372355,
+    "status_5xx": 0
+  },
+  {
+    "framework": "pyronova",
+    "language": "Python",
+    "rps": 2541024,
+    "avg_latency": "25.68ms",
+    "p99_latency": "78.90ms",
+    "cpu": "3274.0%",
+    "memory": "1.2GiB",
+    "connections": 4096,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 16,
+    "bandwidth": "307.65MB/s",
+    "reconnects": 0,
+    "status_2xx": 12705121,
+    "status_3xx": 0,
+    "status_4xx": 0,
     "status_5xx": 0
   },
   {
