@@ -3,12 +3,17 @@ import sys
 import multiprocessing
 import json
 import gzip
+from io import BytesIO 
 import mimetypes
 
 import psycopg_pool
 import psycopg.rows 
 
-from bottle import Bottle, route, request, response, hook, static_file
+import bottle
+
+bottle.BaseRequest.MEMFILE_MAX = 31*1024*1024
+
+from bottle import Bottle, route, request, response, static_file
 
 
 app = Bottle()
@@ -77,70 +82,48 @@ def db_setup():
 
 db_setup()
 
-        
-# -- framework features ----------------------------------------------------------
 
-@hook('after_request')
-def compress_response():
-    if response.status_code < 200 or response.status_code in (204, 304, 206):
-        return
+# -- Bug Fix for chunked body via gunicorn ---------------------------------------------
 
-    accept_encoding = request.headers.get('Accept-Encoding', '')
-    if 'gzip' not in accept_encoding:
-        return
-
-    if response.headers.get('Content-Encoding'):
-        return
-
-    if response.content_length == 0:
-        return
-
-    body = b''
-    try:
-        for chunk in response.body:
-            if isinstance(chunk, str):
-                chunk = chunk.encode('utf-8')
-            body += chunk
-        response.body.close()
-    except Exception:
-        return
-
-    compressed_body = gzip.compress(body, compresslevel = 1)
-    response.body = compressed_body
-    response.set_header('Content-Encoding', 'gzip')
-    response.set_header('Content-Length', str(len(compressed_body)))
-    return
+@app.hook('before_request')
+def fix_chunked_body():
+    if request.chunked:
+        request.environ['HTTP_TRANSFER_ENCODING'] = '_C_H_U_N_K_E_D_'
+        body = BytesIO()
+        while True:
+            chunk = request.environ['wsgi.input'].read(8192)
+            if not chunk:
+                break
+            body.write(chunk)
+        size = body.tell()
+        body.seek(0)
+        request.environ['wsgi.input'] = body
+        request.environ['CONTENT_LENGTH'] = size
 
 
 # -- Routes ------------------------------------------------------------------
 
-@app.route('/pipeline')
+@app.get('/pipeline')
 def pipeline():
+    response.content_type = 'text/plain; charset=utf-8'
     return b'ok' 
 
 
-@app.route('/baseline11', methods=['GET', 'POST'])
+@app.route('/baseline11', method=['GET', 'POST'])
 def baseline11():
-    total = 0
-    try:
-        total = int(request.query.a)
-        total = int(request.query.b)
-    except ValueError:
-        pass
+    total = int(request.query.a) + int(request.query.b)
     if request.method == 'POST':
-        try:
-            total += int(request.body.read(100).strip())
-        except ValueError:
-            pass
+        total += int(request.body.read(100))
+    response.content_type = 'text/plain; charset=utf-8'
     return str(total)
 
 
-@app.route('/json/<count:int>')
-@app.route('/json-comp/<count:int>')
+@app.get('/json/<count:int>')
 def json_endpoint(count: int):
     global DATASET_ITEMS
     if not DATASET_ITEMS:
-        return "No dataset", '500 Internal Server Error'
+        response.content_type = 'text/plain; charset=utf-8'
+        return "No dataset", 500
     m_val = float(request.query.m)
     items = [ ]
     for idx, dsitem in enumerate(DATASET_ITEMS):
@@ -152,7 +135,7 @@ def json_endpoint(count: int):
     return { 'items': items, 'count': len(items) }
 
 
-@app.route('/async-db')
+@app.get('/async-db')
 def async_db_endpoint():
     global DATABASE_POOL
     if not DATABASE_POOL:
@@ -184,14 +167,19 @@ def async_db_endpoint():
         return { "items": [ ], "count": 0 }
 
 
-@app.route('/upload', methods=['POST'])
+@app.post('/upload')
 def upload_endpoint():
     size = 0
-    while True:
-        chunk = request.body.read(256*1024)
-        if not chunk:
-            break
-        size += len(chunk)
+    try:
+        body = request.body
+        while True:
+            chunk = body.read(256*1024)
+            if not chunk:
+                break
+            size += len(chunk)
+    except Exception:
+        pass
+    response.content_type = 'text/plain; charset=utf-8'
     return str(size)
 
 
