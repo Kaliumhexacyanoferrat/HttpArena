@@ -36,7 +36,7 @@ class NoopTracingManager final
 
   void FillRequestWithTracingContext(
       const userver::tracing::Span&,
-      userver::clients::http::RequestTracingEditor) const final {}
+      userver::clients::http::MiddlewareRequest) const final {}
 
   void FillResponseWithTracingContext(
       const userver::tracing::Span&,

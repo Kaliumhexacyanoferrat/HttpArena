@@ -40,9 +40,6 @@ components_manager:
                     level: ERROR
                     overflow_behavior: discard  # Drop logs if the system is too busy to write them down.
 
-        tracer:                                 # Component that helps to trace execution times and requests in logs.
-            service-name: userver-httparena     # "You know. You all know exactly who I am. Say my name. " (c)
-
         dns-client:
             fs-task-processor: fs-task-processor
 
