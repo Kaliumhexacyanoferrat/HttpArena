@@ -13,6 +13,8 @@ namespace genhttp.Tests;
 
 public class Crud
 {
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
+
     private static readonly ICache<string> ItemCache = Cache.Memory<string>().Build();
 
     [ResourceMethod]
@@ -77,7 +79,7 @@ public class Crud
             throw new ProviderException(ResponseStatus.NotFound, $"Item with ID {id} does not exist");
         }
 
-        var json = JsonSerializer.Serialize(item);
+        var json = JsonSerializer.Serialize(item, JsonOptions);
 
         await ItemCache.StoreAsync(cacheKey, string.Empty, json);
 
