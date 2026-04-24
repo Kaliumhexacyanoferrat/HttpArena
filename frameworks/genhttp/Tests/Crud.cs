@@ -60,7 +60,7 @@ public class Crud
 
         if (cached != null)
         {
-            return new Result<ProcessedItem>(cached).Header("X-Cache", "Hit");
+            return new Result<ProcessedItem>(cached).Header("X-Cache", "HIT");
         }
 
         var item = await FetchItemByIdAsync(id);
@@ -72,7 +72,7 @@ public class Crud
 
         Cache.Set(id, item);
 
-        return new Result<ProcessedItem>(item).Header("X-Cache", "Miss");
+        return new Result<ProcessedItem>(item).Header("X-Cache", "MISS");
     }
 
     [ResourceMethod(RequestMethod.Post)]
