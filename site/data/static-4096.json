@@ -870,6 +870,25 @@
     "status_5xx": 0
   },
   {
+    "framework": "symfony-spawn-franken",
+    "language": "PHP",
+    "rps": 134054,
+    "avg_latency": "41.64ms",
+    "p99_latency": "41.64ms",
+    "cpu": "5242.6%",
+    "memory": "2.2GiB",
+    "connections": 4096,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 1,
+    "bandwidth": "766.81MB",
+    "reconnects": 0,
+    "status_2xx": 683678,
+    "status_3xx": 0,
+    "status_4xx": 0,
+    "status_5xx": 0
+  },
+  {
     "framework": "traefik",
     "language": "Go",
     "rps": 133190,
