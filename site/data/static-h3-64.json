@@ -154,5 +154,24 @@
     "status_3xx": 0,
     "status_4xx": 0,
     "status_5xx": 0
+  },
+  {
+    "framework": "symfony-spawn-franken",
+    "language": "PHP",
+    "rps": 64730,
+    "avg_latency": "62.71ms",
+    "p99_latency": "241.28ms",
+    "cpu": "2813.5%",
+    "memory": "4.4GiB",
+    "connections": 64,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 1,
+    "bandwidth": "1004.73MB/s",
+    "reconnects": 0,
+    "status_2xx": 325596,
+    "status_3xx": 0,
+    "status_4xx": 0,
+    "status_5xx": 0
   }
 ]

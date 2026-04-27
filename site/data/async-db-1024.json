@@ -751,6 +751,26 @@
     "status_5xx": 0
   },
   {
+    "framework": "symfony-spawn-franken",
+    "language": "PHP",
+    "rps": 6152,
+    "avg_latency": "158.98ms",
+    "p99_latency": "1.39s",
+    "cpu": "243.8%",
+    "memory": "737MiB",
+    "connections": 1024,
+    "threads": 64,
+    "duration": "5s",
+    "pipeline": 1,
+    "bandwidth": "5.94MB/s",
+    "input_bw": "420.55KB/s",
+    "reconnects": 2028,
+    "status_2xx": 61526,
+    "status_3xx": 0,
+    "status_4xx": 0,
+    "status_5xx": 43
+  },
+  {
     "framework": "uvicorn",
     "language": "Python",
     "rps": 64851,
