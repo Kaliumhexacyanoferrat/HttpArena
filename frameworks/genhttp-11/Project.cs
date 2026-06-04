@@ -14,6 +14,7 @@ namespace genhttp;
 
 public static class Project
 {
+
     public static IHandlerBuilder Create()
     {
         var crud = Layout.Create()

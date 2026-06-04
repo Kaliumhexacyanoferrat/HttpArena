@@ -7,21 +7,9 @@ public class Upload
 {
 
     [ResourceMethod(Method.Post)]
-    public ValueTask<long> Compute(Stream input)
+    public async ValueTask<long> Compute(Stream input)
     {
-        if (input.CanSeek)
-        {
-            // internal engine
-            return ValueTask.FromResult(input.Length);
-        }
-
-        // kestrel
-        return ComputeManually(input);
-    }
-
-    private async ValueTask<long> ComputeManually(Stream input)
-    {
-        var buffer = new byte[8192];
+        var buffer = new byte[16384];
 
         long total = 0;
 
