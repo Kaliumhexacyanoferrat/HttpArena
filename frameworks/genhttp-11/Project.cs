@@ -5,6 +5,7 @@ using GenHTTP.Modules.IO;
 using GenHTTP.Modules.Files;
 using GenHTTP.Modules.Layouting;
 using GenHTTP.Modules.Layouting.Provider;
+using GenHTTP.Modules.Reflection;
 using GenHTTP.Modules.Webservices;
 using GenHTTP.Modules.Websockets;
 
@@ -17,16 +18,18 @@ public static class Project
 
     public static IHandlerBuilder Create()
     {
+        var mode = ExecutionMode.Reflection;
+        
         var crud = Layout.Create()
-                         .AddService<Crud>("items");
+                         .AddService<Crud>("items", mode: mode);
 
         var app = Layout.Create()
                         .Add("pipeline", Content.From(Resource.FromString("ok")))
-                        .AddService<Baseline>("baseline11")
-                        .AddService<Baseline>("baseline2")
-                        .AddService<Upload>("upload")
-                        .AddService<Json>("json")
-                        .AddService<AsyncDatabase>("async-db")
+                        .AddService<Baseline>("baseline11", mode: mode)
+                        .AddService<Baseline>("baseline2", mode: mode)
+                        .AddService<Upload>("upload", mode: mode)
+                        .AddService<Json>("json", mode: mode)
+                        .AddService<AsyncDatabase>("async-db", mode: mode)
                         .Add("crud", crud)
                         .AddStaticFiles()
                         .AddWebsocket();
