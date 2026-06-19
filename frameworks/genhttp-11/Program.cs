@@ -13,6 +13,7 @@ var hasCert = File.Exists(certPath) && File.Exists(keyPath);
 var app = Project.Create();
 
 var host = Host.Create()
+               .Backlog(1024)
                .Handler(app)
                .Compression();
 
