@@ -1,0 +1,11 @@
+{
+  "display_name": "java-nio",
+  "language": "Java",
+  "type": "engine",
+  "engine": "nio",
+  "description": "Bare HTTP/1.1 on java.nio — one NIO Selector per core with SO_REUSEPORT. Non-blocking ServerSocketChannel, per-connection ByteBuffer state machine: request line, headers, Content-Length and chunked bodies, keep-alive. No HTTP framework, no virtual threads.",
+  "repo": "https://github.com/openjdk/jdk",
+  "enabled": true,
+  "tests": ["baseline"],
+  "maintainers": []
+}

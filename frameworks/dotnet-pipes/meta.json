@@ -1,0 +1,11 @@
+{
+  "display_name": "dotnet-pipes",
+  "language": "C#",
+  "type": "engine",
+  "engine": "pipelines",
+  "description": "Bare HTTP/1.1 on System.IO.Pipelines — PipeReader/PipeWriter on a raw Socket, single async accept loop, concurrent connections via the ThreadPool. No HTTP framework, no ASP.NET. Hand-rolled request parser: request line, headers, Content-Length and chunked bodies, keep-alive.",
+  "repo": "https://github.com/dotnet/runtime",
+  "enabled": true,
+  "tests": ["baseline"],
+  "maintainers": []
+}

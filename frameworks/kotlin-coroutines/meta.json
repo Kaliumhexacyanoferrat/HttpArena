@@ -1,0 +1,11 @@
+{
+  "display_name": "kotlin-coroutines",
+  "language": "Kotlin",
+  "type": "engine",
+  "engine": "nio2",
+  "description": "Bare HTTP/1.1 on Kotlin coroutines + Java NIO2 — AsynchronousServerSocketChannel wrapped with suspendCancellableCoroutine, one channel per core with SO_REUSEPORT. Each connection runs as a coroutine with async reads/writes. Hand-rolled request parser: request line, headers, Content-Length and chunked bodies, keep-alive. No HTTP framework, no Ktor.",
+  "repo": "https://github.com/Kotlin/kotlinx.coroutines",
+  "enabled": true,
+  "tests": ["baseline"],
+  "maintainers": []
+}
