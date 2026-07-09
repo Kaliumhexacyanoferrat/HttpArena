@@ -63,8 +63,9 @@ public class Server {
         int n = conn.ch.read(bb);
         if (n < 0) { conn.ch.close(); key.cancel(); return; }
         conn.filled += n;
-        while (process(conn)) { /* loop until incomplete or close */ }
-        if (conn.close) { conn.ch.close(); key.cancel(); }
+        while (process(conn)) {
+            if (conn.close) { conn.ch.close(); key.cancel(); return; }
+        }
     }
 
     // Returns true if a complete request was processed (more may be buffered).
@@ -104,7 +105,7 @@ public class Server {
         c.chunked = false;
         c.contentLen = 0;
         c.querySum = 0;
-        return !c.close;
+        return true;
     }
 
     // ── HTTP parsing ─────────────────────────────────────────────────────────
