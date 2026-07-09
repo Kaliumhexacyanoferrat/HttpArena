@@ -1,10 +1,10 @@
 {
-  "display_name": "kotlin-coroutines",
+  "display_name": "kotlin-virtual-threads",
   "language": "Kotlin",
   "type": "engine",
-  "engine": "nio2",
-  "description": "Bare HTTP/1.1 on Kotlin coroutines + Java NIO2 — AsynchronousServerSocketChannel wrapped with suspendCancellableCoroutine, one channel per core with SO_REUSEPORT. Each connection runs as a coroutine with async reads/writes. Hand-rolled request parser: request line, headers, Content-Length and chunked bodies, keep-alive. No HTTP framework, no Ktor.",
-  "repo": "https://github.com/Kotlin/kotlinx.coroutines",
+  "engine": "virtual-threads",
+  "description": "Bare HTTP/1.1 on Kotlin + JDK 21 virtual threads (Project Loom) — one platform thread per core with SO_REUSEPORT for parallel accepts, each connection handled by a virtual thread with blocking I/O on a BufferedOutputStream. Hand-rolled request parser: request line, headers, Content-Length and chunked bodies, keep-alive. No HTTP framework, no coroutines.",
+  "repo": "https://github.com/openjdk/jdk",
   "enabled": true,
   "tests": ["baseline"],
   "maintainers": []
