@@ -4,8 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="canonical" href="https://www.http-arena.com/">
-<title>HTTP Server Benchmarks Leaderboard – HttpArena</title>
-<meta name="description" content="Open HTTP server benchmarks and webserver benchmark leaderboard — compare 28+ profiles across HTTP/1.1, HTTP/2, HTTP/3, gRPC, and WebSocket. Same 64-core hardware, every framework.">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<title>HTTP Server Benchmarks – HttpArena</title>
+<meta name="description" content="Independent webserver benchmarks across every major framework and protocol (H1, H2, H3, gRPC, WebSocket) in multiple categories.">
 <style>
   :root{
     --bg:#f8f9fa; --panel:#ffffff; --panel-2:#f1f3f4;
@@ -437,17 +439,15 @@
   </div>
 
 <script src="data.js"></script>
-<script src="docs.js"></script>
 <script>
 (function(){
   "use strict";
   var D = window.LB_DATA;
   var LB_DOCS = window.LB_DOCS || {};
-  // Run-logs are published from site/static/logs/ and served at /logs/. The
-  // relative fallback covers file:// and the /new-leaderboard/ copy, where the
-  // board sits one level below the static root.
-  var LOGBASE = (location.protocol==='file:' || location.pathname.indexOf('/new-leaderboard/')>=0) ? '../logs/' : '/logs/';
-  if(!D){ document.getElementById('rows').innerHTML='<div class="empty">data.js not found - run scripts/gen_new_leaderboard_data.py</div>'; return; }
+  // Run-logs are deployed at /logs/ (the board is the root site). Locally,
+  // serve site/ and open /leaderboard/ so ../static/logs/ reaches site/static/logs/.
+  var LOGBASE = (location.protocol==='file:' || location.pathname.indexOf('/leaderboard/')>=0) ? '../static/logs/' : '/logs/';
+  if(!D){ document.getElementById('rows').innerHTML='<div class="empty">data.js not found - run scripts/gen_leaderboard_data.py</div>'; return; }
 
   // ── maps ─────────────────────────────────────────────────
   var PROF = {}; D.profiles.forEach(function(p){ PROF[p.id]=p; });
@@ -627,11 +627,10 @@
     // Clicking a section opens it and shows its overview page (the _index content, e.g. Test Profiles'
     // API Specification); clicking again (when open) collapses it. Root + content-less sections just toggle.
     gh.onclick=function(){
-      // navigate to the section's overview page unless we're already on it (then toggle).
-      // covers: collapsed -> open + show; expanded-but-elsewhere -> show (stay open); on-page -> collapse.
-      var onPage=(state.view==='doc' && state.doc===node.u);
-      if(!isRoot && !onPage && LB_DOCS && LB_DOCS[node.u]!==undefined){ pickDoc(node.u); }
-      else { toggleGrp(grp,node.u); }
+      // Root: expand/collapse the Knowledge Base group in place. Section: navigate
+      // to its real overview page (/docs/<id>/) — children stay browsable in the
+      // tree below and in that page's own sidebar.
+      if(isRoot){ toggleGrp(grp,node.u); } else { location.href=docUrl(node.u); }
     };
     grp.appendChild(gh);
     var body=navBody();
@@ -639,9 +638,8 @@
     grp.appendChild(body); return grp;
   }
   function docsLeaf(node){
-    var a=document.createElement('a'); a.className='nav-item'+(state.view==='doc'&&state.doc===node.u?' active':'');
-    a.href='#doc='+encodeURIComponent(node.u); a.textContent=node.t;
-    a.onclick=function(e){ e.preventDefault(); pickDoc(node.u); };
+    var a=document.createElement('a'); a.className='nav-item';
+    a.href=docUrl(node.u); a.textContent=node.t;   // real page; browser navigates out of the SPA
     return a;
   }
   function expandDocAncestors(id){
@@ -649,12 +647,9 @@
     var parts=id.split('/'), acc='';
     for(var i=0;i<parts.length;i++){ acc=acc?(acc+'/'+parts[i]):parts[i]; expanded.add(acc); }
   }
-  function pickDoc(id){
-    if(!(LB_DOCS && LB_DOCS[id]!==undefined)) return;
-    state.view='doc'; state.doc=id; expandDocAncestors(id);
-    buildNav(); renderHead(); render();
-    var mn=document.querySelector('.main'); if(mn) mn.scrollTop=0; window.scrollTo(0,0);
-  }
+  // Docs are pre-rendered static pages at /docs/<id>/ (real, indexable URLs).
+  function docUrl(id){ return id ? '/docs/'+id+'/' : '/docs/'; }
+  function pickDoc(id){ location.href=docUrl(id); }   // callers (mobile nav) navigate out
   function scrollToAnchor(a){
     if(!a) return;
     var el=document.querySelector('#docview [id="'+a+'"]');
@@ -781,7 +776,7 @@
       var sLabel={h1:'all HTTP/1.1 profiles',h2:'all HTTP/2 profiles',h3:'all HTTP/3 profiles',gw:'the gateway & production-stack profiles',grpc:'all gRPC profiles',ws:'all WebSocket profiles'}[state.scope];
       var sName={h1:'HTTP/1.1',h2:'HTTP/2',h3:'HTTP/3',gw:'Gateway',grpc:'gRPC',ws:'WebSocket'}[state.scope];
       cat.textContent='Composite ranking'; title.textContent=sName;
-      blurb.innerHTML='Normalized score summed across '+sLabel+' (each profile worth 100 to its leader), per framework type. Higher is better. <a href="#doc=scoring/composite-score">How it works →</a>';
+      blurb.innerHTML='Normalized score summed across '+sLabel+' (each profile worth 100 to its leader), per framework type. Higher is better. <a href="/docs/scoring/composite-score/">How it works →</a>';
       ctl.innerHTML='';
       var t=document.createElement('div'); t.className='toggle'+(state.useMem?' on':'');
       t.innerHTML='<span class="sw"><i></i></span> Memory efficiency';
@@ -791,7 +786,7 @@
       var p=PROF[state.profile];
       cat.textContent=p.category; title.textContent=p.label;
       var b=esc(p.blurb||'');
-      if(p.doc) b+=(b?' ':'')+'<a href="#doc='+p.doc+'">Implementation guidelines →</a>';
+      if(p.doc) b+=(b?' ':'')+'<a href="/docs/'+p.doc+'/">Implementation guidelines →</a>';
       blurb.innerHTML=b;
       var seg=document.createElement('div'); seg.className='seg';
       var thumb=document.createElement('div'); thumb.className='seg-thumb'; seg.appendChild(thumb);
@@ -963,9 +958,7 @@
   function restoreFromHash(){
     var h=location.hash.slice(1); if(!h) return;
     var p={}; h.split('&').forEach(function(s){ var i=s.indexOf('='); if(i>0) p[s.slice(0,i)]=decodeURIComponent(s.slice(i+1)); });
-    if(p.hasOwnProperty('doc') && LB_DOCS[p.doc]!==undefined){
-      state.view='doc'; state.doc=p.doc; expandDocAncestors(p.doc); return;
-    }
+    if(p.doc){ location.replace(docUrl(p.doc)); return; }   // legacy #doc=x bookmark -> /docs/x/
     if(p.type){ var ts=p.type.split(',').filter(Boolean); if(ts.length) state.types=ts; }
     if(p.hasOwnProperty('tuned')) state.showTuned = p.tuned!=='0';
     state.q = p.q || '';

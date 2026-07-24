@@ -6,7 +6,8 @@ on:
     branches: [main]
     paths:
       - 'site/**'
-      - 'scripts/gen_new_leaderboard_data.py'
+      - 'scripts/gen_leaderboard_data.py'
+      - 'results/**'
 
 permissions:
   pages: write
@@ -22,26 +23,20 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # Regenerates site/static/new-leaderboard/{data.js,docs.js} from
-      # site/data/*.json and site/content/docs/**. No Hugo involved — the
-      # board is a standalone page and the generator does its own markdown
-      # + shortcode rendering.
-      - name: Generate leaderboard data + docs
-        run: python3 scripts/gen_new_leaderboard_data.py
+      - name: Generate leaderboard data
+        run: python3 scripts/gen_leaderboard_data.py
 
-      # site/static/ is served verbatim at the root: logs/, images/,
-      # openapi*.json, favicon.svg, and new-leaderboard/ itself (kept so the
-      # pre-move URL still serves a working page). The board is then lifted
-      # out of new-leaderboard/ to become the root index.
-      - name: Assemble site
+      - name: Assemble site — standalone leaderboard at root
         working-directory: site
         run: |
           rm -rf public && mkdir public
-          cp -r static/. public/
-          cp static/new-leaderboard/index.html public/index.html
-          cp static/new-leaderboard/data.js   public/data.js
-          cp static/new-leaderboard/docs.js   public/docs.js
-          cp root/404.html public/404.html   # redirects retired Hugo URLs -> the board
+          cp leaderboard/index.html public/index.html
+          cp leaderboard/data.js public/data.js
+          cp -r static/logs public/logs                                             # run logs, served at /logs/
+          for f in openapi.json openapi-gateway.json; do [ -f "static/$f" ] && cp "static/$f" "public/$f"; done   # OpenAPI specs linked from the docs
+          cp -r root/. public/                                                       # 404.html, robots.txt, favicon.ico/.svg, and the /leaderboard/ -> / redirect
+          cp -r generated/docs public/docs                                          # pre-rendered Knowledge Base pages (real /docs/<id>/ URLs) + docs.css
+          cp generated/sitemap.xml public/sitemap.xml                               # root + every /docs/<id>/ (generated, replaces the old static one)
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4

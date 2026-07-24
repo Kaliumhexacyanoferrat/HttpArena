@@ -244,8 +244,8 @@ def write_current_json(root: Path, site_data: Path) -> None:
     # date and commit were intentionally dropped — they churned on every
     # /benchmark --save run and were the dominant source of merge conflicts
     # between concurrent PRs. archive.sh re-derives commit from git directly
-    # at archive time; the displayed badge for the "current" round is hidden
-    # in round-selector.html when the field is absent.
+    # at archive time; the leaderboard omits the "current" round badge when
+    # the field is absent.
     out: dict = {
         "cpu": cpu,
         "cores": cores,

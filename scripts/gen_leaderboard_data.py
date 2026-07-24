@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Generate site/static/new-leaderboard/data.js from site/data/*.json.
+"""Generate site/leaderboard/data.js from site/data/*.json.
 
-The "new leaderboard" is a standalone static page (plain HTML/CSS/JS, no Hugo
-templating). This script reads the same per-profile result files the Hugo
-leaderboard consumes and emits a single `window.LB_DATA = {...}` blob the page
-renders client-side - both the per-profile explorer and the composite ranking.
+The leaderboard is a standalone static page (plain HTML/CSS/JS, no Hugo
+templating). This script reads the per-profile result files under site/data
+and emits a single `window.LB_DATA = {...}` blob the page renders client-side -
+both the per-profile explorer and the composite ranking.
 
 The composite mirrors the canonical board: it averages RPS over each profile's
 *scored* connection set, applies per-type profile eligibility, and carries the
@@ -12,12 +12,13 @@ tpl_*/bandwidth fields needed for the api-4/api-16 (template mix) and json-comp
 (compression-ratio) adjustments.
 
 Run after scripts/rebuild_site_data.py (or any time site/data changes):
-    python3 scripts/gen_new_leaderboard_data.py
+    python3 scripts/gen_leaderboard_data.py
 """
 
 from __future__ import annotations
 import json
 import re
+import shutil
 import posixpath
 import html as _html
 from pathlib import Path
@@ -25,7 +26,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "site" / "data"
 DOCS = ROOT / "site" / "content" / "docs"
-OUT = ROOT / "site" / "static" / "new-leaderboard" / "data.js"
+OUT = ROOT / "site" / "leaderboard" / "data.js"
 
 # Benchmark catalog. Each profile:
 #   id, label, category, blurb,
@@ -126,7 +127,7 @@ def load(name):
     if not p.exists():
         return None
     try:
-        return json.loads(p.read_text())
+        return json.loads(p.read_text(encoding="utf-8"))
     except Exception as e:
         print(f"[warn] {name}: {e}")
         return None
@@ -145,7 +146,7 @@ def _frontmatter(md_path):
     """Parse (title, weight) from a markdown file's leading YAML frontmatter."""
     title, weight = "", 0
     try:
-        text = md_path.read_text()
+        text = md_path.read_text(encoding="utf-8")
     except Exception:
         return title, weight
     if not text.startswith("---"):
@@ -494,7 +495,7 @@ def build_docs():
     content = {}
     for p, did, cur in pages:
         title, _ = _frontmatter(p)
-        content[did] = {"t": title, "html": _doc_html(_strip_frontmatter(p.read_text()), cur, did, ids)}
+        content[did] = {"t": title, "html": _doc_html(_strip_frontmatter(p.read_text(encoding="utf-8")), cur, did, ids)}
     tree = _docs_node(DOCS)
     tree.pop("w", None)
     return tree, content
@@ -509,6 +510,190 @@ def build_rounds():
     idx = load("rounds/index.json")
     archived = idx if isinstance(idx, list) else []
     return {"name": CURRENT_ROUND, "ongoing": True, "archived": archived}
+
+
+# ── Static docs site (SEO) ────────────────────────────────────────────────
+# The Knowledge Base is pre-rendered to real /docs/<id>/ pages so search engines
+# can index each doc — hash-routed SPA state (#doc=x) is invisible to crawlers, so
+# without this every doc collapses into the single "/" URL. Content is the exact
+# HTML build_docs() already produces; only the link scheme differs (#doc=x -> /docs/x/).
+
+SITE = "https://www.http-arena.com"
+GEN = ROOT / "site" / "generated"
+DOCS_OUT = GEN / "docs"
+
+
+def _doc_url(did):
+    return "/docs/" + did + "/" if did else "/docs/"
+
+
+def _static_links(html):
+    """Rewrite the SPA's in-app doc links (#doc=id [+ data-anchor]) to real
+    /docs/id/ URLs, and in-page anchors (href="#" data-anchor=a) to #a."""
+    def doc_repl(m):
+        tid, anc = m.group(1), m.group(2)
+        return 'href="' + _doc_url(tid) + ("#" + anc if anc else "") + '"'
+    html = re.sub(r'href="#doc=([^"#]*)"(?: data-doc="[^"]*")?(?: data-anchor="([^"]*)")?', doc_repl, html)
+    html = re.sub(r'href="#" data-anchor="([^"]*)"', lambda m: 'href="#' + m.group(1) + '"', html)
+    return html
+
+
+def _meta_desc(html):
+    m = re.search(r"<p>(.*?)</p>", html, re.S)
+    text = re.sub(r"<[^>]+>", "", m.group(1)) if m else ""
+    text = _html.unescape(re.sub(r"\s+", " ", text)).strip()
+    if len(text) > 155:
+        text = text[:152].rstrip() + "…"
+    return text or "HttpArena Knowledge Base — how the open HTTP server benchmarks work."
+
+
+def _sidebar(tree, curid):
+    def walk(nodes):
+        out = []
+        for n in nodes:
+            cls = ' class="cur"' if n["u"] == curid else ""
+            kids = walk(n["c"]) if n.get("c") else ""
+            out.append('<li><a href="%s"%s>%s</a>%s</li>'
+                       % (_doc_url(n["u"]), cls, _html.escape(n["t"]), kids))
+        return "<ul>" + "".join(out) + "</ul>"
+    root_cls = ' class="cur"' if curid == "" else ""
+    return ('<a class="ds-home" href="/">← Leaderboard</a>'
+            '<a class="ds-root"%s href="/docs/">%s</a>%s'
+            % (root_cls, _html.escape(tree["t"] or "Knowledge Base"),
+               walk(tree["c"]) if tree.get("c") else ""))
+
+
+_THEME_INIT = ("<script>try{var t=localStorage.getItem('lb-theme');"
+               "if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>")
+_THEME_TOGGLE = ("<script>var b=document.getElementById('theme');if(b)b.onclick=function(){"
+                 "var d=document.documentElement,c=d.getAttribute('data-theme')==='dark'||"
+                 "(d.getAttribute('data-theme')!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);"
+                 "var n=c?'light':'dark';d.setAttribute('data-theme',n);"
+                 "try{localStorage.setItem('lb-theme',n);}catch(e){}};</script>")
+
+
+def _doc_page(did, title, body_html, tree):
+    url = SITE + _doc_url(did)
+    desc = _meta_desc(body_html)
+    t = _html.escape(title)
+    d = _html.escape(desc)
+    head = ('<!doctype html><html lang="en" data-theme=""><head>'
+            '<meta charset="utf-8">'
+            '<meta name="viewport" content="width=device-width, initial-scale=1">'
+            + _THEME_INIT
+            + "<title>" + t + " – HttpArena</title>"
+            + '<meta name="description" content="' + d + '">'
+            + '<link rel="canonical" href="' + url + '">'
+            + '<link rel="icon" href="/favicon.ico" sizes="any">'
+            + '<link rel="icon" href="/favicon.svg" type="image/svg+xml">'
+            + '<meta property="og:type" content="article">'
+            + '<meta property="og:site_name" content="HttpArena">'
+            + '<meta property="og:title" content="' + t + '">'
+            + '<meta property="og:description" content="' + d + '">'
+            + '<meta property="og:url" content="' + url + '">'
+            + '<link rel="stylesheet" href="/docs/docs.css">'
+            + "</head>")
+    header = ('<body><header class="top">'
+              '<a class="brand-name" href="/"><b>Http</b>Arena</a>'
+              '<a class="brand-sub" href="/docs/">Knowledge Base</a>'
+              '<div class="top-links">'
+              '<a href="https://timeline.http-arena.com" target="_blank" rel="noopener">Timeline</a>'
+              '<a href="https://github.com/MDA2AV/HttpArena" target="_blank" rel="noopener">GitHub</a>'
+              '<button id="theme" type="button" title="Toggle theme">◐</button>'
+              '</div></header>')
+    body = ('<div class="docs-layout">'
+            '<aside class="docs-sidebar">' + _sidebar(tree, did) + '</aside>'
+            '<main class="doc-main"><article class="doc-wrap">'
+            '<h1 class="doc-title">' + t + "</h1>"
+            + _static_links(body_html)
+            + "</article></main></div>")
+    return head + header + body + _THEME_TOGGLE + "</body></html>"
+
+
+def _docs_css():
+    return """:root{--bg:#f8f9fa;--panel:#fff;--panel-2:#f1f3f4;--line:#dadce0;--line-soft:#e8eaed;--text:#202124;--text-2:#5f6368;--muted:#80868b;--accent:#1a73e8;--accent-weak:#e8f0fe;--shadow:0 1px 2px 0 rgba(60,64,67,.1),0 2px 6px 2px rgba(60,64,67,.06);--header-bg:rgba(255,255,255,.82);--mono:"SF Mono",ui-monospace,"JetBrains Mono","Roboto Mono",Menlo,Consolas,monospace;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif}
+html[data-theme="dark"]{--bg:#202124;--panel:#2a2b2e;--panel-2:#35363a;--line:#3c4043;--line-soft:#303134;--text:#e8eaed;--text-2:#9aa0a6;--muted:#80868b;--accent:#8ab4f8;--accent-weak:#283446;--shadow:0 1px 2px 0 rgba(0,0,0,.3),0 2px 6px 2px rgba(0,0,0,.25);--header-bg:rgba(32,33,36,.8)}
+@media (prefers-color-scheme:dark){html:not([data-theme="light"]){--bg:#202124;--panel:#2a2b2e;--panel-2:#35363a;--line:#3c4043;--line-soft:#303134;--text:#e8eaed;--text-2:#9aa0a6;--muted:#80868b;--accent:#8ab4f8;--accent-weak:#283446;--shadow:0 1px 2px 0 rgba(0,0,0,.3),0 2px 6px 2px rgba(0,0,0,.25);--header-bg:rgba(32,33,36,.8)}}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit;text-decoration:none}
+.top{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:.9rem;padding:.72rem 1.5rem;background:var(--header-bg);backdrop-filter:blur(14px) saturate(1.6);-webkit-backdrop-filter:blur(14px) saturate(1.6);border-bottom:1px solid var(--line)}
+.brand-name{font-weight:750;font-size:1.06rem;letter-spacing:-.02em;color:var(--text)}
+.brand-name b{color:var(--accent)}
+.brand-name:hover{opacity:.82}
+.brand-sub{color:var(--text-2);font-size:.9rem;padding-left:.7rem;border-left:1px solid var(--line)}
+.top-links{margin-left:auto;display:flex;align-items:center;gap:1rem}
+.top-links a{color:var(--text-2);font-size:.86rem}
+.top-links a:hover{color:var(--text)}
+#theme{background:none;border:0;color:var(--text-2);font-size:1.1rem;cursor:pointer;line-height:1;padding:0}
+.docs-layout{display:flex;align-items:flex-start;gap:2rem;max-width:1200px;margin:0 auto;padding:1.5rem}
+.docs-sidebar{position:sticky;top:64px;flex:none;width:250px;max-height:calc(100vh - 84px);overflow-y:auto;font-size:.86rem}
+.ds-home{display:block;color:var(--muted);font-size:.8rem;margin-bottom:.9rem}
+.ds-home:hover{color:var(--accent)}
+.ds-root{display:block;font-weight:700;color:var(--text);margin-bottom:.5rem;padding:.28rem .4rem}
+.ds-root.cur{color:var(--accent)}
+.docs-sidebar ul{list-style:none;margin:0;padding:0 0 0 .2rem}
+.docs-sidebar li>ul{padding-left:.75rem;border-left:1px solid var(--line-soft);margin:.1rem 0 .1rem .35rem}
+.docs-sidebar a{display:block;padding:.28rem .4rem;border-radius:6px;color:var(--text-2)}
+.docs-sidebar a:hover{background:var(--panel-2);color:var(--text)}
+.docs-sidebar a.cur{background:var(--accent-weak);color:var(--accent);font-weight:650}
+.doc-main{flex:1;min-width:0;max-width:820px}
+.doc-title{font-size:1.9rem;font-weight:800;letter-spacing:-.02em;margin:.1rem 0 1.2rem;color:var(--text)}
+.doc-body{font-size:.92rem;line-height:1.7;color:var(--text-2)}
+.doc-body>:first-child{margin-top:0}
+.doc-body h2{font-size:1.25rem;font-weight:700;color:var(--text);margin:2rem 0 .8rem;padding-bottom:.35rem;border-bottom:1px solid var(--line);letter-spacing:-.01em}
+.doc-body h3{font-size:1.06rem;font-weight:650;color:var(--text);margin:1.6rem 0 .55rem}
+.doc-body h4{font-size:.95rem;font-weight:650;color:var(--text);margin:1.3rem 0 .5rem}
+.doc-body p{margin:.7rem 0}
+.doc-body a{color:var(--accent);text-decoration:none}
+.doc-body a:hover{text-decoration:underline}
+.doc-body ul,.doc-body ol{margin:.7rem 0;padding-left:1.45rem}
+.doc-body li{margin:.3rem 0}
+.doc-body li>ul,.doc-body li>ol{margin:.25rem 0}
+.doc-body code{font-family:var(--mono);font-size:.84em;background:var(--panel-2);border:1px solid var(--line-soft);border-radius:5px;padding:.08em .36em;color:var(--text)}
+.doc-body pre{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.9rem 1.1rem;overflow-x:auto;margin:1rem 0;line-height:1.55}
+.doc-body pre code{background:none;border:0;padding:0;font-size:.82rem;color:var(--text-2);white-space:pre}
+.doc-body blockquote{margin:1rem 0;padding:.2rem .9rem;border-left:3px solid var(--accent-weak);color:var(--muted)}
+.doc-body hr{border:0;border-top:1px solid var(--line);margin:1.6rem 0}
+.doc-body table{border-collapse:separate;border-spacing:0;width:100%;margin:1.1rem 0;font-size:.85rem;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.doc-body th{text-align:left;font-weight:650;color:var(--text);background:var(--panel-2);padding:.55rem .75rem;border-bottom:1px solid var(--line)}
+.doc-body td{padding:.5rem .75rem;border-bottom:1px solid var(--line-soft);vertical-align:top}
+.doc-body tr:last-child td{border-bottom:0}
+.doc-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.7rem;margin:1.2rem 0}
+.doc-card{display:flex;flex-direction:column;gap:.3rem;padding:.85rem 1rem;border:1px solid var(--line);border-radius:10px;background:var(--panel);text-decoration:none;transition:border-color .12s,box-shadow .12s,transform .12s}
+.doc-card:hover{border-color:var(--accent);box-shadow:var(--shadow);transform:translateY(-1px)}
+.doc-card .dc-t{font-weight:650;color:var(--text);font-size:.9rem}
+.doc-card .dc-s{color:var(--muted);font-size:.8rem;line-height:1.5}
+@media (max-width:820px){.docs-layout{flex-direction:column;gap:1rem;padding:1rem}.docs-sidebar{position:static;width:100%;max-height:none;padding-bottom:.5rem;border-bottom:1px solid var(--line)}.doc-main{max-width:100%}}
+"""
+
+
+def build_doc_pages(tree, content):
+    """Write a real static page per doc under site/generated/docs/<id>/index.html."""
+    if not tree:
+        return 0
+    if DOCS_OUT.exists():
+        shutil.rmtree(DOCS_OUT)
+    DOCS_OUT.mkdir(parents=True, exist_ok=True)
+    (DOCS_OUT / "docs.css").write_text(_docs_css(), encoding="utf-8")
+    for did, d in content.items():
+        page = _doc_page(did, d["t"] or "Knowledge Base", d["html"], tree)
+        dest = (DOCS_OUT / did / "index.html") if did else (DOCS_OUT / "index.html")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(page, encoding="utf-8")
+    return len(content)
+
+
+def write_sitemap(content):
+    """Root + every /docs/<id>/. Replaces the old Hugo-generated /old/ sitemap."""
+    urls = [SITE + "/"] + [SITE + _doc_url(did) for did in sorted(content.keys())]
+    body = "".join("<url><loc>%s</loc></url>" % u for u in urls)
+    GEN.mkdir(parents=True, exist_ok=True)
+    (GEN / "sitemap.xml").write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' + body + "</urlset>\n",
+        encoding="utf-8")
+    return len(urls)
 
 
 def main():
@@ -569,14 +754,17 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("window.LB_DATA = " + json.dumps(payload, separators=(",", ":")) + ";\n")
 
-    docs_out = OUT.parent / "docs.js"
-    docs_out.write_text("window.LB_DOCS = " + json.dumps(docs_content, separators=(",", ":")) + ";\n")
+    # Docs are pre-rendered to real /docs/<id>/ pages (SEO); the SPA links out to
+    # them. LB_DATA still carries the docs *tree* for the sidebar labels, but the
+    # doc *content* is no longer shipped as docs.js.
+    n_pages = build_doc_pages(docs_tree, docs_content)
+    n_urls = write_sitemap(docs_content)
 
     n_rows = sum(len(v) for v in results.values())
     print(f"wrote {OUT.relative_to(ROOT)} - {len(profiles)} profiles, "
           f"{len(results)} views, {n_rows} rows, {OUT.stat().st_size // 1024} KB")
-    print(f"wrote {docs_out.relative_to(ROOT)} - {len(docs_content)} docs pages, "
-          f"{docs_out.stat().st_size // 1024} KB")
+    print(f"wrote {DOCS_OUT.relative_to(ROOT)}/ - {n_pages} static doc pages")
+    print(f"wrote {(GEN / 'sitemap.xml').relative_to(ROOT)} - {n_urls} URLs")
 
 
 if __name__ == "__main__":
