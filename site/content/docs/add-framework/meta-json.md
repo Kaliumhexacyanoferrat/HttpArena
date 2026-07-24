@@ -1,5 +1,7 @@
 ---
 title: meta.json
+seo_title: "meta.json Reference"
+description: "Every field in a framework's meta.json: display name, language, type, mode, engine, maintainers, and the tests the entry subscribes to."
 ---
 
 Create a `meta.json` file in your framework directory:

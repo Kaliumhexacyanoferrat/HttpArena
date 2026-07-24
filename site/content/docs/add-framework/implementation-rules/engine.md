@@ -1,5 +1,7 @@
 ---
 title: Engine
+seo_title: "Engine Entry Rules"
+description: "Rules for engine entries: bare-metal HTTP implementations built on raw sockets and low-level I/O, ranked separately from frameworks."
 weight: 2
 ---
 

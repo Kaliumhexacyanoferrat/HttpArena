@@ -1,5 +1,7 @@
 ---
 title: Archiving Rounds
+seo_title: "Archiving Benchmark Rounds"
+description: "Snapshot the current results as a named round so previous benchmark generations stay browsable on the leaderboard."
 weight: 4
 ---
 

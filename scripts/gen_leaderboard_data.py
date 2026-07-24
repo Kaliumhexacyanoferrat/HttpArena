@@ -165,6 +165,38 @@ def _frontmatter(md_path):
     return title, weight
 
 
+def _seo_meta(md_path):
+    """Parse (seo_title, description) from frontmatter.
+
+    `title` is the sidebar label and is often deliberately terse — 26 pages are
+    called "Implementation Guidelines" and 26 more "Validation". Those make poor
+    <title> tags, because every one of them competes for the same query and a
+    search result reading just "Validation" says nothing about which test it
+    covers. `seo_title` overrides the tag without touching navigation; pages
+    whose title is already specific don't need one.
+
+    `description` is authored per page rather than scraped from the first
+    paragraph: the opening line is frequently a cross-reference ("Same workload
+    as JSON Processing, but…") which reads as boilerplate in a search result.
+    """
+    seo_title, description = "", ""
+    try:
+        text = md_path.read_text(encoding="utf-8")
+    except Exception:
+        return seo_title, description
+    if not text.startswith("---"):
+        return seo_title, description
+    end = text.find("\n---", 3)
+    fm = text[3:end] if end != -1 else text[3:]
+    for line in fm.splitlines():
+        line = line.strip()
+        if line.startswith("seo_title:"):
+            seo_title = line[10:].strip().strip('"').strip("'")
+        elif line.startswith("description:"):
+            description = line[12:].strip().strip('"').strip("'")
+    return seo_title, description
+
+
 def _strip_frontmatter(text):
     if text.startswith("---"):
         end = text.find("\n---", 3)
@@ -495,7 +527,9 @@ def build_docs():
     content = {}
     for p, did, cur in pages:
         title, _ = _frontmatter(p)
-        content[did] = {"t": title, "html": _doc_html(_strip_frontmatter(p.read_text(encoding="utf-8")), cur, did, ids)}
+        seo_title, description = _seo_meta(p)
+        content[did] = {"t": title, "st": seo_title, "d": description,
+                        "html": _doc_html(_strip_frontmatter(p.read_text(encoding="utf-8")), cur, did, ids)}
     tree = _docs_node(DOCS)
     tree.pop("w", None)
     return tree, content
@@ -572,10 +606,12 @@ _THEME_TOGGLE = ("<script>var b=document.getElementById('theme');if(b)b.onclick=
                  "try{localStorage.setItem('lb-theme',n);}catch(e){}};</script>")
 
 
-def _doc_page(did, title, body_html, tree):
+def _doc_page(did, title, body_html, tree, seo_title="", description=""):
     url = SITE + _doc_url(did)
-    desc = _meta_desc(body_html)
-    t = _html.escape(title)
+    # Authored metadata wins; the scraped first paragraph stays as the fallback
+    # so a page that hasn't been given frontmatter yet still renders sensibly.
+    desc = description or _meta_desc(body_html)
+    t = _html.escape(seo_title or title)
     d = _html.escape(desc)
     head = ('<!doctype html><html lang="en" data-theme=""><head>'
             '<meta charset="utf-8">'
@@ -677,11 +713,52 @@ def build_doc_pages(tree, content):
     DOCS_OUT.mkdir(parents=True, exist_ok=True)
     (DOCS_OUT / "docs.css").write_text(_docs_css(), encoding="utf-8")
     for did, d in content.items():
-        page = _doc_page(did, d["t"] or "Knowledge Base", d["html"], tree)
+        page = _doc_page(did, d["t"] or "Knowledge Base", d["html"], tree,
+                         seo_title=d.get("st", ""), description=d.get("d", ""))
         dest = (DOCS_OUT / did / "index.html") if did else (DOCS_OUT / "index.html")
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(page, encoding="utf-8")
     return len(content)
+
+
+def write_search_index(tree, content):
+    """Emit window.LB_SEARCH — the Knowledge Base as plain text, for the board's
+    page search.
+
+    The board used to search `docs.js`, which shipped every page's rendered
+    HTML and had the client strip the tags at runtime. Now that the docs are
+    real pages, that blob is gone — but the search still needs something to
+    match against, or it silently stops finding documentation (the exact
+    complaint of #970, which the search was built for).
+
+    A text index is the right shape for this anyway: it is roughly half the
+    size of the HTML it replaces, needs no client-side parsing, and each entry
+    carries the URL of the real page so results link out to /docs/<id>/.
+    """
+    crumbs = {}
+
+    def walk(node, trail):
+        crumbs[node["u"]] = " › ".join(trail) if trail else "Knowledge Base"
+        for ch in node.get("c") or []:
+            walk(ch, trail + [node["t"]] if node["u"] else ["Knowledge Base"])
+
+    if tree:
+        walk(tree, [])
+
+    entries = []
+    for did, d in sorted(content.items()):
+        text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", d["html"]))
+        text = _html.unescape(text).strip()
+        entries.append({"u": did, "t": d["t"] or "Knowledge Base",
+                        "c": crumbs.get(did, "Knowledge Base"),
+                        "d": d.get("d", ""), "x": text})
+    # Next to data.js, not under generated/: the board loads both with relative
+    # <script src>, and the deploy copies them to the site root the same way.
+    out = OUT.parent / "search.js"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text("window.LB_SEARCH = " + json.dumps(entries, separators=(",", ":")) + ";\n",
+                   encoding="utf-8")
+    return len(entries), out.stat().st_size
 
 
 def write_sitemap(content):
@@ -758,12 +835,14 @@ def main():
     # them. LB_DATA still carries the docs *tree* for the sidebar labels, but the
     # doc *content* is no longer shipped as docs.js.
     n_pages = build_doc_pages(docs_tree, docs_content)
+    n_search, search_bytes = write_search_index(docs_tree, docs_content)
     n_urls = write_sitemap(docs_content)
 
     n_rows = sum(len(v) for v in results.values())
     print(f"wrote {OUT.relative_to(ROOT)} - {len(profiles)} profiles, "
           f"{len(results)} views, {n_rows} rows, {OUT.stat().st_size // 1024} KB")
     print(f"wrote {DOCS_OUT.relative_to(ROOT)}/ - {n_pages} static doc pages")
+    print(f"wrote {(OUT.parent / 'search.js').relative_to(ROOT)} - {n_search} indexed pages, {search_bytes // 1024} KB")
     print(f"wrote {(GEN / 'sitemap.xml').relative_to(ROOT)} - {n_urls} URLs")
 
 

@@ -477,6 +477,7 @@
   </div>
 
 <script src="data.js"></script>
+<script src="search.js"></script>
 <script>
 (function(){
   "use strict";
@@ -792,35 +793,17 @@
   // spend it on visitors who never search.
   var SIDX=null, SHITS=[], SSEL=-1;
 
-  // Tags are stripped with a regex rather than by assigning to innerHTML:
-  // a detached element still fetches <img> src, and docs are authored
-  // markdown that may grow images later.
-  function stripHtml(html){
-    return String(html||'')
-      .replace(/<(script|style)[\s\S]*?<\/\1>/gi,' ')
-      .replace(/<[^>]+>/g,' ')
-      .replace(/&nbsp;/g,' ').replace(/&lt;/g,'<').replace(/&gt;/g,'>')
-      .replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&amp;/g,'&')
-      .replace(/\s+/g,' ').trim();
-  }
-  function docCrumb(id){
-    if(!id) return 'Knowledge Base';
-    var parts=id.split('/'), acc='', out=[];
-    for(var i=0;i<parts.length-1;i++){
-      acc=acc?(acc+'/'+parts[i]):parts[i];
-      var d=LB_DOCS[acc]; out.push(d&&d.t?d.t:parts[i]);
-    }
-    return out.length ? ('Knowledge Base › '+out.join(' › ')) : 'Knowledge Base';
-  }
   function buildSearchIndex(){
     if(SIDX) return SIDX;
     SIDX=[];
-    if(window.LB_DOCS) Object.keys(LB_DOCS).forEach(function(id){
-      var d=LB_DOCS[id]; if(!d) return;
-      var title=d.t||id||'Knowledge Base', body=stripHtml(d.html);
-      SIDX.push({ kind:'doc', title:title, crumb:docCrumb(id), body:body,
-                  tl:title.toLowerCase(), bl:body.toLowerCase(),
-                  go:function(){ pickDoc(id); } });
+    // Docs come from search.js — plain text prepared by the generator. They are
+    // real pages now (/docs/<id>/), so a hit navigates out rather than rendering
+    // in place; the entry carries its own crumb, so no tree walk is needed.
+    (window.LB_SEARCH || []).forEach(function(e){
+      var body=(e.d ? e.d + ' ' : '') + (e.x || '');
+      SIDX.push({ kind:'doc', title:e.t, crumb:e.c, body:body,
+                  tl:(e.t || '').toLowerCase(), bl:body.toLowerCase(),
+                  go:(function(id){ return function(){ pickDoc(id); }; })(e.u) });
     });
     D.profiles.forEach(function(p){
       var body=p.blurb||'';

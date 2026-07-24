@@ -32,6 +32,7 @@ jobs:
           rm -rf public && mkdir public
           cp leaderboard/index.html public/index.html
           cp leaderboard/data.js public/data.js
+          cp leaderboard/search.js public/search.js                                  # plain-text Knowledge Base index for the board's page search
           cp -r static/logs public/logs                                             # run logs, served at /logs/
           for f in openapi.json openapi-gateway.json; do [ -f "static/$f" ] && cp "static/$f" "public/$f"; done   # OpenAPI specs linked from the docs
           cp -r root/. public/                                                       # 404.html, robots.txt, favicon.ico/.svg, and the /leaderboard/ -> / redirect

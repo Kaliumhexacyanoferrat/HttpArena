@@ -1,5 +1,7 @@
 ---
 title: WebSocket
+seo_title: "WebSocket Load Generation"
+description: "HttpArena drives its WebSocket profiles with gcannon in --ws mode, reusing the same io_uring engine as the HTTP/1.1 tests."
 ---
 
 HttpArena drives the `echo-ws` profile with **gcannon in `--ws` mode**. The same io_uring engine documented under [HTTP/1.1 → gcannon](../h1/gcannon/) is reused here - worker threads, per-thread provided-buffer rings, multishot receives, per-connection state - with a frame-aware send/recv loop layered on top. Using one tool across transports keeps the client-side ceiling, threading model, and CPU-pinning behavior consistent so differences in the measurement land on the server, not the generator.

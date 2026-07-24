@@ -1,5 +1,7 @@
 ---
 title: Implementation Rules
+seo_title: "Implementation Rules by Entry Type"
+description: "Every entry declares a type in meta.json. Learn which rules apply to framework, engine and experimental entries, and how each is ranked."
 weight: 5
 ---
 

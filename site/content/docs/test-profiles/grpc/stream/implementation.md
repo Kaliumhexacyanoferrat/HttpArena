@@ -1,5 +1,7 @@
 ---
 title: Implementation Guidelines
+seo_title: "Server-Streaming gRPC Benchmark — Implementation Guide"
+description: "Endpoint contract, request and response shapes, and the anti-cheat constraints a framework must satisfy for the server-streaming gRPC benchmark."
 ---
 {{< type-rules standard="Must use the framework's standard gRPC server implementation. No bypassing of protobuf serialization or HTTP/2 framing." tuned="May tune HTTP/2 frame sizes, flow-control window sizes, and server concurrency limits beyond defaults." engine="No specific rules. Ranked separately from frameworks." >}}
 

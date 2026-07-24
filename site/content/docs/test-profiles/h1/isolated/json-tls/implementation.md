@@ -1,5 +1,7 @@
 ---
 title: Implementation Guidelines
+seo_title: "JSON over TLS Benchmark — Implementation Guide"
+description: "Endpoint contract, request and response shapes, and the anti-cheat constraints a framework must satisfy for the JSON over TLS benchmark."
 ---
 {{< type-rules standard="Must use the framework standard JSON serialization and a standard TLS stack (OpenSSL, BoringSSL, rustls, SChannel, JDK JSSE, etc.). No pre-serialized caches, no bypassing the framework response pipeline, no TLS session-ticket shortcuts that skip real handshakes." tuned="May use alternative JSON libraries, tuned TLS providers, and framework-specific optimizations. The JSON body must still be serialized per request from live data - pre-computed / pre-serialized response caches are not allowed on either type; they short-circuit the serialization workload the profile exists to measure." engine="No specific rules." >}}
 

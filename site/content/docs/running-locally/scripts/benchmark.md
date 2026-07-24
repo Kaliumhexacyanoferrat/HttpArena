@@ -1,5 +1,7 @@
 ---
 title: benchmark.sh
+seo_title: "benchmark.sh — Full Benchmark Driver"
+description: "The full-fidelity driver: runs a framework across every profile it subscribes to, tunes the host, collects metrics and saves results."
 weight: 3
 ---
 

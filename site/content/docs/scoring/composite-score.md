@@ -1,5 +1,7 @@
 ---
 title: Composite Score
+seo_title: "Composite Score Methodology"
+description: "The composite score explained: per-profile normalization, the sum across scored profiles, the compression adjustment and the memory bonus."
 ---
 
 The composite score combines results from multiple test profiles into a single number that reflects overall framework performance. Each profile is normalized to a 0–100 scale, then **summed** across all scored profiles. An optional memory toggle adds a 0–50 bonus per profile for memory-efficient frameworks on top of their raw-throughput score.
