@@ -80,6 +80,7 @@ CATALOG = [
     ("WebSocket", [
         ("echo-ws",          "Echo",           "WebSocket echo throughput.",         [512,4096,16384],[512,4096,16384],True,True),
         ("echo-ws-pipeline", "Echo Pipelined", "Batched WebSocket echo.",            [512,4096,16384],[512,4096,16384],True,True),
+        ("echo-ws-limited",  "Echo Short-lived","WebSocket echo, 10 messages per connection.", [512,4096],[512,4096],True,True),
     ]),
 ]
 
@@ -119,7 +120,39 @@ PROFILE_DOC = {
     "production-stack": "test-profiles/gateway/production-stack/implementation",
     "echo-ws":          "test-profiles/ws/echo/implementation",
     "echo-ws-pipeline": "test-profiles/ws/echo-pipeline/implementation",
+    "echo-ws-limited":  "test-profiles/ws/echo-limited/implementation",
 }
+
+
+RESULTS: dict[str, list] = {}
+
+
+def load_results():
+    """Index site/data/results/*.json as {"<profile>-<conns>": [row, ...]}.
+
+    Results used to live in one array per profile-conns, which meant every
+    framework's PR wrote the same files and collided (#751). They are now one
+    file per framework; this rebuilds the per-profile view the rest of the
+    generator expects.
+
+    Rows are sorted by framework name because that is the order the flat files
+    were written in, and the emitted data.js must not churn.
+    """
+    idx: dict[str, list] = {}
+    rdir = DATA / "results"
+    if not rdir.is_dir():
+        return idx
+    for f in sorted(rdir.glob("*.json")):
+        try:
+            entry = json.loads(f.read_text(encoding="utf-8"))
+        except Exception as e:
+            print(f"[warn] {f.name}: {e}")
+            continue
+        for key, row in (entry.get("results") or {}).items():
+            idx.setdefault(key, []).append(row)
+    for key in idx:
+        idx[key].sort(key=lambda r: (r.get("framework") or "").lower())
+    return idx
 
 
 def load(name):
@@ -774,6 +807,8 @@ def write_sitemap(content):
 
 
 def main():
+    global RESULTS
+    RESULTS = load_results()
     frameworks = load("frameworks.json") or {}
     langcolors = load("langcolors.json") or {}
     current = load("current.json") or {}
@@ -793,7 +828,7 @@ def main():
         for pid, label, blurb, explorer, scored, s, es in entries:
             present = []
             for c in explorer:
-                rows = load(f"{pid}-{c}.json")
+                rows = RESULTS.get(f"{pid}-{c}")
                 if not rows:
                     continue
                 trimmed = []

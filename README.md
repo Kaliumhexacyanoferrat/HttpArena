@@ -8,7 +8,7 @@ Hi, thank you for visiting or contributing to our project, we are always looking
 
 HTTP framework benchmark platform.
 
-28 test profiles. 64-core dedicated hardware. Same conditions for every framework.
+29 test profiles. 64-core dedicated hardware. Same conditions for every framework.
 
 [View Leaderboard](https://www.http-arena.com/) | [Documentation](https://www.http-arena.com/#doc=) | [Add a Framework](https://www.http-arena.com/#doc=add-framework)
 
@@ -18,12 +18,21 @@ HTTP framework benchmark platform.
 
 | Command | Description |
 |---------|-------------|
-| `/benchmark -f <framework>` | Run all benchmark tests |
-| `/benchmark -f <framework> -t <test>` | Run a specific test |
-| `/benchmark -f <framework> --save` | Run and save results (updates leaderboard on merge) |
-| `/benchmark -f <framework> -t <test> --save` | Run specific test and save results |
+| `/benchmark -f <framework>` | Run every test the framework subscribes to |
+| `/benchmark -f <framework> -t <test>` | Run one test only |
+| `/benchmark -f <framework> --save` | Run and save results (updates the leaderboard on merge) |
+| `/benchmark -f <framework> -t <test> --save` | Run one test and save results |
+| `/benchmark -f <framework> --compare <other>` | Measure the deltas against another framework instead of this one |
 
-Always specify `-f <framework>`. Results are automatically compared against the current leaderboard.
+Always specify `-f <framework>`; the flags combine in any order. Results come back as a comment with a per-profile table of RPS, p99, CPU and memory.
+
+**What the deltas are measured against.** By default, this framework's own results published on `main` - answering *"did this change help?"*. When you are tuning a variant or a successor entry, `--compare` re-bases them on another entry instead:
+
+```
+/benchmark -f genhttp-11 --compare genhttp
+```
+
+The reply states which baseline it used, and profiles the other framework does not run show `n/a` rather than a delta.
 
 ---
 
@@ -41,7 +50,7 @@ Always specify `-f <framework>`. Results are automatically compared against the 
 | gRPC | `unary-grpc`, `unary-grpc-tls`, `stream-grpc`, `stream-grpc-tls` | Unary and server-streaming gRPC over plaintext HTTP/2 and TLS |
 | Gateway | `gateway-64`, `gateway-h3` | Reverse proxy + server stack over HTTP/2 and HTTP/3 with mixed workload |
 | Production Stack | `production-stack` | Four-service architecture: edge + Redis + JWT auth sidecar + server, 10K-item cache-aside, concurrent reads + writes |
-| WebSocket | `echo-ws` | WebSocket echo throughput across connection counts |
+| WebSocket | `echo-ws`, `echo-ws-pipeline`, `echo-ws-limited` | Echo throughput across connection counts; 16x batched echo; echo with each connection closed after 10 messages (upgrade-handshake cost) |
 
 ## Run Locally
 
