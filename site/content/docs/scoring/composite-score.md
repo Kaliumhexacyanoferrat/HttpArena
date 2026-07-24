@@ -53,7 +53,6 @@ Not all profiles count toward the composite score. Profiles marked as **scored**
 | Async DB | Yes | Async Postgres query with connection pooling |
 | CRUD | Yes | Realistic REST API against Postgres: cached reads (75%), updates (15%), list (5%), upsert create (5%). Cache-aside with 200ms TTL (in-process or Redis sidecar) |
 | Fortunes | No (*) | DB query + HTML template render. Reference-only - engine-comparison test, not part of the composite ranking |
-| TCP Frag | No (*) | Baseline with MTU 69 - TCP fragmentation stress |
 
 ### H/1.1 Workload
 
@@ -92,14 +91,17 @@ Not all profiles count toward the composite score. Profiles marked as **scored**
 |---|---|---|
 | Unary | Yes | gRPC unary call over cleartext HTTP/2 |
 | Unary TLS | Yes | gRPC unary call over TLS |
+| Stream | Yes | Server-streaming gRPC over cleartext HTTP/2 |
+| Stream TLS | Yes | Server-streaming gRPC over TLS |
 
 ### WebSocket
 
 | Profile | Scored | Workload |
 |---|---|---|
 | Echo | Yes | WebSocket echo throughput |
+| Echo Pipelined | Yes | Batched WebSocket echo throughput |
 
-TCP Frag and Noisy are reference-only - shown for comparison but not counted in the composite score.
+Fortunes is the only reference-only profile - shown for comparison but not counted in the composite score.
 
 ## Memory efficiency bonus
 
