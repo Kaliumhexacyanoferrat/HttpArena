@@ -16,7 +16,6 @@
     "json-tls",
     "upload",
     "static",
-    "static-tls",
     "static-h2",
     "baseline-h2",
     "async-db"
