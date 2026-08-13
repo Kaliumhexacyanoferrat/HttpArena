@@ -16,7 +16,6 @@
     "json-tls",
     "upload",
     "static",
-    "static-tls",
     "async-db",
     "crud",
     "api-4",
