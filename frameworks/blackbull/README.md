@@ -117,3 +117,4 @@ exercise.
 `BB_ACCESS_LOG=0` is set by `app.py` to match the peer benchmark
 convention — every peer in the HttpArena framework set disables
 access logging during benchmark runs.
+

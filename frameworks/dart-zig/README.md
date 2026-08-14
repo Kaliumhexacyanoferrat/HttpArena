@@ -43,3 +43,4 @@ That keeps the source-of-truth split clean:
 `dart-zig` uses Linux `io_uring`. Containers must be started with Docker
 seccomp relaxed enough to allow `io_uring`. HttpArena already handles this for
 frameworks with `"engine": "io_uring"`.
+

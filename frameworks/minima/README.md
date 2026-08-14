@@ -30,3 +30,4 @@ For `json`, each item's static JSON is precomputed from the mounted
 io_uring needs `seccomp=unconfined` (harness-provided; `engine: "io_uring"` makes
 validate.sh enable it). `MINIMA_PORT` / `MINIMA_REACTORS` / `MINIMA_DATASET`
 override for local runs.
+

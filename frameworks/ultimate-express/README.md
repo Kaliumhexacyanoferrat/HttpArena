@@ -28,3 +28,4 @@ Tuned mode: compression is negotiated by hand per request (gzip level 1, brotli 
 without Accept-Encoding). Static files are read from disk on every request, per the arena rules:
 only the list of names, existing pre-compressed variants and content types is scanned at startup.
 Routes with a parameter are handed to the µWS router rather than matched in JavaScript.
+

@@ -23,3 +23,4 @@ Echo v4 on the Go `net/http` server, default configuration.
 - Routing and path parameters through the Echo router, JSON through `c.JSON`
 - Compression through the Echo `Gzip` middleware
 - Banner and port log disabled, no other middleware installed
+

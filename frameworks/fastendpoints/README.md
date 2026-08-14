@@ -43,3 +43,4 @@
 - JSON responses use source-generated `JsonSerializerContext` (`AppJsonContext`) inserted into the FastEndpoints serializer options; request DTOs fall back to the default reflection resolver
 - Postgres pooled via `Npgsql.NpgsqlDataSource` built once at startup from `DATABASE_URL`
 - Source split: `Program.cs` (startup + Kestrel), `Endpoints/` (FastEndpoints endpoint classes), `Services/` + `Types/` (framework-agnostic application layer, copied verbatim from the aspnet-minimal entry — no ASP.NET or FastEndpoints dependencies)
+

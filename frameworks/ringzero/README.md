@@ -23,3 +23,4 @@ Custom C HTTP server built on Linux's `io_uring` interface. Uses a multi-reactor
 - Manual HTTP parsing with `memmem`/`memchr` — no framework overhead
 - Chunked Transfer-Encoding decoded inline
 - Worker count configurable via CLI argument (default 64)
+

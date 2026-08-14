@@ -30,3 +30,4 @@ Quarkus with RESTEasy Reactive on Vert.x/Netty, JDK 21, optimized JVM tuning.
 - JVM tuning: `-XX:+UseParallelGC`, `-XX:+UseNUMA`
 - Quarkus metrics, headers, and websocket disabled for minimal overhead
 - `ConcurrentHashMap` for static file cache
+

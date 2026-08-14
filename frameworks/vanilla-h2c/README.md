@@ -46,3 +46,4 @@ multiplexing over cleartext TCP).
 TLS-terminated h2 (`baseline-h2`, `static-h2`) is out of scope: vanilla's TLS
 layer advertises only `http/1.1` via ALPN today, so this entry ships the
 cleartext h2c profiles only.
+

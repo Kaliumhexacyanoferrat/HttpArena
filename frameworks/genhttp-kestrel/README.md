@@ -27,3 +27,4 @@ Lightweight embeddable C# web server using the GenHTTP library on the Kestrel en
 - Implemented via web services and a layout router
 - Compression and routing modules
 - Self-contained single-file deployment
+

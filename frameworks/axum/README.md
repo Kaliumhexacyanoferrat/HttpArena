@@ -24,3 +24,4 @@ Axum 0.8 on hyper with the multi-threaded Tokio runtime, default configuration.
 - JSON through the `Json` response, serialized by serde per request
 - Compression through the tower-http `CompressionLayer`
 - The dataset is leaked once at startup so responses borrow it instead of cloning
+

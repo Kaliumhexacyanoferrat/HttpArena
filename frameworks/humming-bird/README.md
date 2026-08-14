@@ -15,3 +15,4 @@
 - SQLite via [SQLite.swift](https://github.com/stephencelis/SQLite.swift) for the `/db` endpoint
 - Pre-cached JSON responses for `/json` and `/compression` endpoints
 - Static files loaded into memory at startup
+

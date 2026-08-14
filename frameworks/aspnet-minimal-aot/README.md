@@ -33,3 +33,4 @@ Minimal ASP.NET Core Native AOT HTTP server using .NET 10 with Kestrel and minim
 - HTTP/2 tuned: 256 max streams, 2 MB connection window
 - Server GC and Native AOT optimization preference set for throughput
 - Docker build stage installs `clang` and `zlib1g-dev`, which are required for Linux Native AOT publish
+

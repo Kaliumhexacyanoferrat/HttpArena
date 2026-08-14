@@ -29,3 +29,4 @@ one engine, two protocols on the same connection.
 ## Tests
 
 `echo-ws`, `echo-ws-pipeline` (512 / 4096 / 16384-byte payloads).
+

@@ -39,3 +39,4 @@ gRPC are omitted (those Seagreen modules are not ported yet).
   the database-backed endpoints degrade gracefully (empty results / `404`).
 - The image clones Seagreen from `main` (public repo `dotnet-web-stack/Seagreen`), so that branch
   must contain the current engine (including the `workers()` API and the multi-worker spawn fix).
+

@@ -23,3 +23,4 @@ per-request reflection.
 > DB profiles (`async-db`) are not subscribed: picoev is a single-threaded
 > event loop and the stdlib `db.pg` driver is blocking, so a query would stall
 > the loop. A non-blocking PG path would be needed to add them.
+

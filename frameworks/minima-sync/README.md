@@ -32,3 +32,4 @@ the core on a slow handler — for maximum throughput on the CPU-only profiles.
 
 io_uring needs `seccomp=unconfined` (harness-provided; `engine: "io_uring"`).
 `MINIMA_PORT` / `MINIMA_REACTORS` / `MINIMA_DATASET` override for local runs.
+

@@ -30,3 +30,4 @@ Ergonomic Bun-native TypeScript framework running a multi-process cluster behind
 - Postgres pooled via `pg` (node-postgres), sized `DATABASE_MAX_CONN / workers` per worker so the cluster total matches the server's `max_connections`
 - `/async-db` handler catches exceptions and returns an empty payload — `error:` callback style would mask the 500 status code
 - `alwaysStatic: false` on `staticPlugin` avoids Bun's pre-buffered static route path which crashes on `Bun.file()` streams under `NODE_ENV=production`
+

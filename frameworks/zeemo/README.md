@@ -48,3 +48,4 @@ zig test src/handlers.zig
 `scripts/local-validate.sh` runs the HttpArena validation suite (17 checks
 covering baseline, anti-cheat, TCP fragmentation, and JSON) against a
 local container.
+

@@ -28,3 +28,4 @@
 ## Known limitation
 
 libreactor's HTTP server keeps connections open unconditionally — it ignores the `Connection` request header and the only teardown API (`server_disconnect` → `stream_close`) is abortive. That makes the TCP-fragmentation validation checks in `scripts/validate.sh` (which send `Connection: close` and then `recv` until EOF) time out waiting for a close that never comes. Plain `curl`-driven checks are fine because curl uses `Content-Length`. Fixing this cleanly needs a write-completion hook in libreactor's `stream_t`, which isn't exposed in the public API.
+

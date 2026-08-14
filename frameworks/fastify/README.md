@@ -30,3 +30,4 @@ Fastify 5 on node's own HTTP server, with the cluster module for multi-core scal
   through, since the two POST endpoints only count or sum what arrives.
 - Logging is off and responses are plain strings and Buffers with the content type set by hand,
   so no serializer or schema machinery runs per request.
+

@@ -19,3 +19,4 @@ compiled ahead of time to bytecode that the VM runs.
 The typev VM itself (binary + FFI plugins) is not vendored here — the Dockerfile
 fetches it from object storage at build time. Only the compiled benchmark and
 its source live in this directory.
+

@@ -27,3 +27,4 @@ h2o web server with mruby scripting handlers and native HTTP/3 (QUIC) support vi
 - Config generated dynamically by `entrypoint.sh`
 - Large dataset pre-processed via jq at startup
 - TLS cert/key detection for HTTPS listeners
+

@@ -24,3 +24,4 @@ NestJS 11 on the Express platform adapter, default configuration.
 - Compression through the `compression` middleware, as the Nest docs recommend
 - Body parsers are off and the POST endpoints read the raw stream, since they only sum or count what arrives
 - The cluster module is used for multi-core scaling, one worker per available CPU
+

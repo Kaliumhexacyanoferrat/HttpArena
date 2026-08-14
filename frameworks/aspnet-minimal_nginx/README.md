@@ -88,3 +88,4 @@ Empirically tuned for this entry:
 - Routes behind `/api/*` are only registered when `REDIS_URL` is set (guarded by `if (!string.IsNullOrWhiteSpace(redisUrl))`) — otherwise ASP.NET's endpoint builder fails to resolve `HybridCache` as a DI dependency and every route returns 500
 - Postgres runs on tmpfs (`--tmpfs /var/lib/postgresql/data`) for write performance
 - Shares `Handlers.cs`, `AppData.cs`, `Models.cs` from `aspnet-minimal/` via Dockerfile COPY
+

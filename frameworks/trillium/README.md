@@ -55,3 +55,4 @@ gRPC shares these listeners: `unary-grpc` / `stream-grpc` run over h2c prior-kno
 - Dataset (`/data/dataset.json`) is loaded once at startup; per-request totals are computed and the response is serialized fresh each request.
 - The CRUD cache is in-process (`DashMap`, 200 ms TTL).
 - The async-db handler returns `{"items":[],"count":0}` and logs a warning if the pool is unavailable, per the implementation guidelines.
+

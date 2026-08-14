@@ -29,3 +29,4 @@ Actix-web 4 HTTP server with rustls for TLS/HTTP/2 support, compiled with thin L
 - Backlog set to 4096 for connection queuing
 - Static files preloaded into memory at startup
 - Gzip compression level 1
+

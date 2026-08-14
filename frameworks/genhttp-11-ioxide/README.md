@@ -39,3 +39,4 @@ This entry targets **.NET 11** (`net11.0`), matching the GenHTTP ioxide packages
 references. Requires the .NET 11 SDK with Roslyn 5.3+ (GenHTTP's `MemoryView` source generator
 references `Microsoft.CodeAnalysis 5.3`); the `mcr.microsoft.com/dotnet/sdk:11.0.100-preview.5`
 image used by the Dockerfile provides both.
+

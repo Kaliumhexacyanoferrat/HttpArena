@@ -35,3 +35,4 @@ Ultra-high-performance custom HTTP server for .NET 10 — built from scratch for
 - Postgres pooled via `Npgsql.NpgsqlDataSource` with multiplexing, built once at startup from `DATABASE_URL`
 - WebSocket endpoint at `/ws` handles text, binary, and ping/pong frames; non-upgrade requests to `/ws` return 400
 - Source split: `Program.cs` (startup + routing), `Models.cs` (DTOs + JSON context), `Tests/` (one file per test profile)
+

@@ -21,3 +21,4 @@ fragmented-read reassembly (requests split across `recv`s).
 | `GET /pipeline` | `text/plain` — `ok` |
 
 `PORT` overrides the listen port for local testing (defaults to 8080).
+

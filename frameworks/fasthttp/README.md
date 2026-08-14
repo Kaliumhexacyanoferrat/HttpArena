@@ -45,3 +45,4 @@ connection, so it is not used).
 
 JSON responses are built in a single allocation (precomputed prefixes written
 directly into the connection buffer) with no per-request reflection.
+

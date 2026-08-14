@@ -24,3 +24,4 @@ Django 6.1 as an ASGI application on Uvicorn.
 - URLconf routing with the `int` path converter, async views returning `HttpResponse` / `JsonResponse`
 - Compression through `django.middleware.gzip.GZipMiddleware`
 - ASGI and not WSGI because the WSGI request drops `Transfer-Encoding: chunked` bodies, which the baseline profile sends
+

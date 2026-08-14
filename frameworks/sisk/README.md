@@ -26,3 +26,4 @@ Sisk is a lightweight, agnostic, simple, and robust web development framework.
 ## Notes
 
 - Self-contained single-file deployment
+

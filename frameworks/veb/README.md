@@ -41,3 +41,4 @@ two requests to different worker threads) and are `RwMutex`-guarded.
 
 JSON is serialized manually (precomputed prefixes + `strings.Builder`) to avoid
 per-request reflection.
+

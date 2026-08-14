@@ -53,3 +53,4 @@ covers all three ports.
 The PgPool is a Rust-side `OnceLock<sqlx::PgPool>` — not per-Python-
 interpreter. All sub-interp workers reach the same pool via the global,
 so a 16-interp deployment doesn't multiply connection count.
+

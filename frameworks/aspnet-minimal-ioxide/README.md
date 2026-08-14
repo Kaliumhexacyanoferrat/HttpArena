@@ -42,3 +42,4 @@ Minimal ASP.NET Core HTTP server using .NET 11 with Kestrel on the **ioxide io_u
 - Source split: `Program.cs` (startup + Kestrel), `Handlers.cs` (routes + JSON ctx), `AppData.cs` (dataset + pg pool), `Models.cs` (DTOs)
 - **Transport:** `builder.WebHost.UseIoxide()` swaps Kestrel's default sockets transport for the ioxide io_uring transport (one io_uring ring per reactor thread, request loop pinned to the reactor). `ioxide.Kestrel` resolves from nuget.org; until 0.0.13 is published there, `nuget.config` adds a local feed.
 - **Reactor count:** default = `Environment.ProcessorCount` **per bound listener**. This app binds multiple listeners (h1, h2c, and TLS h1/h2/h3 when certs are present), so the total ring count is `listeners × ProcessorCount`. If that's too many io_uring rings for your box, set `UseIoxide(o => o.ReactorCount = N)`.
+

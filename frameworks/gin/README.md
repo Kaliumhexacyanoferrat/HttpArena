@@ -23,3 +23,4 @@ Gin web framework on the Go `net/http` server, default configuration.
 - Routing and path parameters through the Gin router, JSON through `c.JSON`
 - Compression through the `gin-contrib/gzip` middleware
 - Release mode, only the Recovery middleware is installed
+

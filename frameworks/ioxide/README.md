@@ -27,3 +27,4 @@ pipelining, fragmented reads) is hand-written on the raw recv/send API - no HTTP
 - `IOXIDE_DATASET` (/data/dataset.json), `IOXIDE_STATIC` (/data/static)
 - `DATABASE_URL`, `DATABASE_MAX_CONN` (Postgres; pool per reactor = max_conn / reactors, clamped 1..8)
 - `REDIS_URL` (crud cache-aside sidecar)
+

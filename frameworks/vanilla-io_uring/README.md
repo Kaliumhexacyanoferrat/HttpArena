@@ -36,3 +36,4 @@ backend. The harness runs it with `--security-opt seccomp=unconfined` and
 
 > HTTP/2, HTTP/3 and gRPC profiles need protocol support vanilla doesn't have
 > yet — tracked in [enghitalo/vanilla#18](https://github.com/enghitalo/vanilla/issues/18).
+

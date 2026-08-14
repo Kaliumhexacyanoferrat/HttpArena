@@ -22,3 +22,4 @@ bodies, keep-alive, request pipelining, and fragmented-read reassembly.
 io_uring requires `seccomp=unconfined` under Docker (the harness sets this;
 `engine: "io_uring"` makes validate.sh enable it). `PORT` overrides the listen
 port for local testing.
+

@@ -38,3 +38,4 @@ Minimal ASP.NET Core HTTP server using .NET 10 with Kestrel and minimal API rout
 - JSON responses use source-generated `JsonSerializerContext` (`AppJsonContext`) so the hot path avoids reflection
 - Postgres pooled via `Npgsql.NpgsqlDataSource` built once at startup from `DATABASE_URL`
 - Source split: `Program.cs` (startup + Kestrel + routes), `Handlers.cs` (HTTP adapters), `Services/` (framework-agnostic application logic: dataset, Postgres/Redis connections, item queries, fortunes), `Types/` (DTOs + JSON serializer context). `Services/` and `Types/` have no ASP.NET dependencies and can be copied as-is into other framework integrations.
+

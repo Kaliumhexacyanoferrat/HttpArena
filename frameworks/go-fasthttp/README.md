@@ -27,3 +27,4 @@ High-performance Go HTTP server using fasthttp with zero-allocation design and b
 - Compression via `compress/flate` (level 1)
 - Zero-copy query parameter iteration with `VisitAll`
 - Baseline11 is the default route handler
+

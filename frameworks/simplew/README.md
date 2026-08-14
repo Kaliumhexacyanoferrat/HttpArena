@@ -29,3 +29,4 @@ SimpleW is Modern Web Server for .NET. Designed for Simplicity. Built for Speed.
 
 - Plain HTTP listens on `8080`.
 - If `/certs/server.crt` and `/certs/server.key` are mounted, HTTPS for `json-tls` listens on `8081`.
+

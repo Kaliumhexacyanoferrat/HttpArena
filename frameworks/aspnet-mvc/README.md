@@ -37,3 +37,4 @@ ASP.NET Core HTTP server using .NET 10 with Kestrel and MVC controller routing.
 - Postgres pooled via `Npgsql.NpgsqlDataSource` built once at startup from `DATABASE_URL`; optional Redis cache from `REDIS_URL` for the crud profile
 - `/fortunes` renders through the standard MVC pipeline: `FortunesController` returns a `View()` backed by `Views/Fortunes/Index.cshtml`
 - Source split: `Program.cs` (startup + Kestrel), `TestController.cs` / `CrudController.cs` / `FortunesController.cs` (HTTP adapters), `Services/` + `Types/` (framework-agnostic application layer shared with the other C# entries — no ASP.NET dependencies)
+
