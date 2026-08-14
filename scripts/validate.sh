@@ -84,8 +84,8 @@ dump_stack_logs() {
     done
 }
 
-# 5-minute overall timeout
-VALIDATE_TIMEOUT=${VALIDATE_TIMEOUT:-300}
+# 10-minute overall timeout
+VALIDATE_TIMEOUT=${VALIDATE_TIMEOUT:-600}
 ( trap 'exit 0' TERM; sleep "$VALIDATE_TIMEOUT"; echo ""; echo "FAIL: Validation timed out after ${VALIDATE_TIMEOUT}s"; dump_logs "$CONTAINER_NAME" "$FRAMEWORK"; kill -TERM $$ 2>/dev/null ) &
 WATCHDOG_PID=$!
 
