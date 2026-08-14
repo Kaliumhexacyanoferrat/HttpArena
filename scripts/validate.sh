@@ -1775,7 +1775,7 @@ _validate_gateway() {
     if [ -f "$compose_file" ]; then
         echo "[gateway] Building and starting compose stack..."
         CERTS_DIR="$CERTS_DIR" DATA_DIR="$DATA_DIR" DATABASE_URL="postgres://bench:bench@localhost:5432/benchmark" \
-            docker compose -f "$compose_file" -p "$gw_project" up --build -d || { echo "FAIL: gateway compose up"; dump_stack_logs "$gw_project"; FAIL=$((FAIL + 1)); return; }
+            docker compose -f "$compose_file" -f "$SCRIPT_DIR/lib/compose-overrides/no-cpuset.gateway.yml" -p "$gw_project" up --build -d || { echo "FAIL: gateway compose up"; dump_stack_logs "$gw_project"; FAIL=$((FAIL + 1)); return; }
     else
         echo "  FAIL [$profile]: compose file not found at $compose_file"
         FAIL=$((FAIL + 1))
@@ -1959,7 +1959,7 @@ _validate_production_stack() {
     if [ -f "$compose_file" ]; then
         echo "[$profile] Building and starting compose stack..."
         CERTS_DIR="$CERTS_DIR" DATA_DIR="$DATA_DIR" DATABASE_URL="postgres://bench:bench@localhost:5432/benchmark" \
-            docker compose -f "$compose_file" -p "$gw_project" up --build -d || { echo "FAIL: $profile compose up"; dump_stack_logs "$gw_project"; FAIL=$((FAIL + 1)); return; }
+            docker compose -f "$compose_file" -f "$SCRIPT_DIR/lib/compose-overrides/no-cpuset.production-stack.yml" -p "$gw_project" up --build -d || { echo "FAIL: $profile compose up"; dump_stack_logs "$gw_project"; FAIL=$((FAIL + 1)); return; }
     else
         echo "  FAIL [$profile]: compose file not found at $compose_file"
         FAIL=$((FAIL + 1))

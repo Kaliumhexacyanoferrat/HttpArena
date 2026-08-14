@@ -1,0 +1,16 @@
+# Applied on top of every frameworks/*/compose.production-stack.yml during
+# validate.sh. Those files pin "edge", "cache", "authsvc" and "server" to
+# disjoint cpuset ranges sized for a 96+-core benchmark host — meaningless,
+# and often invalid, on a small CI runner. Validation only checks
+# correctness, not throughput, so blanking cpuset here (Compose then omits
+# --cpuset-cpus entirely) lets all services share whatever cores the
+# runner actually has.
+services:
+  edge:
+    cpuset: ""
+  cache:
+    cpuset: ""
+  authsvc:
+    cpuset: ""
+  server:
+    cpuset: ""

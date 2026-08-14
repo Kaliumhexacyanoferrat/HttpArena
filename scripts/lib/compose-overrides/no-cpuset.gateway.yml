@@ -1,0 +1,12 @@
+# Applied on top of every frameworks/*/compose.gateway.yml and
+# compose.gateway-h3.yml during validate.sh. Those files pin "proxy" and
+# "server" to disjoint cpuset ranges sized for a 96+-core benchmark host
+# (e.g. cpuset: "20-31,84-95") — meaningless, and often invalid, on a
+# small CI runner. Validation only checks correctness, not throughput, so
+# blanking cpuset here (Compose then omits --cpuset-cpus entirely) lets
+# both services share whatever cores the runner actually has.
+services:
+  proxy:
+    cpuset: ""
+  server:
+    cpuset: ""
