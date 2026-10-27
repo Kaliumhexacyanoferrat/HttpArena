@@ -6,6 +6,11 @@ import org.genhttp.api.infrastructure.CertificateProvider
 import org.genhttp.engine.netty.Host
 import org.genhttp.modules.compression.compression
 
+import org.genhttp.engine.netty.EngineOptions
+import org.genhttp.engine.netty.EventLoopOptions
+import org.genhttp.engine.netty.TcpTransportOptions
+import org.genhttp.engine.netty.Transport
+
 import org.slf4j.helpers.NOPLoggerFactory
 
 import java.io.File
