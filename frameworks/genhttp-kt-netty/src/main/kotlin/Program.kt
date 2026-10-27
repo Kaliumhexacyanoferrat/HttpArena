@@ -19,7 +19,14 @@ suspend fun main() {
 
     val app = Project.create()
 
-    val host = Host.create()
+    val cpuCount = Runtime.getRuntime().availableProcessors()
+
+    val options = EngineOptions(
+      eventLoop = EventLoopOptions(count = cpuCount, transport = Transport.IoUring),
+      tcp = TcpTransportOptions(idleTimeout = 30.seconds, sendTimeout = 30.seconds)
+    )
+
+    val host = Host.create(options = options)
         .handler(app)
         .compression()
         .logging(NOPLoggerFactory(), false)
