@@ -11,6 +11,8 @@ import org.genhttp.engine.netty.EventLoopOptions
 import org.genhttp.engine.netty.TcpTransportOptions
 import org.genhttp.engine.netty.Transport
 
+import kotlin.time.Duration.Companion.seconds
+
 import org.slf4j.helpers.NOPLoggerFactory
 
 import java.io.File
